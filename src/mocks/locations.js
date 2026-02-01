@@ -1,0 +1,52 @@
+export const MOCK_LOCATIONS = [
+    {
+        id: '1',
+        title: 'Cafe Camelot',
+        description: 'Historic cafe in the heart of Krakow with a vintage atmosphere.',
+        address: 'Świętego Tomasza 17, 31-022 Kraków',
+        coordinates: { lat: 50.0619, lng: 19.9368 },
+        category: 'Cafe',
+        image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=1000&auto=format&fit=crop',
+        rating: 4.8,
+        tags: ['Vintage', 'Coffee', 'Cakes'],
+        openingHours: '09:00 - 23:00'
+    },
+    {
+        id: '2',
+        title: 'Hamsa Hummus & Happiness Israeli Restobar',
+        description: 'Modern Israeli cuisine in the heart of Kazimierz.',
+        address: 'Szeroka 2, 31-053 Kraków',
+        coordinates: { lat: 50.0516, lng: 19.9486 },
+        category: 'Restaurant',
+        image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000&auto=format&fit=crop',
+        rating: 4.6,
+        tags: ['Israeli', 'Vegan Friendly', 'Hummus'],
+        openingHours: '10:00 - 22:00'
+    },
+    {
+        id: '3',
+        title: 'Szara Gęś',
+        description: 'Fine dining experience on the Main Square.',
+        address: 'Rynek Główny 17, 31-008 Kraków',
+        coordinates: { lat: 50.0608, lng: 19.9376 },
+        category: 'Fine Dining',
+        image: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1000&auto=format&fit=crop',
+        rating: 4.9,
+        tags: ['Luxury', 'View', 'Polish'],
+        openingHours: '12:00 - 23:00'
+    },
+    {
+        id: '4',
+        title: 'Forum Przestrzenie',
+        description: 'Trendy spot in a former hotel building by the river.',
+        address: 'Marii Konopnickiej 28, 30-302 Kraków',
+        coordinates: { lat: 50.0463, lng: 19.9358 },
+        category: 'Bar',
+        image: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1000&auto=format&fit=crop',
+        rating: 4.5,
+        tags: ['Hipster', 'River View', 'Pizza'],
+        openingHours: '10:00 - 02:00'
+    }
+];
+
+export const MOCK_CATEGORIES = ['All', 'Cafe', 'Restaurant', 'Bar', 'Fine Dining', 'Breakfast'];
