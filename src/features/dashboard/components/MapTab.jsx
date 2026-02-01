@@ -45,7 +45,7 @@ const LocationController = ({ userPos, trigger }) => {
 
 const MapTab = ({ activeFilter = 'All' }) => {
     const { theme } = useTheme()
-    const { locations } = useLocationsStore()
+    const { locations, filteredLocations: storeFiltered } = useLocationsStore()
     const [userPos, setUserPos] = React.useState(null)
     const [locateTrigger, setLocateTrigger] = React.useState(0)
 
@@ -83,10 +83,10 @@ const MapTab = ({ activeFilter = 'All' }) => {
     const lightTiles = "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
     const darkTiles = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
 
-    // Apply Filter
-    const filteredLocations = activeFilter === 'All'
-        ? locations
-        : locations.filter(loc => loc.category === activeFilter)
+    // Apply Filter (respecting activeFilter prop if provided, else using store)
+    const displayLocations = activeFilter === 'All'
+        ? storeFiltered
+        : storeFiltered.filter(loc => loc.category === activeFilter)
 
     // Pulsing User Marker Icon
     const userIcon = L.divIcon({
@@ -145,40 +145,43 @@ const MapTab = ({ activeFilter = 'All' }) => {
                     </Marker>
                 )}
 
-                {filteredLocations.map((loc) => (
-                    <Marker
-                        key={loc.id}
-                        position={[50.0614 + (Math.random() - 0.5) * 0.04, 19.9366 + (Math.random() - 0.5) * 0.04]}
-                        icon={L.divIcon({
-                            className: 'custom-icon',
-                            html: `<div class="w-8 h-8 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-lg transform hover:scale-110 transition-transform ${loc.category === 'Cafe' ? 'bg-orange-400' :
-                                loc.category === 'Dining' ? 'bg-blue-500' : 'bg-purple-500'
-                                }">
-                                ${loc.category === 'Cafe' ? '☕' : loc.category === 'Dining' ? '🍽️' : '🍸'}
-                            </div>`,
-                            iconSize: [32, 32],
-                            iconAnchor: [16, 16],
-                            popupAnchor: [0, -20]
-                        })}
-                    >
-                        <Popup className="custom-popup" closeButton={false}>
-                            <div className="w-48 p-1">
-                                <div className="h-24 rounded-t-xl overflow-hidden relative mb-2">
-                                    <img src={loc.image} alt={loc.title} className="w-full h-full object-cover" />
-                                    <div className="absolute top-1 right-1 bg-white/90 px-1.5 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1">
-                                        <Star size={8} className="text-yellow-500 fill-yellow-500" /> {loc.rating}
+                {displayLocations.map((loc) => {
+                    if (!loc.coordinates) return null;
+                    return (
+                        <Marker
+                            key={loc.id}
+                            position={[loc.coordinates.lat, loc.coordinates.lng]}
+                            icon={L.divIcon({
+                                className: 'custom-icon',
+                                html: `<div class="w-8 h-8 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-lg transform hover:scale-110 transition-transform ${loc.category === 'Cafe' ? 'bg-orange-400' :
+                                    loc.category === 'Dining' ? 'bg-blue-500' : 'bg-purple-500'
+                                    }">
+                                    ${loc.category === 'Cafe' ? '☕' : loc.category === 'Dining' ? '🍽️' : '🍸'}
+                                </div>`,
+                                iconSize: [32, 32],
+                                iconAnchor: [16, 16],
+                                popupAnchor: [0, -20]
+                            })}
+                        >
+                            <Popup className="custom-popup" closeButton={false}>
+                                <div className="w-48 p-1">
+                                    <div className="h-24 rounded-t-xl overflow-hidden relative mb-2">
+                                        <img src={loc.image} alt={loc.title} className="w-full h-full object-cover" />
+                                        <div className="absolute top-1 right-1 bg-white/90 px-1.5 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1">
+                                            <Star size={8} className="text-yellow-500 fill-yellow-500" /> {loc.rating}
+                                        </div>
                                     </div>
+                                    <h3 className="font-bold text-gray-900 text-sm leading-tight mb-1">{loc.title}</h3>
+                                    <div className="flex justify-between items-center text-[10px] text-gray-500 mb-2">
+                                        <span>{loc.category}</span>
+                                        <span>{loc.price}</span>
+                                    </div>
+                                    <Link to={`/location/${loc.id}`} className="btn btn-xs btn-primary w-full text-white">View</Link>
                                 </div>
-                                <h3 className="font-bold text-gray-900 text-sm leading-tight mb-1">{loc.title}</h3>
-                                <div className="flex justify-between items-center text-[10px] text-gray-500 mb-2">
-                                    <span>{loc.category}</span>
-                                    <span>{loc.price}</span>
-                                </div>
-                                <Link to={`/location/${loc.id}`} className="btn btn-xs btn-primary w-full text-white">View</Link>
-                            </div>
-                        </Popup>
-                    </Marker>
-                ))}
+                            </Popup>
+                        </Marker>
+                    )
+                })}
             </MapContainer>
         </div>
     )

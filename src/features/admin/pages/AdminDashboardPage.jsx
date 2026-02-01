@@ -7,6 +7,7 @@ import {
     ListFilter, ChevronDown, ChevronUp, BarChart3,
     ArrowRight, Upload
 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import LocationHierarchyExplorer from '../components/LocationHierarchyExplorer'
 
@@ -43,6 +44,7 @@ const QuickAction = ({ icon: Icon, label, color, description }) => (
 )
 
 const AdminDashboardPage = () => {
+    const navigate = useNavigate()
     const [isStatsCollapsed, setIsStatsCollapsed] = useState(false)
 
     const stats = [
@@ -65,13 +67,22 @@ const AdminDashboardPage = () => {
                 </div>
 
                 <div className="flex gap-2 w-full sm:w-auto p-1 bg-slate-100/50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/20 dark:border-slate-800/50">
-                    <button className="flex-1 sm:px-6 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-sm active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <button
+                        onClick={() => navigate('/admin/locations?import=true')}
+                        className="flex-1 sm:px-6 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-sm active:scale-95 transition-all flex items-center justify-center gap-2"
+                    >
                         <Upload size={14} /> Импорт
                     </button>
-                    <button className="flex-1 sm:px-6 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-sm active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <button
+                        onClick={() => navigate('/admin/locations?export=true')}
+                        className="flex-1 sm:px-6 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-sm active:scale-95 transition-all flex items-center justify-center gap-2"
+                    >
                         <Download size={14} /> Экспорт
                     </button>
-                    <button className="flex-1 sm:px-8 py-2.5 bg-indigo-600 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-indigo-500/20 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <button
+                        onClick={() => navigate('/admin/locations?create=true')}
+                        className="flex-1 sm:px-8 py-2.5 bg-indigo-600 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-indigo-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+                    >
                         <Plus size={14} /> Создать
                     </button>
                 </div>

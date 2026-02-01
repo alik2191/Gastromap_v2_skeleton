@@ -74,18 +74,33 @@ const FilterModal = ({ isOpen, onClose, theme }) => {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 {/* Type Selection */}
-                                <div className="space-y-4 text-left">
-                                    <label className={`text-[11px] font-semibold uppercase tracking-widest ${isDark ? 'text-white/40' : 'text-gray-400'}`}>Type</label>
-                                    <div className="relative">
-                                        <select className={`w-full h-14 border rounded-2xl px-4 font-medium appearance-none outline-none focus:border-blue-500 transition-colors ${isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
-                                            <option>All Types</option>
-                                            <option>Fine Dining</option>
-                                            <option>Cafe</option>
-                                            <option>Bar</option>
-                                        </select>
-                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                                            <X size={16} className="rotate-45" />
-                                        </div>
+                                <div className="space-y-4 text-left md:col-span-2">
+                                    <label className={`text-[11px] font-semibold uppercase tracking-widest ${isDark ? 'text-white/40' : 'text-gray-400'}`}>Establishment Type</label>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                                        {/* Type blocks */}
+                                        {[
+                                            { id: 'all', label: 'All', icon: '🌎' },
+                                            { id: 'cafe', label: 'Cafe', icon: '☕' },
+                                            { id: 'restaurant', label: 'Restaurant', icon: '🍽️' },
+                                            { id: 'street_food', label: 'Street', icon: '🍕' },
+                                            { id: 'bar', label: 'Bar', icon: '🍸' },
+                                            { id: 'market', label: 'Market', icon: '🛒' },
+                                            { id: 'bakery', label: 'Bakery', icon: '🥐' },
+                                            { id: 'winery', label: 'Winery', icon: '🍷' },
+                                            { id: 'coffee', label: 'Coffee', icon: '☕' },
+                                            { id: 'pastry', label: 'Pastry', icon: '🍰' }
+                                        ].map(type => (
+                                            <button
+                                                key={type.id}
+                                                className={`p-2 rounded-[16px] border transition-all duration-500 group cursor-pointer flex items-center gap-3 ${isDark
+                                                    ? 'bg-white/[0.05] border-white/10 text-white/80 hover:bg-white/[0.1] hover:border-white/20 hover:shadow-lg'
+                                                    : 'bg-white border-gray-100 text-gray-900 shadow-sm hover:shadow-lg hover:border-blue-500/30'
+                                                    }`}
+                                            >
+                                                <span className="text-xl group-hover:scale-110 transition-transform duration-500">{type.icon}</span>
+                                                <span className="text-[11px] font-bold">{type.label}</span>
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
 
@@ -118,18 +133,67 @@ const FilterModal = ({ isOpen, onClose, theme }) => {
                                 </div>
                             </div>
 
-                            {/* Special Features */}
+                            {/* Best Time to Visit */}
                             <div className="space-y-4 text-left">
-                                <label className={`text-[11px] font-semibold uppercase tracking-widest ${isDark ? 'text-white/40' : 'text-gray-400'}`}>Establishment Features</label>
-                                <div className="flex flex-wrap gap-2.5">
+                                <label className={`text-[11px] font-black uppercase tracking-[0.2em] ${isDark ? 'text-white/40' : 'text-gray-400'}`}>Best Time to Visit</label>
+                                <div className="grid grid-cols-2 gap-3">
                                     {[
-                                        'All Day Breakfast', 'Board Games', 'Breakfast Menu', 'Business Lunch',
-                                        'Scenic View', 'Seasonal Menu', 'Specialty Coffee', 'Sports Broadcasts',
-                                        'Pet Friendly', 'Free Wi-Fi', 'Outdoor Seating', 'Live Music'
-                                    ].map(chip => (
-                                        <button key={chip} className={`px-5 py-3 rounded-2xl font-semibold text-[12px] border transition-all ${isDark ? 'bg-white/5 border-white/5 text-white/80 hover:bg-white/10' : 'bg-white border-gray-100 text-gray-600 hover:border-blue-500 hover:text-blue-600'}`}>
-                                            {chip}
+                                        { id: 'morning', label: 'Morning', icon: '🌅' },
+                                        { id: 'day', label: 'Day', icon: '☀️' },
+                                        { id: 'evening', label: 'Evening', icon: '🌙' },
+                                        { id: 'late_night', label: 'Night', icon: '✨' }
+                                    ].map(time => (
+                                        <button
+                                            key={time.id}
+                                            className={`p-2 rounded-[16px] border transition-all duration-500 group cursor-pointer flex items-center gap-3 ${isDark
+                                                ? 'bg-white/[0.05] border-white/10 text-white/80 hover:bg-white/[0.1] hover:border-white/20 hover:shadow-lg'
+                                                : 'bg-white border-gray-100 text-gray-900 shadow-sm hover:shadow-lg hover:border-blue-500/30'
+                                                }`}
+                                        >
+                                            <span className="text-xl group-hover:scale-110 transition-transform duration-500">{time.icon}</span>
+                                            <span className="text-[11px] font-bold">{time.label}</span>
                                         </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Establishment Features (Labels) */}
+                            <div className="space-y-6 text-left">
+                                <label className={`text-[11px] font-black uppercase tracking-[0.2em] ${isDark ? 'text-white/40' : 'text-gray-400'}`}>Special Features & Labels</label>
+
+                                <div className="space-y-6">
+                                    {[
+                                        {
+                                            group: "Cuisine & Menu",
+                                            items: ["Signature Cuisine", "Vegan Menu", "Delicious Desserts", "All Day Breakfast", "Imported Products", "Local Products", "Breakfast Menu", "Lunch Menu", "Fusion"]
+                                        },
+                                        {
+                                            group: "Bar & Drinks",
+                                            items: ["Signature Cocktails", "Wine List", "Guest Shifts", "Wine Tasting", "DJ Sets", "Craft Beer", "Mixology", "Specialty Coffee", "Wide Gin Selection"]
+                                        },
+                                        {
+                                            group: "Atmosphere",
+                                            items: ["Scenic View", "Live Music", "Coworking", "Board Games", "Lively", "Romantic", "Speakeasy", "Happy Hours", "Themed Interior", "Quiet Atmosphere", "Cozy"]
+                                        },
+                                        {
+                                            group: "Amenities & Service",
+                                            items: ["Balconies", "Kids Area", "High Chairs", "Delivery", "Inclusive", "Local Favorite", "Parking", "Pet friendly", "Takeaway", "Courtyard Terrace", "Rooftop Terrace", "WiFi"]
+                                        },
+                                        {
+                                            group: "Awards & Special",
+                                            items: ["Michelin Guide", "Michelin Star", "Hookah", "Late Dinner"]
+                                        }
+                                    ].map(cat => (
+                                        <div key={cat.group} className="space-y-3">
+                                            <h4 className={`text-[9px] font-black uppercase tracking-widest ${isDark ? 'text-white/50' : 'text-gray-300'}`}>{cat.group}</h4>
+                                            <div className="flex flex-wrap gap-2">
+                                                {cat.items.sort().map(chip => (
+                                                    <button key={chip} className={`px-4 py-2 rounded-xl font-bold text-[11px] border transition-all ${isDark ? 'bg-white/5 border-white/5 text-white/70 hover:bg-white/10' : 'bg-gray-50/50 border-gray-100 text-gray-500 hover:border-blue-500/30 hover:text-blue-600'}`}>
+                                                        {chip}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
                                     ))}
                                 </div>
                             </div>

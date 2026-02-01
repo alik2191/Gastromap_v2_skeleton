@@ -9,6 +9,7 @@ import { useTheme } from '@/hooks/useTheme'
 import MapTab from '../components/MapTab'
 import FilterModal from '../components/FilterModal'
 import { PageTransition } from '@/components/ui/PageTransition'
+import { translate } from '@/utils/translation'
 
 // --- MOBILE COMPONENTS ---
 const MarqueeTitle = ({ title, theme }) => {
@@ -70,9 +71,24 @@ const LocationCardMobile = ({ loc, type = 'recommended' }) => {
                     <p className="text-[11px] font-medium text-gray-400 mt-1 line-clamp-1">
                         {loc.subtitle || 'Authentic flavors and vibes'}
                     </p>
-                    <div className="flex gap-2 mt-2">
-                        {['#Asian', '#Fusion', '#Cozy'].map(tag => (
-                            <span key={tag} className="text-[10px] font-bold text-blue-500">{tag}</span>
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                        {/* Best Time Indicator - Subtle Emoji */}
+                        {loc.best_time && loc.best_time.length > 0 && (
+                            <div className="flex items-center gap-1 mr-1">
+                                <span className="text-[10px]" title="Best time to visit">
+                                    {loc.best_time.includes('morning') && '🌅'}
+                                    {loc.best_time.includes('day') && '☀️'}
+                                    {loc.best_time.includes('evening') && '🌙'}
+                                    {loc.best_time.includes('late_night') && '✨'}
+                                </span>
+                            </div>
+                        )}
+
+                        {/* Special Labels - Subtle small chips */}
+                        {loc.special_labels?.slice(0, 2).map(label => (
+                            <span key={label} className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${isDark ? 'bg-white/5 text-white/40' : 'bg-gray-100 text-gray-400'}`}>
+                                {translate(label)}
+                            </span>
                         ))}
                     </div>
                 </div>
@@ -391,9 +407,26 @@ const DesktopDashboard = ({ locations, recommended, authUser, countries, theme, 
                                             <Star size={14} className="text-yellow-500 fill-yellow-500" /> {item.rating}
                                         </div>
                                     </div>
-                                    <div className="space-y-1 px-1">
-                                        <h4 className={`text-lg font-bold ${textStyle}`}>{item.title}</h4>
+                                    <div className="space-y-1.5 px-1">
+                                        <div className="flex justify-between items-start">
+                                            <h4 className={`text-lg font-bold ${textStyle}`}>{item.title}</h4>
+                                            {item.best_time && item.best_time.length > 0 && (
+                                                <div className="flex gap-1 text-sm pt-1 opacity-70">
+                                                    {item.best_time.includes('morning') && '🌅'}
+                                                    {item.best_time.includes('day') && '☀️'}
+                                                    {item.best_time.includes('evening') && '🌙'}
+                                                    {item.best_time.includes('late_night') && '✨'}
+                                                </div>
+                                            )}
+                                        </div>
                                         <p className={`text-sm ${subTextStyle}`}>{item.subtitle}</p>
+                                        <div className="flex flex-wrap gap-1.5 pt-1">
+                                            {item.special_labels?.slice(0, 3).map(label => (
+                                                <span key={label} className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${theme === 'light' ? 'bg-gray-100 text-gray-400' : 'bg-white/10 text-white/50'}`}>
+                                                    {translate(label)}
+                                                </span>
+                                            ))}
+                                        </div>
                                     </div>
                                 </motion.div>
                             ))}
@@ -417,9 +450,26 @@ const DesktopDashboard = ({ locations, recommended, authUser, countries, theme, 
                                             <Star size={14} className="text-yellow-500 fill-yellow-500" /> {item.rating}
                                         </div>
                                     </div>
-                                    <div className="space-y-1 px-1">
-                                        <h4 className={`text-lg font-bold ${textStyle}`}>{item.title}</h4>
+                                    <div className="space-y-1.5 px-1">
+                                        <div className="flex justify-between items-start">
+                                            <h4 className={`text-lg font-bold ${textStyle}`}>{item.title}</h4>
+                                            {item.best_time && item.best_time.length > 0 && (
+                                                <div className="flex gap-1 text-sm pt-1 opacity-70">
+                                                    {item.best_time.includes('morning') && '🌅'}
+                                                    {item.best_time.includes('day') && '☀️'}
+                                                    {item.best_time.includes('evening') && '🌙'}
+                                                    {item.best_time.includes('late_night') && '✨'}
+                                                </div>
+                                            )}
+                                        </div>
                                         <p className={`text-sm ${subTextStyle}`}>{item.subtitle}</p>
+                                        <div className="flex flex-wrap gap-1.5 pt-1">
+                                            {item.special_labels?.slice(0, 3).map(label => (
+                                                <span key={label} className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${theme === 'light' ? 'bg-gray-100 text-gray-400' : 'bg-white/10 text-white/50'}`}>
+                                                    {translate(label)}
+                                                </span>
+                                            ))}
+                                        </div>
                                     </div>
                                 </motion.div>
                             ))}

@@ -134,7 +134,7 @@ export default function AdminLayout() {
                 {/* Top Header */}
                 <header className="h-20 bg-white/50 dark:bg-slate-950/50 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 flex items-center justify-between px-6 lg:px-10 sticky top-0 z-20 transition-all">
                     <div className="flex items-center gap-6">
-                        <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2.5 text-slate-500 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
+                        <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2.5 text-slate-500 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm" aria-label="menu">
                             <Menu size={20} />
                         </button>
 

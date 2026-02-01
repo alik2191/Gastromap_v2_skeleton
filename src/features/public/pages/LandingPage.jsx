@@ -52,31 +52,31 @@ const BentoHero = () => {
     }, [])
 
     return (
-        <section className="pt-32 pb-20 px-4 md:px-6 bg-blue-50/30 dark:bg-base-200 hero-section">
+        <section className="pt-24 md:pt-32 pb-12 md:pb-20 px-4 md:px-6 bg-slate-50 dark:bg-slate-950 hero-section transition-colors duration-500">
             <div className="container mx-auto max-w-7xl">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 mb-6">
                     <motion.div
                         initial="hidden"
                         animate="visible"
                         variants={fadeInUp}
-                        className="lg:col-span-7 bg-base-100 rounded-[40px] p-10 md:p-16 flex flex-col justify-center shadow-sm relative overflow-hidden"
+                        className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-[30px] md:rounded-[40px] p-6 sm:p-10 md:p-16 flex flex-col justify-center shadow-sm relative overflow-hidden border border-slate-200/50 dark:border-slate-800/50"
                     >
                         <div className="bg-blue-50 dark:bg-blue-900/20 w-fit px-3 py-1 rounded-full text-xs font-semibold text-blue-600 dark:text-blue-400 mb-8 border border-blue-100 dark:border-blue-900/30">
                             ● Beta Version Live
                         </div>
-                        <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1] mb-8 text-base-content">
-                            Explore flavors <br /> <span className="text-blue-600">without borders.</span>
+                        <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight leading-[1.1] md:leading-[1] mb-6 md:mb-8 text-base-content">
+                            Explore flavors <br className="hidden sm:block" /> <span className="text-blue-600">without borders.</span>
                         </h1>
-                        <p className="text-lg text-base-content/70 mb-10 max-w-md leading-relaxed">
+                        <p className="text-base md:text-lg text-base-content/70 mb-8 md:mb-10 max-w-md leading-relaxed">
                             AI-powered guide with route planning and personalized recommendations.
                         </p>
-                        <div className="flex flex-wrap gap-4">
-                            <Link to="/explore">
-                                <Button size="lg" className="rounded-full h-14 px-8 text-base bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-200 dark:shadow-none transition-transform hover:scale-105">
+                        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                            <Link to="/explore" className="w-full sm:w-auto">
+                                <Button size="lg" className="w-full h-12 md:h-14 rounded-full px-8 text-base bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-200 dark:shadow-none transition-transform hover:scale-105">
                                     Get Started
                                 </Button>
                             </Link>
-                            <Button variant="outline" size="lg" className="btn btn-outline rounded-full h-14 px-8 text-base transition-transform hover:scale-105">
+                            <Button variant="outline" size="lg" className="w-full h-12 md:h-14 btn btn-outline rounded-full px-8 text-base transition-transform hover:scale-105">
                                 How it Works
                             </Button>
                         </div>
@@ -87,7 +87,7 @@ const BentoHero = () => {
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.2, duration: 0.6 }}
-                            className="flex-1 bg-black rounded-[40px] relative overflow-hidden group min-h-[300px]"
+                            className="flex-1 bg-black rounded-[30px] md:rounded-[40px] relative overflow-hidden group min-h-[200px] md:min-h-[300px]"
                         >
                             <img src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2940&auto=format&fit=crop" alt="Bar" className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-[1.5s] ease-out" />
                             <div className="absolute bottom-6 left-6 right-6 z-10">
@@ -103,14 +103,14 @@ const BentoHero = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4, duration: 0.6 }}
-                            className="bg-blue-100/50 rounded-[40px] p-8 relative overflow-hidden min-h-[260px] flex flex-col justify-between"
+                            className="bg-blue-50/80 dark:bg-blue-900/10 rounded-[30px] md:rounded-[40px] p-6 md:p-8 relative overflow-hidden min-h-[220px] md:min-h-[260px] flex flex-col justify-between border border-blue-100/50 dark:border-blue-900/20"
                         >
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <h3 className="text-5xl font-bold text-blue-900 mb-1 tracking-tight">200+</h3>
-                                    <p className="text-blue-600 font-medium">Verified Locations</p>
+                                    <h3 className="text-4xl md:text-5xl font-bold text-blue-900 dark:text-blue-100 mb-1 tracking-tight">200+</h3>
+                                    <p className="text-sm md:text-base text-blue-600 dark:text-blue-400 font-medium">Verified Locations</p>
                                 </div>
-                                <ArrowUpRight className="w-6 h-6 text-blue-600" />
+                                <ArrowUpRight className="w-5 h-5 md:w-6 md:h-6 text-blue-600 dark:text-blue-400" />
                             </div>
 
                             <motion.div
@@ -119,15 +119,15 @@ const BentoHero = () => {
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: 0.5 }}
-                                className="bg-white p-4 rounded-2xl shadow-sm border border-blue-100 mt-4 relative"
+                                className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-blue-100 dark:border-blue-900/30 mt-4 relative"
                             >
-                                <p className="text-sm text-gray-700 font-medium leading-relaxed h-[3.5rem] flex items-center">
+                                <p className="text-sm text-slate-700 dark:text-slate-300 font-medium leading-relaxed h-[3.5rem] flex items-center">
                                     "{reviews[reviewIndex].text}"
                                 </p>
                                 <div className="mt-2 flex items-center gap-2">
-                                    <div className="text-xs font-bold text-blue-600">{reviews[reviewIndex].name}</div>
-                                    <div className="text-xs text-blue-300">•</div>
-                                    <div className="text-xs text-gray-400">{reviews[reviewIndex].loc}</div>
+                                    <div className="text-xs font-bold text-blue-600 dark:text-blue-400">{reviews[reviewIndex].name}</div>
+                                    <div className="text-xs text-blue-300 dark:text-blue-800">•</div>
+                                    <div className="text-xs text-slate-400 dark:text-slate-500">{reviews[reviewIndex].loc}</div>
                                 </div>
                             </motion.div>
 
@@ -155,21 +155,20 @@ const BentoHero = () => {
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, margin: "-50px" }}
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"
                 >
                     {/* 1. AI Guide Card */}
-                    <motion.div variants={fadeInUp} className="bg-base-100 rounded-[32px] p-6 shadow-sm hover:shadow-xl transition-all feature-card-sm group overflow-hidden relative border border-base-200 h-full flex flex-col">
+                    <motion.div variants={fadeInUp} className="bg-white dark:bg-slate-900 rounded-[32px] p-6 shadow-sm hover:shadow-xl transition-all feature-card-sm group overflow-hidden relative border border-slate-200 dark:border-slate-800 h-full flex flex-col">
                         <div className="flex items-start gap-4 mb-6">
                             <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0">
                                 <Sparkles size={24} />
                             </div>
                             <div>
-                                <h3 className="font-bold text-lg text-base-content leading-tight">AI Guide</h3>
-                                <p className="text-sm text-base-content/60">Routes & Memory</p>
+                                <h3 className="font-bold text-lg text-slate-900 dark:text-white leading-tight">AI Guide</h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">Routes & Memory</p>
                             </div>
                         </div>
-
-                        <div className="bg-white rounded-2xl p-4 shadow-sm border border-pink-100/50 mt-auto">
+                        <div className="bg-slate-50 dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-pink-100/50 dark:border-pink-900/20 mt-auto">
                             <motion.p
                                 initial={{ opacity: 0 }}
                                 whileInView={{ opacity: 1 }}
@@ -213,13 +212,13 @@ const BentoHero = () => {
                                             <Heart size={12} className="text-pink-400 fill-pink-400" />
                                             <span className="font-semibold text-gray-600 uppercase tracking-wider text-[10px]">Wish-list</span>
                                         </div>
-                                        <div className="bg-gray-50 p-2.5 rounded-xl flex items-center gap-3">
+                                        <div className="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-xl flex items-center gap-3">
                                             <div className="w-2 h-2 rounded-full bg-pink-400" />
-                                            <span className="text-xs font-medium text-gray-700">Hidden Jazz Club</span>
+                                            <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Hidden Jazz Club</span>
                                         </div>
-                                        <div className="bg-gray-50 p-2.5 rounded-xl flex items-center gap-3 opacity-60">
-                                            <div className="w-2 h-2 rounded-full bg-gray-300" />
-                                            <span className="text-xs font-medium text-gray-700">Ramen Shop</span>
+                                        <div className="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-xl flex items-center gap-3 opacity-60">
+                                            <div className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600" />
+                                            <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Ramen Shop</span>
                                         </div>
                                     </motion.div>
                                 ) : (
@@ -231,27 +230,27 @@ const BentoHero = () => {
                                         transition={{ duration: 0.4 }}
                                         className="space-y-2 absolute inset-0"
                                     >
-                                        <div className="flex items-center gap-2 text-xs text-gray-400">
+                                        <div className="flex items-center gap-2 text-xs text-slate-400">
                                             <CheckCircle2 size={12} className="text-green-500" />
-                                            <span className="font-semibold text-gray-600 uppercase tracking-wider text-[10px]">Visited</span>
+                                            <span className="font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider text-[10px]">Visited</span>
                                         </div>
-                                        <div className="bg-green-50 p-2.5 rounded-xl flex items-center gap-3 border border-green-100">
+                                        <div className="bg-green-50 dark:bg-green-950/20 p-2.5 rounded-xl flex items-center gap-3 border border-green-100 dark:border-green-900/30">
                                             <motion.div
                                                 initial={{ scale: 0 }} animate={{ scale: 1 }}
-                                                className="text-green-600"
+                                                className="text-green-600 dark:text-green-500"
                                             >
-                                                <CheckCircle2 size={12} fill="currentColor" className="text-white" />
+                                                <CheckCircle2 size={12} fill="currentColor" className="text-white dark:text-slate-900" />
                                             </motion.div>
-                                            <span className="text-xs font-medium text-green-800">Cafe Mozart</span>
+                                            <span className="text-xs font-medium text-green-800 dark:text-green-200">Cafe Mozart</span>
                                         </div>
-                                        <div className="bg-green-50 p-2.5 rounded-xl flex items-center gap-3 border border-green-100 opacity-80">
+                                        <div className="bg-green-50 dark:bg-green-950/20 p-2.5 rounded-xl flex items-center gap-3 border border-green-100 dark:border-green-900/30 opacity-80">
                                             <motion.div
                                                 initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.1 }}
-                                                className="text-green-600"
+                                                className="text-green-600 dark:text-green-500"
                                             >
-                                                <CheckCircle2 size={12} fill="currentColor" className="text-white" />
+                                                <CheckCircle2 size={12} fill="currentColor" className="text-white dark:text-slate-900" />
                                             </motion.div>
-                                            <span className="text-xs font-medium text-green-800">La Bottega</span>
+                                            <span className="text-xs font-medium text-green-800 dark:text-green-200">La Bottega</span>
                                         </div>
                                     </motion.div>
                                 )}
@@ -260,19 +259,18 @@ const BentoHero = () => {
                     </motion.div>
 
                     {/* 3. Interactive Maps Card - 2D City Scheme */}
-                    <motion.div variants={fadeInUp} className="bg-base-100 rounded-[32px] p-6 border border-base-200 shadow-sm hover:shadow-xl transition-all feature-card-sm hover:-translate-y-1 duration-300 h-full flex flex-col">
+                    <motion.div variants={fadeInUp} className="bg-white dark:bg-slate-900 rounded-[32px] p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all feature-card-sm hover:-translate-y-1 duration-300 h-full flex flex-col">
                         <div className="flex items-start gap-4 mb-6">
                             <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0">
                                 <Map size={24} />
                             </div>
                             <div>
-                                <h3 className="font-bold text-lg leading-tight">Interactive Maps</h3>
-                                <p className="text-sm text-gray-500">Navigation</p>
+                                <h3 className="font-bold text-lg leading-tight text-slate-900 dark:text-white">Interactive Maps</h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">Navigation</p>
                             </div>
                         </div>
-
                         {/* 2D Map Visualization */}
-                        <div className="bg-blue-50/30 rounded-2xl mt-auto relative overflow-hidden h-28 border border-blue-100">
+                        <div className="bg-blue-50/30 dark:bg-blue-900/10 rounded-2xl mt-auto relative overflow-hidden h-28 border border-blue-100 dark:border-blue-900/20">
                             {/* Map Streets Style */}
                             <div className="absolute inset-0">
                                 <svg width="100%" height="100%" className="opacity-20">
@@ -307,21 +305,20 @@ const BentoHero = () => {
                     </motion.div>
 
                     {/* 4. Global Search Card */}
-                    <motion.div variants={fadeInUp} className="bg-base-100 rounded-[32px] p-6 border border-base-200 shadow-sm hover:shadow-xl transition-all feature-card-sm hover:-translate-y-1 duration-300 h-full flex flex-col">
+                    <motion.div variants={fadeInUp} className="bg-white dark:bg-slate-900 rounded-[32px] p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all feature-card-sm hover:-translate-y-1 duration-300 h-full flex flex-col">
                         <div className="flex items-start gap-4 mb-6">
-                            <div className="w-12 h-12 bg-black rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0">
+                            <div className="w-12 h-12 bg-slate-950 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0">
                                 <Globe size={24} />
                             </div>
                             <div>
-                                <h3 className="font-bold text-lg leading-tight">Global Search</h3>
-                                <p className="text-sm text-gray-500">Find anywhere</p>
+                                <h3 className="font-bold text-lg leading-tight text-slate-900 dark:text-white">Global Search</h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">Find anywhere</p>
                             </div>
                         </div>
-
                         {/* City Scroll Animation */}
-                        <div className="relative h-24 overflow-hidden mt-auto mask-gradient rounded-xl bg-gray-50 border border-gray-100">
-                            <div className="absolute inset-x-0 top-0 h-4 bg-gradient-to-b from-gray-50 to-transparent z-10" />
-                            <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-gray-50 to-transparent z-10" />
+                        <div className="relative h-24 overflow-hidden mt-auto mask-gradient rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+                            <div className="absolute inset-x-0 top-0 h-4 bg-gradient-to-b from-slate-50 dark:from-slate-800 to-transparent z-10" />
+                            <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-slate-50 dark:from-slate-800 to-transparent z-10" />
 
                             <motion.div
                                 animate={{ y: [0, -120] }}
@@ -362,18 +359,18 @@ const FeaturesGrid = () => {
     ]
 
     return (
-        <section className="py-24 bg-base-200">
-            <div className="container mx-auto px-6 max-w-7xl">
+        <section className="py-16 md:py-24 bg-slate-50 dark:bg-slate-950">
+            <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                 <motion.div
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true }}
                     transition={{ duration: 0.6 }}
                     variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
-                    className="text-center mb-16"
+                    className="text-center mb-12 md:mb-16"
                 >
-                    <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight">More than just a <span className="text-blue-600">guide.</span></h2>
-                    <p className="text-gray-500 max-w-2xl mx-auto">We curated the best features to ensure your culinary journey is seamless.</p>
+                    <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight text-slate-900 dark:text-white">More than just a <span className="text-blue-600">guide.</span></h2>
+                    <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">We curated the best features to ensure your culinary journey is seamless.</p>
                 </motion.div>
                 <motion.div
                     variants={staggerContainer}
@@ -383,12 +380,12 @@ const FeaturesGrid = () => {
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
                     {features.map((f, i) => (
-                        <motion.div variants={fadeInUp} key={i} className="bg-base-100 p-8 rounded-[32px] shadow-sm hover:shadow-md transition-all border border-base-200">
-                            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 mb-4">
+                        <motion.div variants={fadeInUp} key={i} className="bg-white dark:bg-slate-900 p-8 rounded-[32px] shadow-sm hover:shadow-md transition-all border border-slate-100 dark:border-slate-800">
+                            <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4">
                                 <f.icon size={20} />
                             </div>
-                            <h3 className="font-bold text-lg mb-2 text-base-content">{f.title}</h3>
-                            <p className="text-sm text-base-content/70 leading-relaxed">{f.desc}</p>
+                            <h3 className="font-bold text-lg mb-2 text-slate-900 dark:text-white">{f.title}</h3>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{f.desc}</p>
                         </motion.div>
                     ))}
                 </motion.div>
@@ -399,17 +396,17 @@ const FeaturesGrid = () => {
 
 // --- Component: Collection ---
 const CollectionPreview = () => (
-    <section className="py-24 bg-base-100 collection-section">
-        <div className="container mx-auto px-6 max-w-7xl">
+    <section className="py-16 md:py-24 bg-white dark:bg-slate-900 collection-section">
+        <div className="container mx-auto px-4 md:px-6 max-w-7xl">
             <motion.div
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeInUp}
-                className="text-center mb-16"
+                className="text-center mb-12 md:mb-16"
             >
-                <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight">Peek into the <span className="text-blue-600">collection.</span></h2>
-                <p className="text-gray-500">Just a small sample of the 12,000+ curated locations waiting for you.</p>
+                <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight text-slate-900 dark:text-white">Peek into the <span className="text-blue-600">collection.</span></h2>
+                <p className="text-slate-500 dark:text-slate-400">Just a small sample of the 12,000+ curated locations waiting for you.</p>
             </motion.div>
             <motion.div
                 variants={staggerContainer}
@@ -424,13 +421,13 @@ const CollectionPreview = () => (
                     { title: "Mercardo San Miguel", sub: "Madrid, Spain", img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=2874&auto=format&fit=crop" },
                     { title: "Sushi Arai", sub: "Tokyo, Japan", img: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=2940&auto=format&fit=crop" }
                 ].map((item, i) => (
-                    <motion.div key={i} variants={fadeInUp} className="group relative h-[300px] md:h-[400px] rounded-[40px] overflow-hidden bg-gray-100 cursor-pointer">
+                    <motion.div key={i} variants={fadeInUp} className="group relative h-[250px] sm:h-[300px] md:h-[400px] rounded-[30px] md:rounded-[40px] overflow-hidden bg-gray-100 cursor-pointer">
                         <img src={item.img} alt={item.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                        <div className="absolute bottom-8 left-8 text-white">
+                        <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 text-white">
                             <span className="bg-blue-600 text-[10px] font-bold px-2 py-1 rounded-full mb-3 inline-block">MUST VISIT</span>
-                            <h3 className="text-2xl font-bold">{item.title}</h3>
-                            <p className="opacity-80 flex items-center gap-2 mt-1"><MapPinIcon className="w-3 h-3" /> {item.sub}</p>
+                            <h3 className="text-xl md:text-2xl font-bold">{item.title}</h3>
+                            <p className="text-xs md:text-base opacity-80 flex items-center gap-2 mt-1"><MapPinIcon className="w-3 h-3" /> {item.sub}</p>
                         </div>
                     </motion.div>
                 ))}
@@ -444,35 +441,35 @@ const MapPinIcon = ({ className }) => <svg className={className} xmlns="http://w
 
 // --- Component: Pricing ---
 const Pricing = () => (
-    <section className="py-24 bg-base-200 pricing-section">
-        <div className="container mx-auto px-6 max-w-7xl">
+    <section className="py-16 md:py-24 bg-slate-50 dark:bg-slate-950 pricing-section">
+        <div className="container mx-auto px-4 md:px-6 max-w-7xl">
             <motion.div
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeInUp}
-                className="text-center mb-16"
+                className="text-center mb-12 md:mb-16"
             >
-                <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight">Invest in <span className="text-blue-600">experiences.</span></h2>
+                <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight text-slate-900 dark:text-white">Invest in <span className="text-blue-600">experiences.</span></h2>
             </motion.div>
             <motion.div
                 variants={staggerContainer}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-50px" }}
-                className="grid grid-cols-1 md:grid-cols-3 gap-8 items-end"
+                className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-end"
             >
                 {/* Basic */}
-                <motion.div variants={fadeInUp} className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 h-fit hover:shadow-xl transition-shadow duration-300">
-                    <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Basic</div>
-                    <div className="text-4xl font-bold mb-2">$9.99<span className="text-base font-normal text-gray-400">/mo</span></div>
-                    <p className="text-xs text-gray-400 mb-8">For casual explorers</p>
-                    <ul className="space-y-4 mb-8 text-sm font-medium">
-                        <li className="flex gap-3"><Check className="w-4 h-4" /> 5 Searches/day</li>
-                        <li className="flex gap-3"><Check className="w-4 h-4" /> Basic Maps</li>
-                        <li className="flex gap-3"><Check className="w-4 h-4" /> Read Reviews</li>
+                <motion.div variants={fadeInUp} className="bg-white dark:bg-slate-900 p-8 rounded-[40px] shadow-sm border border-slate-100 dark:border-slate-800 h-fit hover:shadow-xl transition-shadow duration-300 group">
+                    <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Basic</div>
+                    <div className="text-4xl font-bold mb-2 text-slate-900 dark:text-white">$9.99<span className="text-base font-normal text-slate-400">/mo</span></div>
+                    <p className="text-xs text-slate-400 mb-8">For casual explorers</p>
+                    <ul className="space-y-4 mb-8 text-sm font-medium text-slate-600 dark:text-slate-400">
+                        <li className="flex gap-3"><Check className="w-4 h-4 text-blue-600" /> 5 Searches/day</li>
+                        <li className="flex gap-3"><Check className="w-4 h-4 text-blue-600" /> Basic Maps</li>
+                        <li className="flex gap-3"><Check className="w-4 h-4 text-blue-600" /> Read Reviews</li>
                     </ul>
-                    <Button className="w-full bg-black text-white rounded-full h-12 hover:bg-gray-800">Start Free</Button>
+                    <Button className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full h-12 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors">Start Free</Button>
                 </motion.div>
 
                 {/* Pro (Black) */}
@@ -533,10 +530,10 @@ const FAQ = () => {
     ]
 
     return (
-        <section className="py-24 bg-base-200">
-            <div className="container mx-auto px-6 max-w-5xl">
-                <div className="text-center mb-16">
-                    <h2 className="text-3xl font-bold mb-2 text-base-content">Questions? <span className="text-blue-600">We've got answers.</span></h2>
+        <section className="py-16 md:py-24 bg-slate-50 dark:bg-slate-950">
+            <div className="container mx-auto px-4 md:px-6 max-w-5xl">
+                <div className="text-center mb-12 md:mb-16">
+                    <h2 className="text-2xl md:text-3xl font-bold mb-2 text-slate-900 dark:text-white">Questions? <span className="text-blue-600">We've got answers.</span></h2>
                 </div>
                 <div className="grid md:grid-cols-2 gap-x-12 gap-y-8">
                     {questions.map((section, secIdx) => (
@@ -551,11 +548,11 @@ const FAQ = () => {
                                     <div
                                         key={i}
                                         onClick={() => toggleFAQ(index)}
-                                        className={`bg-base-100 p-5 rounded-2xl cursor-pointer border transition-all duration-300 ${isOpen ? 'shadow-md border-blue-100 ring-1 ring-blue-50' : 'border-base-200 hover:border-base-300'}`}
+                                        className={`p-5 rounded-2xl cursor-pointer border transition-all duration-300 ${isOpen ? 'bg-white dark:bg-slate-800 shadow-md border-blue-100 dark:border-blue-900/50 ring-1 ring-blue-50 dark:ring-blue-900/10' : 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'}`}
                                     >
                                         <div className="flex justify-between items-center">
-                                            <span className={`font-medium text-sm transition-colors ${isOpen ? 'text-blue-600' : 'text-base-content'}`}>{item.q}</span>
-                                            <ChevronDown size={16} className={`text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180 text-blue-600' : ''}`} />
+                                            <span className={`font-medium text-sm transition-colors ${isOpen ? 'text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'}`}>{item.q}</span>
+                                            <ChevronDown size={16} className={`text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180 text-blue-600 dark:text-blue-400' : ''}`} />
                                         </div>
                                         <AnimatePresence>
                                             {isOpen && (
@@ -566,7 +563,7 @@ const FAQ = () => {
                                                     transition={{ duration: 0.3, ease: "easeInOut" }}
                                                     className="overflow-hidden"
                                                 >
-                                                    <p className="text-xs text-base-content/70 leading-relaxed">
+                                                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                                                         {item.a}
                                                     </p>
                                                 </motion.div>

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import App from '@/App'
+import App from '@/app/App'
 import { useAuthStore } from './hooks/useAuthStore'
 
 const createTestQueryClient = () => new QueryClient({
@@ -28,7 +28,7 @@ describe('Auth Features Integration', () => {
         render(
             <QueryClientProvider client={createTestQueryClient()}>
                 <MemoryRouter initialEntries={['/login']}>
-                    <App />
+                    <App includeRouter={false} />
                 </MemoryRouter>
             </QueryClientProvider>
         )
@@ -50,7 +50,7 @@ describe('Auth Features Integration', () => {
         render(
             <QueryClientProvider client={createTestQueryClient()}>
                 <MemoryRouter initialEntries={['/login']}>
-                    <App />
+                    <App includeRouter={false} />
                 </MemoryRouter>
             </QueryClientProvider>
         )

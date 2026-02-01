@@ -34,8 +34,8 @@ describe('AdminLayout', () => {
     it('renders sidebar with navigation items', () => {
         renderWithRouter(<AdminLayout />)
 
-        expect(screen.getByText(/GastroMap/i)).toBeInTheDocument()
-        expect(screen.getByText(/Главная/i)).toBeInTheDocument()
+        expect(screen.getByText(/GastroOS/i)).toBeInTheDocument()
+        expect(screen.getByText(/Обзор/i)).toBeInTheDocument()
         expect(screen.getByText(/Локации/i)).toBeInTheDocument()
         expect(screen.getByText(/Пользователи/i)).toBeInTheDocument()
     })

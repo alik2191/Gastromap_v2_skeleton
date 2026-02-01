@@ -7,26 +7,19 @@ describe('AdminDashboardPage', () => {
         render(<AdminDashboardPage />)
 
         expect(screen.getByText(/Панель управления/i)).toBeInTheDocument()
-        expect(screen.getByText(/Юзеры/i)).toBeInTheDocument()
-        expect(screen.getByText(/Места/i)).toBeInTheDocument()
-        expect(screen.getByText(/Визиты/i)).toBeInTheDocument()
+        expect(screen.getByText(/Пользователей/i)).toBeInTheDocument()
+        expect(screen.getByText(/Локаций/i)).toBeInTheDocument()
+        expect(screen.getByText(/Просмотры/i)).toBeInTheDocument()
     })
 
     it('displays welcome message and activity feed', () => {
         render(<AdminDashboardPage />)
-        expect(screen.getByText(/Активность/i)).toBeInTheDocument()
+        expect(screen.getByText(/Последняя активность/i)).toBeInTheDocument()
         expect(screen.getByText(/Дмитрий С./i)).toBeInTheDocument()
     })
 
-    it('renders performance snapshot', () => {
+    it('renders AI Insight block', () => {
         render(<AdminDashboardPage />)
-        expect(screen.getByText(/Продажи/i)).toBeInTheDocument()
-        expect(screen.getByText(/Цель месяца/i)).toBeInTheDocument()
-    })
-
-    it('renders AI Analyst block', () => {
-        render(<AdminDashboardPage />)
-        expect(screen.getByText(/AI Аналитик/i)).toBeInTheDocument()
-        expect(screen.getByText(/Отчет готов/i)).toBeInTheDocument()
+        expect(screen.getByText(/GastroAI/i)).toBeInTheDocument()
     })
 })

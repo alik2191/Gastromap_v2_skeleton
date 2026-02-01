@@ -1,11 +1,13 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Star, Heart } from 'lucide-react'
+import { MapPin, Star, Heart } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
+import { Link } from 'react-router-dom'
 import { useFavoritesStore } from '@/features/dashboard/hooks/useFavoritesStore'
 import { cn } from '@/lib/utils'
+import { translate } from '@/utils/translation'
 
 export default function LocationCard({ location }) {
     const navigate = useNavigate()
@@ -58,11 +60,29 @@ export default function LocationCard({ location }) {
                 <p className="text-sm text-muted-foreground line-clamp-2">
                     {location.description}
                 </p>
-                <div className="mt-3 flex flex-wrap gap-1">
-                    {location.tags.slice(0, 3).map(tag => (
-                        <Badge key={tag} variant="outline" className="text-[10px] h-5 px-1.5">
-                            {tag}
+                <div className="mt-3 flex flex-wrap gap-1.5 items-center">
+                    {/* Best Time subtle indicator */}
+                    {location.best_time && location.best_time.length > 0 && (
+                        <div className="flex gap-1 text-[12px] opacity-70 mr-1">
+                            {location.best_time.includes('morning') && '🌅'}
+                            {location.best_time.includes('day') && '☀️'}
+                            {location.best_time.includes('evening') && '🌙'}
+                            {location.best_time.includes('late_night') && '✨'}
+                        </div>
+                    )}
+
+                    {/* Tags */}
+                    {location.tags?.slice(0, 2).map(tag => (
+                        <Badge key={tag} variant="outline" className="text-[9px] font-bold h-5 px-2 bg-slate-50 dark:bg-slate-800/50 border-none">
+                            {translate(tag)}
                         </Badge>
+                    ))}
+
+                    {/* Special Labels */}
+                    {location.special_labels?.slice(0, 2).map(label => (
+                        <span key={label} className="text-[9px] font-black uppercase tracking-wider text-blue-500/80 dark:text-blue-400/60">
+                            • {translate(label)}
+                        </span>
                     ))}
                 </div>
             </CardContent>

@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { Instagram, Twitter, Linkedin } from 'lucide-react'
 
 const PublicFooter = () => (
-    <footer className="relative bg-black text-white py-20 rounded-t-[40px] mt-auto overflow-hidden">
+    <footer className="relative bg-black text-white py-12 md:py-20 rounded-t-[30px] md:rounded-t-[40px] mt-auto overflow-hidden">
         {/* Aurora Background Effect */}
         <div className="absolute inset-0 pointer-events-none">
             <motion.div
@@ -36,15 +36,15 @@ const PublicFooter = () => (
             />
         </div>
 
-        <div className="container relative z-10 mx-auto px-6 max-w-7xl">
-            <div className="flex flex-col md:flex-row justify-between items-start gap-12">
+        <div className="container relative z-10 mx-auto px-4 md:px-6 max-w-7xl">
+            <div className="flex flex-col lg:flex-row justify-between items-start gap-12">
                 <div>
                     <div className="bg-white/10 w-fit px-4 py-2 rounded-full flex items-center gap-2 mb-6 backdrop-blur-md border border-white/5">
                         <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xs">G</div>
                         <span className="font-semibold text-sm">GastroMap</span>
                     </div>
                     <p className="text-gray-400 text-sm max-w-xs leading-relaxed">
-                        The world's most intelligent culinary guide. <br />
+                        The world's most intelligent culinary guide. <br className="hidden sm:block" />
                         Made with love for foodies.
                     </p>
                     <div className="flex gap-4 mt-8">
@@ -55,7 +55,7 @@ const PublicFooter = () => (
                         ))}
                     </div>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12 md:gap-12 w-full lg:w-auto">
                     {/* 
                       Note: Using real Links here so they basically work in SPA navigation. 
                       Need to ensure these routes exist in App.jsx.
@@ -94,8 +94,8 @@ const PublicFooter = () => (
                             ]
                         },
                     ].map((col, i) => (
-                        <div key={i}>
-                            <h4 className="font-bold mb-6">{col.head}</h4>
+                        <div key={i} className="min-w-[120px]">
+                            <h4 className="font-bold mb-4 md:mb-6 text-sm md:text-base">{col.head}</h4>
                             <ul className="space-y-4 text-sm text-gray-400">
                                 {col.links.map(l => (
                                     <li key={l.name}>
@@ -109,7 +109,7 @@ const PublicFooter = () => (
                     ))}
                 </div>
             </div>
-            <div className="border-t border-white/10 mt-20 pt-8 flex justify-between text-xs text-gray-500">
+            <div className="border-t border-white/10 mt-12 md:mt-20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left text-[10px] md:text-xs text-gray-500">
                 <p>© 2025 GastroMap Inc. All rights reserved.</p>
                 <div className="flex gap-6">
                     <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
