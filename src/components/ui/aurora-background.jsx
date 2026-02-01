@@ -21,11 +21,16 @@ const AuroraBackground = ({ theme = 'light', children, className }) => {
     const blob2Class = isLight ? 'bg-yellow-400' : 'bg-orange-700'
     const blob3Class = isLight ? 'bg-blue-200' : 'bg-orange-600' // Using slightly different secondary colors
 
+    // Fix: Sync body background with theme to prevent "white corners" on mobile overscroll
+    React.useEffect(() => {
+        document.body.style.backgroundColor = isLight ? '#eff6ff' : '#0f172a' // blue-50 : slate-900
+    }, [isLight])
+
     return (
         <div className={cn(`relative w-full h-full min-h-screen overflow-hidden ${bgClass} transition-colors duration-1000`, className)}>
             {/* Ambient Background Blobs */}
-            {/* Added 'will-change-transform' and 'translate-z-0' for GPU layering */}
-            <div className="absolute inset-0 pointer-events-none transform-gpu">
+            {/* Optimized: Used fixed positioning to keep blobs in viewport and prevent huge render layer on scroll */}
+            <div className="fixed inset-0 pointer-events-none transform-gpu overflow-hidden">
                 {/* Blob 1 (Top Left) */}
                 <div
                     className={cn(

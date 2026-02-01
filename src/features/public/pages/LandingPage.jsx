@@ -52,8 +52,8 @@ const BentoHero = () => {
     }, [])
 
     return (
-        <section className="pt-24 md:pt-32 pb-12 md:pb-20 px-4 md:px-6 bg-slate-50 dark:bg-slate-950 hero-section transition-colors duration-500">
-            <div className="container mx-auto max-w-7xl">
+        <section className="pt-24 md:pt-32 pb-12 md:pb-20 bg-slate-50 dark:bg-slate-950 hero-section transition-colors duration-500">
+            <div className="w-full px-4 md:px-8">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 mb-6">
                     <motion.div
                         initial="hidden"
@@ -360,7 +360,7 @@ const FeaturesGrid = () => {
 
     return (
         <section className="py-16 md:py-24 bg-slate-50 dark:bg-slate-950">
-            <div className="container mx-auto px-4 md:px-6 max-w-7xl">
+            <div className="w-full px-4 md:px-8">
                 <motion.div
                     initial="hidden"
                     whileInView="visible"
@@ -397,7 +397,7 @@ const FeaturesGrid = () => {
 // --- Component: Collection ---
 const CollectionPreview = () => (
     <section className="py-16 md:py-24 bg-white dark:bg-slate-900 collection-section">
-        <div className="container mx-auto px-4 md:px-6 max-w-7xl">
+        <div className="w-full px-4 md:px-8">
             <motion.div
                 initial="hidden"
                 whileInView="visible"
@@ -442,7 +442,7 @@ const MapPinIcon = ({ className }) => <svg className={className} xmlns="http://w
 // --- Component: Pricing ---
 const Pricing = () => (
     <section className="py-16 md:py-24 bg-slate-50 dark:bg-slate-950 pricing-section">
-        <div className="container mx-auto px-4 md:px-6 max-w-7xl">
+        <div className="w-full px-4 md:px-8">
             <motion.div
                 initial="hidden"
                 whileInView="visible"
@@ -531,7 +531,7 @@ const FAQ = () => {
 
     return (
         <section className="py-16 md:py-24 bg-slate-50 dark:bg-slate-950">
-            <div className="container mx-auto px-4 md:px-6 max-w-5xl">
+            <div className="w-full px-4 md:px-8">
                 <div className="text-center mb-12 md:mb-16">
                     <h2 className="text-2xl md:text-3xl font-bold mb-2 text-slate-900 dark:text-white">Questions? <span className="text-blue-600">We've got answers.</span></h2>
                 </div>
