@@ -1,6 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Hammer, AlertTriangle, MessageSquare, ArrowLeft } from 'lucide-react'
+import { Hammer, AlertTriangle, MessageCircle, ArrowLeft } from 'lucide-react'
 import { useAppConfigStore } from '@/store/useAppConfigStore'
 import { useAuthStore } from '@/features/auth/hooks/useAuthStore'
 import { Link } from 'react-router-dom'
