@@ -35,9 +35,16 @@ export default function LocationCard({ location }) {
                         <Heart className={cn("h-5 w-5", isFav && "fill-current")} />
                     </Button>
                 </div>
-                <Badge className="absolute top-2 left-2 bg-background/80 text-foreground backdrop-blur-sm border-none">
-                    {location.category}
-                </Badge>
+                <div className="absolute top-2 left-2 flex gap-1.5">
+                    <Badge className="bg-background/80 text-foreground backdrop-blur-sm border-none">
+                        {location.category}
+                    </Badge>
+                    {location.cuisine && (
+                        <Badge className="bg-blue-600/90 text-white backdrop-blur-sm border-none font-black shadow-lg">
+                            {translate(location.cuisine)}
+                        </Badge>
+                    )}
+                </div>
             </div>
 
             <CardHeader className="p-4 pb-2">

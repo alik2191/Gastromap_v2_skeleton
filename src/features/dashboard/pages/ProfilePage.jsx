@@ -134,6 +134,65 @@ const ProfilePage = () => {
                 </div>
             </div>
 
+            {/* Taste Preferences Section - "The Foodie DNA" */}
+            <div className="px-5 mt-8">
+                <div className={`p-6 rounded-[32px] border backdrop-blur-md ${cardBg}`}>
+                    <div className="flex items-center gap-2 mb-6">
+                        <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500">
+                            <Utensils size={18} />
+                        </div>
+                        <h3 className={`text-[15px] font-black uppercase tracking-tight ${textStyle}`}>Taste Profile</h3>
+                    </div>
+
+                    <div className="space-y-6">
+                        {/* Favorite Cuisines */}
+                        <div className="space-y-3">
+                            <label className={`text-[10px] font-black uppercase tracking-widest opacity-40 ml-1 ${textStyle}`}>Favorite Cuisines</label>
+                            <div className="flex flex-wrap gap-2">
+                                {user.preferences?.longTerm?.favoriteCuisines?.map(cuisine => (
+                                    <span key={cuisine} className={`px-4 py-2 rounded-xl text-[11px] font-bold border ${isDark ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-50 border-blue-100 text-blue-600'}`}>
+                                        {cuisine}
+                                    </span>
+                                ))}
+                                {(!user.preferences?.longTerm?.favoriteCuisines || user.preferences.longTerm.favoriteCuisines.length === 0) && (
+                                    <span className="text-[11px] italic opacity-30">No cuisines selected</span>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Preferred Atmosphere */}
+                        <div className="space-y-3">
+                            <label className={`text-[10px] font-black uppercase tracking-widest opacity-40 ml-1 ${textStyle}`}>Atmosphere Style</label>
+                            <div className="flex flex-wrap gap-2">
+                                {user.preferences?.longTerm?.atmospherePreference?.map(style => (
+                                    <span key={style} className={`px-4 py-2 rounded-xl text-[11px] font-bold border ${isDark ? 'bg-purple-500/10 border-purple-500/20 text-purple-400' : 'bg-purple-50 border-purple-100 text-purple-600'}`}>
+                                        #{style}
+                                    </span>
+                                ))}
+                                {(!user.preferences?.longTerm?.atmospherePreference || user.preferences.longTerm.atmospherePreference.length === 0) && (
+                                    <span className="text-[11px] italic opacity-30">No styles selected</span>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Must-have Features */}
+                        <div className="space-y-3">
+                            <label className={`text-[10px] font-black uppercase tracking-widest opacity-40 ml-1 ${textStyle}`}>Must-have Features</label>
+                            <div className="flex flex-wrap gap-2">
+                                {user.preferences?.longTerm?.features?.map(feature => (
+                                    <span key={feature} className={`px-4 py-2 rounded-xl text-[11px] font-bold border ${isDark ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-green-50 border-green-100 text-green-600'}`}>
+                                        {feature}
+                                    </span>
+                                ))}
+                                {(!user.preferences?.longTerm?.features || user.preferences.longTerm.features.length === 0) && (
+                                    <span className="text-[11px] italic opacity-30">No features selected</span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {/* Settings Menu Groups */}
             <div className="px-5 mt-8 space-y-6">
                 {menuItems.map((group, groupIdx) => (

@@ -12,6 +12,7 @@ import {
 import { useTheme } from '@/hooks/useTheme'
 import { MOCK_LOCATIONS } from '@/mocks/locations'
 import { PageTransition } from '@/components/ui/PageTransition'
+import { translate } from '@/utils/translation'
 
 const LocationDetailsPage = () => {
     const { id } = useParams()
@@ -92,18 +93,45 @@ const LocationDetailsPage = () => {
                 ))}
             </div>
 
+            <section className="space-y-4">
+                <div className="flex items-center gap-2.5">
+                    <div className="w-1 h-5 bg-blue-600 rounded-full" />
+                    <h3 className={`text-lg font-black ${textStyle}`}>Cuisine & Menu</h3>
+                </div>
+
+                <div className={`p-6 rounded-[32px] border ${cardBg} space-y-4`}>
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500">
+                            <UtensilsCrossed size={20} />
+                        </div>
+                        <div>
+                            <p className={`text-[10px] font-black uppercase tracking-widest opacity-40 ${textStyle}`}>Primary Cuisine</p>
+                            <p className={`text-sm font-black ${textStyle}`}>{translate(location.cuisine) || 'International'}</p>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 pt-2 border-t border-white/5">
+                        {location.special_labels?.map(label => (
+                            <span key={label} className={`px-4 py-2 rounded-xl text-[10px] font-black border transition-all ${isDark ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-50 border-blue-100 text-blue-600'}`}>
+                                {translate(label)}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
             <section className="space-y-2.5">
                 <div className="flex items-center gap-2.5">
                     <div className="w-1 h-5 bg-blue-600 rounded-full" />
                     <h3 className={`text-lg font-black ${textStyle}`}>Experience {location.title}</h3>
                 </div>
                 <p className={`text-sm leading-relaxed font-medium ${subTextStyle}`}>
-                    {location.description} One of the most iconic culinary destinations.
+                    {location.description}
                 </p>
                 <div className="flex flex-wrap gap-2 pt-1">
                     {location.tags?.map(tag => (
-                        <span key={tag} className={`px-4 py-1.5 rounded-full text-[10px] font-black border transition-all cursor-default ${isDark ? 'bg-white/5 border-white/5 text-blue-400' : 'bg-blue-50 border-blue-100 text-blue-600'}`}>
-                            #{tag.toUpperCase()}
+                        <span key={tag} className={`px-4 py-1.5 rounded-full text-[10px] font-black border transition-all cursor-default ${isDark ? 'bg-white/5 border-white/5 text-gray-400' : 'bg-gray-50 border-gray-100 text-gray-500'}`}>
+                            #{translate(tag).toUpperCase()}
                         </span>
                     ))}
                 </div>

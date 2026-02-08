@@ -1,13 +1,24 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Camera, User, Mail, UserCircle, Save } from 'lucide-react'
+import { ArrowLeft, Camera, User, Mail, UserCircle, Save, Utensils, Sparkles, Heart } from 'lucide-react'
 import { useTheme } from '@/hooks/useTheme'
 import { useAuthStore } from '../../auth/hooks/useAuthStore'
 
 const ProfileEditPage = () => {
-    const { user: authUser } = useAuthStore()
-    const user = authUser || { name: 'Alex Johnson', email: 'alex@gastromap.com' }
+    const { user: authUser, updateProfile } = useAuthStore()
+    const user = authUser || {
+        name: 'Alex Johnson',
+        email: 'alex@gastromap.com',
+        preferences: {
+            longTerm: {
+                favoriteCuisines: ['Israeli', 'Modern Polish', 'Coffee'],
+                atmospherePreference: ['cozy', 'modern', 'quiet'],
+                features: ['wifi', 'pet-friendly']
+            }
+        }
+    }
+
     const { theme } = useTheme()
     const isDark = theme === 'dark'
     const navigate = useNavigate()
@@ -15,8 +26,14 @@ const ProfileEditPage = () => {
     const [formData, setFormData] = useState({
         name: user.name,
         email: user.email,
-        bio: 'Food enthusiast traveling the world for the best flavors.',
-        location: 'Krakow, Poland'
+        bio: user.bio || 'Food enthusiast traveling the world for the best flavors.',
+        preferences: user.preferences || {
+            longTerm: {
+                favoriteCuisines: [],
+                atmospherePreference: [],
+                features: []
+            }
+        }
     })
 
     const textStyle = isDark ? "text-white" : "text-gray-900"
@@ -25,9 +42,35 @@ const ProfileEditPage = () => {
     const inputBg = isDark ? "bg-white/5 border-white/10" : "bg-gray-50 border-gray-200"
 
     const handleSave = () => {
-        // Mock save
+        updateProfile(formData)
         navigate('/profile')
     }
+
+    // Toggle helper for preferences
+    const togglePreference = (category, value) => {
+        const current = formData.preferences.longTerm[category] || []
+        const updated = current.includes(value)
+            ? current.filter(item => item !== value)
+            : [...current, value]
+
+        setFormData({
+            ...formData,
+            preferences: {
+                ...formData.preferences,
+                longTerm: {
+                    ...formData.preferences.longTerm,
+                    [category]: updated
+                }
+            }
+        })
+    }
+
+    const CUISINES = [
+        'Italian', 'Japanese', 'Modern Polish', 'Israeli', 'Coffee', 'French', 'Georgian',
+        'Chinese', 'Greek', 'Spanish', 'Mexican', 'Thai', 'American', 'Mediterranean', 'Indian', 'Vietnamese', 'Turkish'
+    ]
+    const ATMOSPHERES = ['cozy', 'modern', 'quiet', 'vibrant', 'romantic', 'family-friendly']
+    const FEATURES = ['wifi', 'pet-friendly', 'outdoor seating', 'vegan-options', 'live music']
 
     return (
         <div className="w-full min-h-screen relative z-10 pb-32">
@@ -55,10 +98,12 @@ const ProfileEditPage = () => {
                     </div>
                 </div>
 
-                {/* Form */}
+                {/* Basic Info */}
                 <div className={`p-6 rounded-[32px] border ${cardBg} space-y-5`}>
+                    <h3 className={`text-[11px] font-black uppercase tracking-widest ml-2 mb-2 ${subTextStyle}`}>Basic Information</h3>
+
                     <div className="space-y-2">
-                        <label className={`text-[11px] font-black uppercase tracking-widest ml-2 ${subTextStyle}`}>Full Name</label>
+                        <label className={`text-[10px] font-bold uppercase tracking-tight ml-2 ${subTextStyle}`}>Full Name</label>
                         <div className="relative">
                             <User className="absolute left-4 top-1/2 -translate-y-1/2 opacity-30" size={18} />
                             <input
@@ -72,7 +117,7 @@ const ProfileEditPage = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <label className={`text-[11px] font-black uppercase tracking-widest ml-2 ${subTextStyle}`}>Email Address</label>
+                        <label className={`text-[10px] font-bold uppercase tracking-tight ml-2 ${subTextStyle}`}>Email Address</label>
                         <div className="relative">
                             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 opacity-30" size={18} />
                             <input
@@ -86,13 +131,87 @@ const ProfileEditPage = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <label className={`text-[11px] font-black uppercase tracking-widest ml-2 ${subTextStyle}`}>Bio</label>
+                        <label className={`text-[10px] font-bold uppercase tracking-tight ml-2 ${subTextStyle}`}>Bio</label>
                         <textarea
                             value={formData.bio}
                             onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                            className={`w-full p-4 rounded-2xl text-sm font-bold outline-none border transition-all focus:border-blue-500 h-32 resize-none ${inputBg} ${textStyle}`}
+                            className={`w-full p-4 rounded-2xl text-sm font-bold outline-none border transition-all focus:border-blue-500 h-24 resize-none ${inputBg} ${textStyle}`}
                             placeholder="Tell us about yourself"
                         />
+                    </div>
+                </div>
+
+                {/* Taste Profile Editor */}
+                <div className={`p-6 rounded-[32px] border ${cardBg} space-y-6`}>
+                    <div className="flex items-center gap-2 mb-2">
+                        <Sparkles size={16} className="text-yellow-500" />
+                        <h3 className={`text-[11px] font-black uppercase tracking-widest ${subTextStyle}`}>Taste Profile DNA</h3>
+                    </div>
+
+                    {/* Cuisines Editor */}
+                    <div className="space-y-3">
+                        <label className={`text-[10px] font-black uppercase tracking-widest opacity-40 ml-1 ${textStyle}`}>Favorite Cuisines</label>
+                        <div className="flex flex-wrap gap-2">
+                            {CUISINES.map(cuisine => {
+                                const isSelected = formData.preferences?.longTerm?.favoriteCuisines?.includes(cuisine)
+                                return (
+                                    <button
+                                        key={cuisine}
+                                        onClick={() => togglePreference('favoriteCuisines', cuisine)}
+                                        className={`px-4 py-2 rounded-xl text-[11px] font-bold border transition-all ${isSelected
+                                            ? (isDark ? 'bg-blue-500/20 border-blue-500 text-blue-400' : 'bg-blue-600 border-blue-600 text-white')
+                                            : (isDark ? 'bg-white/5 border-white/10 text-white/40' : 'bg-gray-100 border-gray-200 text-gray-500')
+                                            }`}
+                                    >
+                                        {cuisine}
+                                    </button>
+                                )
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Atmosphere Editor */}
+                    <div className="space-y-3">
+                        <label className={`text-[10px] font-black uppercase tracking-widest opacity-40 ml-1 ${textStyle}`}>Atmosphere Style</label>
+                        <div className="flex flex-wrap gap-2">
+                            {ATMOSPHERES.map(style => {
+                                const isSelected = formData.preferences?.longTerm?.atmospherePreference?.includes(style)
+                                return (
+                                    <button
+                                        key={style}
+                                        onClick={() => togglePreference('atmospherePreference', style)}
+                                        className={`px-4 py-2 rounded-xl text-[11px] font-bold border transition-all ${isSelected
+                                            ? (isDark ? 'bg-purple-500/20 border-purple-500 text-purple-400' : 'bg-purple-600 border-purple-600 text-white')
+                                            : (isDark ? 'bg-white/5 border-white/10 text-white/40' : 'bg-gray-100 border-gray-200 text-gray-500')
+                                            }`}
+                                    >
+                                        #{style}
+                                    </button>
+                                )
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Features Editor */}
+                    <div className="space-y-3">
+                        <label className={`text-[10px] font-black uppercase tracking-widest opacity-40 ml-1 ${textStyle}`}>Must-have Features</label>
+                        <div className="flex flex-wrap gap-2">
+                            {FEATURES.map(feature => {
+                                const isSelected = formData.preferences?.longTerm?.features?.includes(feature)
+                                return (
+                                    <button
+                                        key={feature}
+                                        onClick={() => togglePreference('features', feature)}
+                                        className={`px-4 py-2 rounded-xl text-[11px] font-bold border transition-all ${isSelected
+                                            ? (isDark ? 'bg-green-500/20 border-green-500 text-green-400' : 'bg-green-600 border-green-600 text-white')
+                                            : (isDark ? 'bg-white/5 border-white/10 text-white/40' : 'bg-gray-100 border-gray-200 text-gray-500')
+                                            }`}
+                                    >
+                                        {feature}
+                                    </button>
+                                )
+                            })}
+                        </div>
                     </div>
                 </div>
 

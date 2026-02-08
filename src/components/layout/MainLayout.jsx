@@ -15,14 +15,14 @@ export function MainLayout() {
     const location = useLocation()
     const isProfile = location.pathname === '/profile'
     const isAIGuide = location.pathname === '/ai-guide'
-    const hasSearch = !isProfile && !isAIGuide
+    const isExplore = location.pathname.startsWith('/explore')
+    const hasSearch = !isProfile && !isAIGuide && !isExplore
 
     return (
         <AuroraBackground theme={theme}>
             <div className="flex flex-col min-h-screen text-foreground relative">
                 <UniversalHeader />
-                <main className={`flex-1 transition-all duration-300 ${hasSearch ? 'pt-0 md:pt-0' : 'pt-0 md:pt-0'
-                    } pb-24 md:pb-0`}>
+                <main className={`flex-1 transition-all duration-300 ${isAIGuide || isExplore ? 'pb-0' : 'pb-24'} md:pb-0`}>
                     <SubscriptionGate>
                         <Outlet />
                     </SubscriptionGate>

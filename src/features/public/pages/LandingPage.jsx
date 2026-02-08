@@ -164,7 +164,7 @@ const BentoHero = () => {
                                 <Sparkles size={24} />
                             </div>
                             <div>
-                                <h3 className="font-bold text-lg text-slate-900 dark:text-white leading-tight">AI Guide</h3>
+                                <h3 className="font-bold text-lg text-slate-900 dark:text-white leading-tight">GastroGuide</h3>
                                 <p className="text-sm text-slate-500 dark:text-slate-400">Routes & Memory</p>
                             </div>
                         </div>

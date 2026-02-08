@@ -75,7 +75,7 @@ const FilterModal = ({ isOpen, onClose, theme }) => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 {/* Type Selection */}
                                 <div className="space-y-4 text-left md:col-span-2">
-                                    <label className={`text-[11px] font-semibold uppercase tracking-widest ${isDark ? 'text-white/40' : 'text-gray-400'}`}>Establishment Type</label>
+                                    <label className={`text-[11px] font-semibold uppercase tracking-widest ${isDark ? 'text-white/40' : 'text-slate-900'}`}>Establishment Type</label>
                                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                                         {/* Type blocks */}
                                         {[
@@ -106,7 +106,7 @@ const FilterModal = ({ isOpen, onClose, theme }) => {
 
                                 {/* Rating */}
                                 <div className="space-y-4 text-left">
-                                    <label className={`text-[11px] font-semibold uppercase tracking-widest ${isDark ? 'text-white/40' : 'text-gray-400'}`}>Rating</label>
+                                    <label className={`text-[11px] font-semibold uppercase tracking-widest ${isDark ? 'text-white/40' : 'text-slate-900'}`}>Rating</label>
                                     <div className="grid grid-cols-3 gap-3">
                                         <button className="h-14 rounded-2xl bg-blue-600 text-white font-semibold text-sm shadow-lg shadow-blue-500/20">Any</button>
                                         <button className={`h-14 rounded-2xl border flex items-center justify-center gap-1.5 font-semibold text-sm transition-all ${isDark ? 'bg-white/5 border-white/5 text-white shadow-none' : 'bg-white border-gray-100 text-gray-600 shadow-sm'}`}>
@@ -121,7 +121,7 @@ const FilterModal = ({ isOpen, onClose, theme }) => {
 
                             {/* Price Range */}
                             <div className="space-y-4 text-left">
-                                <label className={`text-[11px] font-semibold uppercase tracking-widest ${isDark ? 'text-white/40' : 'text-gray-400'}`}>Price Range</label>
+                                <label className={`text-[11px] font-semibold uppercase tracking-widest ${isDark ? 'text-white/40' : 'text-slate-900'}`}>Price Range</label>
                                 <div className="pt-2 relative">
                                     <input type="range" className="w-full h-2 bg-blue-600/10 rounded-full appearance-none cursor-pointer accent-blue-600" />
                                     <div className={`flex justify-between mt-3 text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-white/30' : 'text-gray-400'}`}>
@@ -135,7 +135,7 @@ const FilterModal = ({ isOpen, onClose, theme }) => {
 
                             {/* Best Time to Visit */}
                             <div className="space-y-4 text-left">
-                                <label className={`text-[11px] font-black uppercase tracking-[0.2em] ${isDark ? 'text-white/40' : 'text-gray-400'}`}>Best Time to Visit</label>
+                                <label className={`text-[11px] font-black uppercase tracking-[0.2em] ${isDark ? 'text-white/40' : 'text-slate-900'}`}>Best Time to Visit</label>
                                 <div className="grid grid-cols-2 gap-3">
                                     {[
                                         { id: 'morning', label: 'Morning', icon: '🌅' },
@@ -159,13 +159,17 @@ const FilterModal = ({ isOpen, onClose, theme }) => {
 
                             {/* Establishment Features (Labels) */}
                             <div className="space-y-6 text-left">
-                                <label className={`text-[11px] font-black uppercase tracking-[0.2em] ${isDark ? 'text-white/40' : 'text-gray-400'}`}>Special Features & Labels</label>
+                                <label className={`text-[11px] font-black uppercase tracking-[0.2em] ${isDark ? 'text-white/40' : 'text-slate-900'}`}>Special Features & Labels</label>
 
                                 <div className="space-y-6">
                                     {[
                                         {
                                             group: "Cuisine & Menu",
-                                            items: ["Signature Cuisine", "Vegan Menu", "Delicious Desserts", "All Day Breakfast", "Imported Products", "Local Products", "Breakfast Menu", "Lunch Menu", "Fusion"]
+                                            items: [
+                                                "Signature Cuisine", "Vegan Menu", "Delicious Desserts", "All Day Breakfast", "Fusion",
+                                                "Italian", "French", "Japanese", "Chinese", "Greek", "Spanish", "Mexican", "Thai",
+                                                "Georgian", "Polish", "Israeli", "American", "Mediterranean", "Indian", "Vietnamese", "Turkish"
+                                            ]
                                         },
                                         {
                                             group: "Bar & Drinks",
@@ -185,7 +189,7 @@ const FilterModal = ({ isOpen, onClose, theme }) => {
                                         }
                                     ].map(cat => (
                                         <div key={cat.group} className="space-y-3">
-                                            <h4 className={`text-[9px] font-black uppercase tracking-widest ${isDark ? 'text-white/50' : 'text-gray-300'}`}>{cat.group}</h4>
+                                            <h4 className={`text-[9px] font-black uppercase tracking-widest ${isDark ? 'text-white/50' : 'text-slate-800'}`}>{cat.group}</h4>
                                             <div className="flex flex-wrap gap-2">
                                                 {cat.items.sort().map(chip => (
                                                     <button key={chip} className={`px-4 py-2 rounded-xl font-bold text-[11px] border transition-all ${isDark ? 'bg-white/5 border-white/5 text-white/70 hover:bg-white/10' : 'bg-gray-50/50 border-gray-100 text-gray-500 hover:border-blue-500/30 hover:text-blue-600'}`}>
@@ -201,7 +205,7 @@ const FilterModal = ({ isOpen, onClose, theme }) => {
                             {/* Distance */}
                             <div className="space-y-4 text-left pt-6 border-t border-white/5">
                                 <div className="flex justify-between items-center">
-                                    <label className={`text-[11px] font-semibold uppercase tracking-widest ${isDark ? 'text-white/40' : 'text-gray-400'}`}>Search Radius</label>
+                                    <label className={`text-[11px] font-semibold uppercase tracking-widest ${isDark ? 'text-white/40' : 'text-slate-900'}`}>Search Radius</label>
                                     <span className="text-blue-500 font-bold text-sm">10 km</span>
                                 </div>
                                 <input type="range" className="w-full h-2 bg-blue-600/10 rounded-full appearance-none cursor-pointer accent-blue-600" />

@@ -24,46 +24,54 @@ const ESTABLISHMENTS_DATA = [
         image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2070&auto=format&fit=crop",
         status: "Open Now",
         distance: "0.8 km",
-        isNew: true
+        isNew: true,
+        special_labels: ['Signature Cuisine', 'Michelin Guide'],
+        best_time: ['evening']
     },
     {
         id: 2,
         title: "Coffee & Art",
         category: "Café",
-        cuisine: "Specialty Coffee",
+        cuisine: "French",
         rating: 4.7,
         reviews: 128,
         price: "$",
         image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2047&auto=format&fit=crop",
         status: "Closing Soon",
         distance: "1.2 km",
-        isNew: false
+        isNew: false,
+        special_labels: ['Specialty Coffee', 'Delicious Desserts'],
+        best_time: ['morning', 'day']
     },
     {
         id: 3,
-        title: "Neon Nights",
-        category: "Bar",
-        cuisine: "Cocktails",
+        title: "Hamsa Hummus",
+        category: "Dining",
+        cuisine: "Israeli",
         rating: 4.8,
         reviews: 512,
         price: "$$",
         image: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2070&auto=format&fit=crop",
         status: "Open Now",
         distance: "2.4 km",
-        isNew: false
+        isNew: false,
+        special_labels: ['Vegan Menu', 'Local Favorite'],
+        best_time: ['day', 'evening']
     },
     {
         id: 4,
         title: "The Golden Crust",
         category: "Bakery",
-        cuisine: "French Pastries",
+        cuisine: "French",
         rating: 4.6,
         reviews: 89,
         price: "$$",
         image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=2072&auto=format&fit=crop",
         status: "Open Now",
         distance: "0.5 km",
-        isNew: true
+        isNew: true,
+        special_labels: ['Bakery', 'Local Products'],
+        best_time: ['morning']
     }
 ]
 
@@ -98,7 +106,7 @@ const LocationsPage = () => {
     }
 
     return (
-        <PageTransition className="min-h-screen bg-transparent relative overflow-hidden">
+        <PageTransition className="fixed inset-0 w-full h-[100dvh] bg-transparent overflow-hidden overscroll-none">
             <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} theme={theme} />
 
             {/* --- MOBILE VIEW: HIDDEN LAYER (MAP) --- */}
@@ -145,7 +153,7 @@ const LocationsPage = () => {
                     if (info.offset.y > 50) setSheetMode('mini')
                 }}
             >
-                <div className={`flex flex-col h-screen rounded-t-[48px] pb-32 border-t backdrop-blur-3xl shadow-[0_-20px_60px_-15px_rgba(0,0,0,0.4)] ${isDark ? 'bg-[#1a1c24]/95 border-white/10' : 'bg-white/98 border-gray-200'}`}>
+                <div className={`flex flex-col h-[100dvh] rounded-t-[48px] pb-32 border-t backdrop-blur-3xl shadow-[0_-20px_60px_-15px_rgba(0,0,0,0.4)] ${isDark ? 'bg-[#1a1c24]/95 border-white/10' : 'bg-white/98 border-gray-200'}`}>
                     {/* Drag Handle & Toggle */}
                     <div
                         onPointerDown={(e) => dragControls.start(e)}
@@ -169,7 +177,7 @@ const LocationsPage = () => {
 
                     {/* Scrollable List Content */}
                     <motion.div
-                        className="flex-1 overflow-y-auto pt-2 pb-24 px-[4vw] scrollbar-hide"
+                        className="flex-1 overflow-y-auto pt-2 pb-32 px-[4vw] scrollbar-hide overscroll-contain touch-pan-y"
                         animate={{
                             opacity: sheetMode === 'full' ? 1 : 0,
                             filter: sheetMode === 'full' ? 'blur(0px)' : 'blur(10px)'
@@ -366,7 +374,7 @@ const LocationsPage = () => {
                                         ${isDark ? 'bg-white/[0.03] border-white/5 shadow-2xl' : 'bg-white border-gray-100 shadow-xl shadow-gray-200/50'}
                                     `}
                                 >
-                                    <div className="relative h-56 mb-5 overflow-hidden rounded-[28px] shadow-inner">
+                                    <div className="relative h-56 mb-5 rounded-[28px] shadow-inner">
                                         <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                                         <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-xs font-black text-gray-900 flex items-center gap-1 shadow-md">
                                             <Star size={14} className="text-yellow-500 fill-yellow-500" /> {item.rating}

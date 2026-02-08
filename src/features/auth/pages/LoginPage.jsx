@@ -40,7 +40,7 @@ const LoginPage = () => {
     }
 
     return (
-        <div className="min-h-screen w-full bg-white flex overflow-hidden">
+        <div className="min-h-screen w-full bg-white flex">
             {/* Left Side - Visual (Desktop only) */}
             <div className="hidden lg:flex lg:w-[45%] relative bg-black text-white p-12 flex-col justify-between overflow-hidden">
                 {/* Aurora Background */}

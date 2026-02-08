@@ -124,15 +124,15 @@ const DashboardPage = () => {
     ]
 
     const recommended = [
-        { id: 101, title: 'Bouble affrent Gomen', subtitle: 'Authentic italian flavors', rating: 4.8, image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2070&auto=format&fit=crop' },
-        { id: 102, title: 'Bouda Pooble Khint', subtitle: 'Seafood fresh from ocean', rating: 4.7, image: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1974&auto=format&fit=crop' },
-        { id: 103, title: 'Nirioves Pooble PoPo', subtitle: 'Best sushi in town', rating: 4.9, image: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=2070&auto=format&fit=crop' },
+        { id: 101, title: 'La Mammola', subtitle: 'Authentic Italian flavors', rating: 4.8, image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2070&auto=format&fit=crop', special_labels: ['Signature Cuisine', 'Michelin Guide'] },
+        { id: 102, title: 'Hamsa Hummus', subtitle: 'Modern Israeli cuisine', rating: 4.7, image: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1974&auto=format&fit=crop', special_labels: ['Vegan Menu', 'Local Favorite'] },
+        { id: 103, title: 'Szara Gęś', subtitle: 'Best view in Krakow', rating: 4.9, image: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=2070&auto=format&fit=crop', special_labels: ['Michelin Star', 'Scenic View'] },
     ]
 
     const textStyle = theme === 'light' ? "text-gray-900" : "text-white"
 
     return (
-        <PageTransition className="w-full max-w-7xl mx-auto min-h-screen flex flex-col relative z-0">
+        <PageTransition className="w-full max-w-7xl mx-auto h-[100dvh] flex flex-col relative z-0 overscroll-none overflow-y-auto scrollbar-hide">
             <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} theme={theme} />
 
             {/* MOBILE VIEW (Horizontal Sliders) */}

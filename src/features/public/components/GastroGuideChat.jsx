@@ -32,7 +32,7 @@ export default function GastroGuideChat({ isOpen, onClose }) {
                             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-200">
                                 <Sparkles className="h-4 w-4 text-white" />
                             </div>
-                            <span className="font-semibold text-sm tracking-tight text-gray-900 dark:text-white">Gastro Intelligence</span>
+                            <span className="font-semibold text-sm tracking-tight text-gray-900 dark:text-white">GastroGuide</span>
                         </div>
                         <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full hover:bg-black/5 dark:hover:bg-white/5 w-8 h-8">
                             <X className="h-4 w-4 opacity-50" />

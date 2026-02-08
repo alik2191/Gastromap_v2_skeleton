@@ -68,7 +68,7 @@ export default function AdminLayout() {
             </div>
 
             {/* Nav */}
-            <nav className={cn("flex-1 px-4 py-10 space-y-2 overflow-y-auto scrollbar-hide relative z-10", collapsed && "px-3")}>
+            <nav className={cn("flex-1 px-4 py-10 space-y-2 overflow-y-auto relative z-10", collapsed && "px-3")}>
                 {navItems.map(item => {
                     const isActive = location.pathname === item.path || (item.path !== '/admin' && location.pathname.startsWith(item.path))
                     return (
@@ -187,7 +187,7 @@ export default function AdminLayout() {
                     </div>
                 </header>
 
-                <main className="flex-1 overflow-y-auto overflow-x-hidden p-6 lg:p-10 scrollbar-hide bg-[#FDFDFD] dark:bg-slate-950">
+                <main className="flex-1 overflow-y-auto overflow-x-hidden p-6 lg:p-10 bg-[#FDFDFD] dark:bg-slate-950">
                     <div className="max-w-[1600px] mx-auto min-h-full">
                         <Outlet />
                     </div>

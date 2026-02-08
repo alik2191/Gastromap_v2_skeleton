@@ -14,7 +14,7 @@ const SubscriptionGate = ({ children }) => {
 
     const plans = [
         { name: 'Basic', price: '$9.99', features: ['Explore 10,000+ locations', 'Save your favorites', 'Basic AI Search'], color: 'from-blue-500/10 to-blue-600/10' },
-        { name: 'Premium', price: '$89.99', features: ['All Basic features', 'AI Guide Pro Assistant', 'Offline Maps', 'Insider Tips'], color: 'from-purple-500/15 to-blue-600/15', popular: true },
+        { name: 'Premium', price: '$89.99', features: ['All Basic features', 'GastroGuide Pro Assistant', 'Offline Maps', 'Insider Tips'], color: 'from-purple-500/15 to-blue-600/15', popular: true },
     ]
 
     return (

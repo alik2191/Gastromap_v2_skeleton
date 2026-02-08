@@ -49,7 +49,7 @@ const CitiesPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-transparent relative">
+        <div className="h-[100dvh] bg-transparent relative overscroll-none overflow-y-auto scrollbar-hide">
             {/* --- MOBILE VIEW --- */}
             <motion.div
                 className="md:hidden space-y-5 px-[2.5vw] pt-24 pb-12"

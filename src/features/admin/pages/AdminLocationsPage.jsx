@@ -56,10 +56,10 @@ const AdminLocationsPage = () => {
     const navigate = useNavigate()
 
     const [locationsList, setLocationsList] = useState([
-        { id: 1, name: 'Zen Garden', category: 'Restaurant', city: 'Krakow', country: 'Poland', status: 'Active', rating: 4.8, description: 'Лучший дзен в Кракове', address: 'ul. Kanonicza 12' },
-        { id: 2, name: 'Coffee Hub', category: 'Cafe', city: 'Warsaw', country: 'Poland', status: 'Pending', rating: 4.5, description: 'Кофе и работа', address: 'ul. Marszałkowska 8' },
-        { id: 3, name: 'Pasta Viva', category: 'Restaurant', city: 'Berlin', country: 'Germany', status: 'Active', rating: 4.2, description: 'Итальянская страсть', address: 'Müllerstraße 15' },
-        { id: 4, name: 'Sushi Wave', category: 'Sushi', city: 'Krakow', country: 'Poland', status: 'Draft', rating: 0.0, description: 'Японская волна', address: 'ul. Grodzka 3' },
+        { id: 1, name: 'Zen Garden', category: 'Restaurant', cuisine: 'Китайская', city: 'Krakow', country: 'Poland', status: 'Active', rating: 4.8, description: 'Лучший дзен в Кракове', address: 'ul. Kanonicza 12', special_labels: ['Китайская'] },
+        { id: 2, name: 'Coffee Hub', category: 'Cafe', cuisine: 'Французская', city: 'Warsaw', country: 'Poland', status: 'Pending', rating: 4.5, description: 'Кофе и работа', address: 'ul. Marszałkowska 8', special_labels: ['Вкусные десерты'] },
+        { id: 3, name: 'Pasta Viva', category: 'Restaurant', cuisine: 'Итальянская', city: 'Berlin', country: 'Germany', status: 'Active', rating: 4.2, description: 'Итальянская страсть', address: 'Müllerstraße 15', special_labels: ['Итальянская'] },
+        { id: 4, name: 'Sushi Wave', category: 'Sushi', cuisine: 'Японская', city: 'Krakow', country: 'Poland', status: 'Draft', rating: 0.0, description: 'Японская волна', address: 'ul. Grodzka 3', special_labels: ['Японская'] },
     ])
 
     const handleCreateNew = () => {
@@ -87,6 +87,7 @@ const AdminLocationsPage = () => {
             tags: [],
             best_time: [],
             special_labels: [],
+            cuisine: '',
             is_hidden_gem: false,
             is_featured: false,
             status: 'Draft'
@@ -122,6 +123,7 @@ const AdminLocationsPage = () => {
             tags: loc.tags || [],
             best_time: loc.best_time || [],
             special_labels: loc.special_labels || [],
+            cuisine: loc.cuisine || '',
             is_hidden_gem: loc.is_hidden_gem || false,
             is_featured: loc.is_featured || false
         })
@@ -157,7 +159,10 @@ const AdminLocationsPage = () => {
     const LABEL_GROUPS = {
         "Кухня и Меню": [
             "Авторская кухня", "Веганское меню", "Вкусные десерты", "Завтраки целый день",
-            "Импортные продукты", "Местные продукты", "Меню завтраков", "Меню ланча", "Фьюжен"
+            "Импортные продукты", "Местные продукты", "Меню завтраков", "Меню ланча", "Фьюжен",
+            "Итальянская", "Французская", "Японская", "Китайская", "Греческая", "Испанская",
+            "Мексиканская", "Тайская", "Грузинская", "Польская", "Израильская", "Американская",
+            "Средиземноморская", "Индийская", "Вьетнамская", "Турецкая"
         ].sort(),
         "Бар и Напитки": [
             "Авторские коктейли", "Винная карта", "Гостевые смены", "Дегустация вин",
@@ -227,7 +232,14 @@ const AdminLocationsPage = () => {
                                     </div>
                                     <div className="min-w-0">
                                         <p className="text-[13px] font-bold text-slate-900 dark:text-white truncate leading-tight">{loc.name}</p>
-                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 uppercase tracking-widest font-bold">{loc.category}</p>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <p className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest font-black shrink-0">{loc.category}</p>
+                                            {loc.cuisine && (
+                                                <Badge variant="secondary" className="bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[8px] h-4 px-1.5 font-black border-none uppercase tracking-widest shrink-0">
+                                                    {loc.cuisine}
+                                                </Badge>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </td>
@@ -481,20 +493,41 @@ const AdminLocationsPage = () => {
                                                 </div>
                                             </div>
                                             <div className="space-y-3">
-                                                <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-[0.2em] ml-1">Диапазон цен</label>
+                                                <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-[0.2em] ml-1">Основная кухня</label>
                                                 <div className="relative">
                                                     <select
-                                                        value={formData.price_range}
-                                                        onChange={e => setFormData({ ...formData, price_range: e.target.value })}
+                                                        value={formData.cuisine}
+                                                        onChange={e => setFormData({ ...formData, cuisine: e.target.value })}
                                                         className="w-full px-6 py-4 bg-slate-50/40 dark:bg-slate-800/40 rounded-2xl border-none font-bold text-xs outline-none focus:ring-4 ring-indigo-500/5 transition-all appearance-none"
                                                     >
-                                                        <option value="$">$ (Дешево)</option>
-                                                        <option value="$$">$$ (Средне)</option>
-                                                        <option value="$$$">$$$ (Дорого)</option>
-                                                        <option value="$$$$">$$$$ (Люкс)</option>
+                                                        <option value="">Не выбрано</option>
+                                                        {[
+                                                            "Итальянская", "Французская", "Японская", "Китайская", "Греческая", "Испанская",
+                                                            "Мексиканская", "Тайская", "Грузинская", "Польская", "Израильская", "Американская",
+                                                            "Средиземноморская", "Индийская", "Вьетнамская", "Турецкая"
+                                                        ].sort().map(cuisine => (
+                                                            <option key={cuisine} value={cuisine}>{cuisine}</option>
+                                                        ))}
                                                     </select>
                                                     <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
                                                 </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-[0.2em] ml-1">Диапазон цен</label>
+                                            <div className="relative">
+                                                <select
+                                                    value={formData.price_range}
+                                                    onChange={e => setFormData({ ...formData, price_range: e.target.value })}
+                                                    className="w-full px-6 py-4 bg-slate-50/40 dark:bg-slate-800/40 rounded-2xl border-none font-bold text-xs outline-none focus:ring-4 ring-indigo-500/5 transition-all appearance-none"
+                                                >
+                                                    <option value="$">$ (Дешево)</option>
+                                                    <option value="$$">$$ (Средне)</option>
+                                                    <option value="$$$">$$$ (Дорого)</option>
+                                                    <option value="$$$$">$$$$ (Люкс)</option>
+                                                </select>
+                                                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
                                             </div>
                                         </div>
                                     </div>
