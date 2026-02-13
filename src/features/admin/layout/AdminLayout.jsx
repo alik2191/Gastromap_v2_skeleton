@@ -92,6 +92,10 @@ export default function AdminLayout() {
 
             {/* Footer Actions */}
             <div className="p-6 bg-slate-50/30 dark:bg-slate-900/30 border-t border-slate-100 dark:border-slate-800/50 space-y-3 relative z-10">
+                <Link to="/dashboard" className={cn("w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all border border-transparent hover:border-indigo-100/30 font-black text-[10px] uppercase tracking-widest", collapsed && "justify-center px-0")}>
+                    <ArrowLeft size={18} />
+                    {!collapsed && <span>В приложение</span>}
+                </Link>
                 <button onClick={toggleTheme} className={cn("w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-700 font-black text-[10px] uppercase tracking-widest", collapsed && "justify-center px-0")}>
                     {theme === 'dark' ? <Sun size={18} className="text-yellow-500" /> : <Moon size={18} className="text-indigo-600" />}
                     {!collapsed && <span>{theme === 'dark' ? 'Светлая' : 'Темная'}</span>}

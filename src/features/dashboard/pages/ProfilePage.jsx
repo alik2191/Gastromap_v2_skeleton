@@ -145,48 +145,33 @@ const ProfilePage = () => {
                     </div>
 
                     <div className="space-y-6">
-                        {/* Favorite Cuisines */}
+                        {/* Foodie DNA Section */}
                         <div className="space-y-3">
-                            <label className={`text-[10px] font-black uppercase tracking-widest opacity-40 ml-1 ${textStyle}`}>Favorite Cuisines</label>
-                            <div className="flex flex-wrap gap-2">
-                                {user.preferences?.longTerm?.favoriteCuisines?.map(cuisine => (
-                                    <span key={cuisine} className={`px-4 py-2 rounded-xl text-[11px] font-bold border ${isDark ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-50 border-blue-100 text-blue-600'}`}>
-                                        {cuisine}
-                                    </span>
-                                ))}
-                                {(!user.preferences?.longTerm?.favoriteCuisines || user.preferences.longTerm.favoriteCuisines.length === 0) && (
-                                    <span className="text-[11px] italic opacity-30">No cuisines selected</span>
-                                )}
+                            <label className={`text-[10px] font-black uppercase tracking-widest opacity-40 ml-1 ${textStyle}`}>Foodie DNA & Preferences</label>
+                            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-blue-500/5 border-blue-500/10' : 'bg-blue-50/50 border-blue-100/50'}`}>
+                                <p className={`text-[13px] leading-relaxed italic ${textStyle} opacity-70`}>
+                                    {user.preferences?.longTerm?.foodieDNA || "No preferences set yet. Edit your profile to describe your culinary DNA."}
+                                </p>
                             </div>
                         </div>
 
                         {/* Preferred Atmosphere */}
                         <div className="space-y-3">
                             <label className={`text-[10px] font-black uppercase tracking-widest opacity-40 ml-1 ${textStyle}`}>Atmosphere Style</label>
-                            <div className="flex flex-wrap gap-2">
-                                {user.preferences?.longTerm?.atmospherePreference?.map(style => (
-                                    <span key={style} className={`px-4 py-2 rounded-xl text-[11px] font-bold border ${isDark ? 'bg-purple-500/10 border-purple-500/20 text-purple-400' : 'bg-purple-50 border-purple-100 text-purple-600'}`}>
-                                        #{style}
-                                    </span>
-                                ))}
-                                {(!user.preferences?.longTerm?.atmospherePreference || user.preferences.longTerm.atmospherePreference.length === 0) && (
-                                    <span className="text-[11px] italic opacity-30">No styles selected</span>
-                                )}
+                            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-purple-500/5 border-purple-500/10' : 'bg-purple-50/50 border-purple-100/50'}`}>
+                                <p className={`text-[13px] leading-relaxed italic ${textStyle} opacity-70`}>
+                                    {user.preferences?.longTerm?.atmospherePreference || "No atmosphere preferred yet. How about something cozy?"}
+                                </p>
                             </div>
                         </div>
 
                         {/* Must-have Features */}
                         <div className="space-y-3">
                             <label className={`text-[10px] font-black uppercase tracking-widest opacity-40 ml-1 ${textStyle}`}>Must-have Features</label>
-                            <div className="flex flex-wrap gap-2">
-                                {user.preferences?.longTerm?.features?.map(feature => (
-                                    <span key={feature} className={`px-4 py-2 rounded-xl text-[11px] font-bold border ${isDark ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-green-50 border-green-100 text-green-600'}`}>
-                                        {feature}
-                                    </span>
-                                ))}
-                                {(!user.preferences?.longTerm?.features || user.preferences.longTerm.features.length === 0) && (
-                                    <span className="text-[11px] italic opacity-30">No features selected</span>
-                                )}
+                            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-green-500/5 border-green-500/10' : 'bg-green-50/50 border-green-100/50'}`}>
+                                <p className={`text-[13px] leading-relaxed italic ${textStyle} opacity-70`}>
+                                    {user.preferences?.longTerm?.features || "No specific features required yet. WiFi? Outdoor seating?"}
+                                </p>
                             </div>
                         </div>
                     </div>

@@ -29,9 +29,9 @@ const ProfileEditPage = () => {
         bio: user.bio || 'Food enthusiast traveling the world for the best flavors.',
         preferences: user.preferences || {
             longTerm: {
-                favoriteCuisines: [],
-                atmospherePreference: [],
-                features: []
+                atmospherePreference: '',
+                features: '',
+                foodieDNA: ''
             }
         }
     })
@@ -46,31 +46,6 @@ const ProfileEditPage = () => {
         navigate('/profile')
     }
 
-    // Toggle helper for preferences
-    const togglePreference = (category, value) => {
-        const current = formData.preferences.longTerm[category] || []
-        const updated = current.includes(value)
-            ? current.filter(item => item !== value)
-            : [...current, value]
-
-        setFormData({
-            ...formData,
-            preferences: {
-                ...formData.preferences,
-                longTerm: {
-                    ...formData.preferences.longTerm,
-                    [category]: updated
-                }
-            }
-        })
-    }
-
-    const CUISINES = [
-        'Italian', 'Japanese', 'Modern Polish', 'Israeli', 'Coffee', 'French', 'Georgian',
-        'Chinese', 'Greek', 'Spanish', 'Mexican', 'Thai', 'American', 'Mediterranean', 'Indian', 'Vietnamese', 'Turkish'
-    ]
-    const ATMOSPHERES = ['cozy', 'modern', 'quiet', 'vibrant', 'romantic', 'family-friendly']
-    const FEATURES = ['wifi', 'pet-friendly', 'outdoor seating', 'vegan-options', 'live music']
 
     return (
         <div className="w-full min-h-screen relative z-10 pb-32">
@@ -148,70 +123,78 @@ const ProfileEditPage = () => {
                         <h3 className={`text-[11px] font-black uppercase tracking-widest ${subTextStyle}`}>Taste Profile DNA</h3>
                     </div>
 
-                    {/* Cuisines Editor */}
-                    <div className="space-y-3">
-                        <label className={`text-[10px] font-black uppercase tracking-widest opacity-40 ml-1 ${textStyle}`}>Favorite Cuisines</label>
-                        <div className="flex flex-wrap gap-2">
-                            {CUISINES.map(cuisine => {
-                                const isSelected = formData.preferences?.longTerm?.favoriteCuisines?.includes(cuisine)
-                                return (
-                                    <button
-                                        key={cuisine}
-                                        onClick={() => togglePreference('favoriteCuisines', cuisine)}
-                                        className={`px-4 py-2 rounded-xl text-[11px] font-bold border transition-all ${isSelected
-                                            ? (isDark ? 'bg-blue-500/20 border-blue-500 text-blue-400' : 'bg-blue-600 border-blue-600 text-white')
-                                            : (isDark ? 'bg-white/5 border-white/10 text-white/40' : 'bg-gray-100 border-gray-200 text-gray-500')
-                                            }`}
-                                    >
-                                        {cuisine}
-                                    </button>
-                                )
-                            })}
+                    {/* Foodie DNA Input */}
+                    <div className="space-y-4">
+                        <div className="flex flex-col gap-1">
+                            <label className={`text-[10px] font-black uppercase tracking-widest opacity-40 ml-1 ${textStyle}`}>Foodie DNA & Preferences</label>
+                            <p className={`text-[10px] font-medium ml-1 opacity-50 ${textStyle}`}>Describe your tastes, allergies, or what you crave most. GastroGuide uses this to personalize recommendations.</p>
+                        </div>
+                        <div className="relative group">
+                            <div className="absolute top-4 left-4 text-blue-500 opacity-50 group-focus-within:opacity-100 transition-opacity">
+                                <Sparkles size={18} />
+                            </div>
+                            <textarea
+                                value={formData.preferences?.longTerm?.foodieDNA || ''}
+                                onChange={(e) => setFormData({
+                                    ...formData,
+                                    preferences: {
+                                        ...formData.preferences,
+                                        longTerm: {
+                                            ...formData.preferences.longTerm,
+                                            foodieDNA: e.target.value
+                                        }
+                                    }
+                                })}
+                                className={`w-full pl-12 pr-4 py-4 rounded-[24px] text-sm font-bold outline-none border transition-all focus:border-blue-500 h-32 resize-none ${inputBg} ${textStyle}`}
+                                placeholder="E.g., I love spicy Asian food, authentic Italian pasta, and quiet specialty coffee shops. I'm vegan and avoid cilantro..."
+                            />
                         </div>
                     </div>
 
                     {/* Atmosphere Editor */}
-                    <div className="space-y-3">
-                        <label className={`text-[10px] font-black uppercase tracking-widest opacity-40 ml-1 ${textStyle}`}>Atmosphere Style</label>
-                        <div className="flex flex-wrap gap-2">
-                            {ATMOSPHERES.map(style => {
-                                const isSelected = formData.preferences?.longTerm?.atmospherePreference?.includes(style)
-                                return (
-                                    <button
-                                        key={style}
-                                        onClick={() => togglePreference('atmospherePreference', style)}
-                                        className={`px-4 py-2 rounded-xl text-[11px] font-bold border transition-all ${isSelected
-                                            ? (isDark ? 'bg-purple-500/20 border-purple-500 text-purple-400' : 'bg-purple-600 border-purple-600 text-white')
-                                            : (isDark ? 'bg-white/5 border-white/10 text-white/40' : 'bg-gray-100 border-gray-200 text-gray-500')
-                                            }`}
-                                    >
-                                        #{style}
-                                    </button>
-                                )
-                            })}
+                    <div className="space-y-4">
+                        <div className="flex flex-col gap-1">
+                            <label className={`text-[10px] font-black uppercase tracking-widest opacity-40 ml-1 ${textStyle}`}>Atmosphere Style</label>
+                            <p className={`text-[10px] font-medium ml-1 opacity-50 ${textStyle}`}>What kind of vibe do you prefer? Quiet, vibrant, romantic, or perfect for work?</p>
                         </div>
+                        <textarea
+                            value={formData.preferences?.longTerm?.atmospherePreference || ''}
+                            onChange={(e) => setFormData({
+                                ...formData,
+                                preferences: {
+                                    ...formData.preferences,
+                                    longTerm: {
+                                        ...formData.preferences.longTerm,
+                                        atmospherePreference: e.target.value
+                                    }
+                                }
+                            })}
+                            className={`w-full p-4 rounded-[24px] text-sm font-bold outline-none border transition-all focus:border-blue-500 h-24 resize-none ${inputBg} ${textStyle}`}
+                            placeholder="E.g., I prefer quiet, hidden places with dim lighting and jazz. Perfect for long reading sessions..."
+                        />
                     </div>
 
                     {/* Features Editor */}
-                    <div className="space-y-3">
-                        <label className={`text-[10px] font-black uppercase tracking-widest opacity-40 ml-1 ${textStyle}`}>Must-have Features</label>
-                        <div className="flex flex-wrap gap-2">
-                            {FEATURES.map(feature => {
-                                const isSelected = formData.preferences?.longTerm?.features?.includes(feature)
-                                return (
-                                    <button
-                                        key={feature}
-                                        onClick={() => togglePreference('features', feature)}
-                                        className={`px-4 py-2 rounded-xl text-[11px] font-bold border transition-all ${isSelected
-                                            ? (isDark ? 'bg-green-500/20 border-green-500 text-green-400' : 'bg-green-600 border-green-600 text-white')
-                                            : (isDark ? 'bg-white/5 border-white/10 text-white/40' : 'bg-gray-100 border-gray-200 text-gray-500')
-                                            }`}
-                                    >
-                                        {feature}
-                                    </button>
-                                )
-                            })}
+                    <div className="space-y-4">
+                        <div className="flex flex-col gap-1">
+                            <label className={`text-[10px] font-black uppercase tracking-widest opacity-40 ml-1 ${textStyle}`}>Must-have Features</label>
+                            <p className={`text-[10px] font-medium ml-1 opacity-50 ${textStyle}`}>Any specific requirements like high-speed WiFi, pet-friendly, or outdoor seating?</p>
                         </div>
+                        <textarea
+                            value={formData.preferences?.longTerm?.features || ''}
+                            onChange={(e) => setFormData({
+                                ...formData,
+                                preferences: {
+                                    ...formData.preferences,
+                                    longTerm: {
+                                        ...formData.preferences.longTerm,
+                                        features: e.target.value
+                                    }
+                                }
+                            })}
+                            className={`w-full p-4 rounded-[24px] text-sm font-bold outline-none border transition-all focus:border-blue-500 h-24 resize-none ${inputBg} ${textStyle}`}
+                            placeholder="E.g., High-speed WiFi is a must. Also, I usually travel with my dog, so pet-friendly places only please..."
+                        />
                     </div>
                 </div>
 

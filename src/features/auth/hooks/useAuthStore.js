@@ -4,10 +4,10 @@ import { persist } from 'zustand/middleware'
 // Default preferences for new users
 const DEFAULT_PREFERENCES = {
     longTerm: {
-        favoriteCuisines: [],
-        atmospherePreference: [],
+        atmospherePreference: '',
         priceRange: ['$', '$$'],
-        features: []
+        features: '',
+        foodieDNA: ''
     },
     shortTerm: {}
 }

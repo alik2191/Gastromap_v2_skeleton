@@ -40,20 +40,30 @@ export const useGastroAI = () => {
 
         let filteredLocations = [...locations];
 
-        // Apply user's long-term preferences first (if available)
-        if (user?.preferences?.longTerm?.favoriteCuisines?.length > 0) {
-            const favCuisines = user.preferences.longTerm.favoriteCuisines.map(c => c.toLowerCase());
-            filteredLocations = filteredLocations.sort((a, b) => {
-                const aMatch = favCuisines.some(cuisine =>
-                    a.category.toLowerCase().includes(cuisine) ||
-                    a.tags.some(t => t.toLowerCase().includes(cuisine))
-                );
-                const bMatch = favCuisines.some(cuisine =>
-                    b.category.toLowerCase().includes(cuisine) ||
-                    b.tags.some(t => t.toLowerCase().includes(cuisine))
-                );
-                return bMatch - aMatch;
-            });
+        // Apply user's long-term DNA preferences (Deep Personalization)
+        if (user?.preferences?.longTerm) {
+            const { foodieDNA, atmospherePreference, features } = user.preferences.longTerm;
+            const combinedDNA = [foodieDNA, atmospherePreference, features].filter(Boolean).join(' ').toLowerCase();
+
+            if (combinedDNA) {
+                filteredLocations = filteredLocations.sort((a, b) => {
+                    let aScore = 0;
+                    let bScore = 0;
+
+                    // Simple keyword matching for all DNA text
+                    const keywords = combinedDNA.split(/\s+/).filter(w => w.length > 3);
+
+                    keywords.forEach(word => {
+                        const aData = [a.title, a.category, ...a.tags].join(' ').toLowerCase();
+                        const bData = [b.title, b.category, ...b.tags].join(' ').toLowerCase();
+
+                        if (aData.includes(word)) aScore++;
+                        if (bData.includes(word)) bScore++;
+                    });
+
+                    return bScore - aScore;
+                });
+            }
         }
 
         // Filter locations based on short-term context
