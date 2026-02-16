@@ -21,13 +21,16 @@ export function AnimatedInputBar({ input, onInputChange, onSubmit, isTyping }) {
     const isLongPressing = useRef(false)
 
     const navItems = [
-        { icon: Home, label: 'Dashboard', path: '/dashboard', angle: -60 },
-        { icon: Map, label: 'Explore', path: '/explore', angle: -20 },
-        { icon: Heart, label: 'Saved', path: '/saved', angle: 20 },
-        { icon: CheckCircle, label: 'Visited', path: '/visited', angle: 60 },
+        { icon: Home, label: 'Dashboard', path: '/dashboard', angle: -45 },
+        { icon: Map, label: 'Explore', path: '/explore', angle: -15 },
+        { icon: Heart, label: 'Saved', path: '/saved', angle: 15 },
+        { icon: CheckCircle, label: 'Visited', path: '/visited', angle: 45 },
     ]
 
     const handlePointerDown = (e) => {
+        // Only trigger joystick if NOT typing
+        if (isTyping) return
+
         isLongPressing.current = false
         longPressTimer.current = setTimeout(() => {
             setIsMenuOpen(true)
@@ -49,7 +52,7 @@ export function AnimatedInputBar({ input, onInputChange, onSubmit, isTyping }) {
         const distance = Math.sqrt(dx * dx + dy * dy)
 
         // Only trigger if dragged far enough
-        if (distance > 40) {
+        if (distance > 30) {
             const rad = Math.atan2(dy, dx)
             const deg = rad * (180 / Math.PI)
 
@@ -59,7 +62,7 @@ export function AnimatedInputBar({ input, onInputChange, onSubmit, isTyping }) {
 
             navItems.forEach((item, index) => {
                 const diff = Math.abs(deg - (item.angle - 90))
-                if (diff < minDiff && diff < 30) {
+                if (diff < minDiff && diff < 35) {
                     minDiff = diff
                     closest = index
                 }
@@ -83,9 +86,15 @@ export function AnimatedInputBar({ input, onInputChange, onSubmit, isTyping }) {
             }
             setIsMenuOpen(false)
             setSelectedIndex(-1)
-        } else if (!isLongPressing.current) {
-            // It was a regular click
         }
+    }
+
+    // New form submit handler to prevent empty sends
+    const handleLocalSubmit = (e) => {
+        e.preventDefault()
+        if (isLongPressing.current) return
+        if (!input.trim() || isTyping) return
+        onSubmit(e)
     }
 
     // Cleanup timers
@@ -108,10 +117,7 @@ export function AnimatedInputBar({ input, onInputChange, onSubmit, isTyping }) {
             style={{ perspective: 1000 }}
         >
             <form
-                onSubmit={(e) => {
-                    if (isLongPressing.current) e.preventDefault()
-                    else onSubmit(e)
-                }}
+                onSubmit={handleLocalSubmit}
                 className="max-w-md mx-auto pointer-events-auto"
             >
                 <div className={`relative flex items-center h-[60px] px-5 rounded-[32px] border backdrop-blur-md transition-all duration-300 ${isDark
@@ -134,11 +140,11 @@ export function AnimatedInputBar({ input, onInputChange, onSubmit, isTyping }) {
                         {/* Joystick Menu Items */}
                         <AnimatePresence>
                             {isMenuOpen && (
-                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 pb-12 pointer-events-none">
+                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 pb-14 pointer-events-none">
                                     {navItems.map((item, idx) => {
                                         const isActive = selectedIndex === idx
                                         const angle = item.angle - 90 // align to top
-                                        const dist = isActive ? 100 : 80
+                                        const dist = isActive ? 95 : 75
 
                                         return (
                                             <motion.div
@@ -152,8 +158,8 @@ export function AnimatedInputBar({ input, onInputChange, onSubmit, isTyping }) {
                                                 }}
                                                 exit={{ scale: 0, opacity: 0, x: 0, y: 0 }}
                                                 className={`absolute transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center shadow-2xl border transition-colors ${isActive
-                                                        ? 'bg-blue-600 border-white/40 text-white z-20 scale-125'
-                                                        : 'bg-black/60 border-white/10 text-white/70 z-10'
+                                                    ? 'bg-blue-600 border-white/40 text-white z-20 shadow-blue-500/40'
+                                                    : 'bg-black/60 border-white/10 text-white/70 z-10 backdrop-blur-md'
                                                     }`}
                                             >
                                                 <item.icon className="h-5 w-5" />
@@ -162,7 +168,7 @@ export function AnimatedInputBar({ input, onInputChange, onSubmit, isTyping }) {
                                                         layoutId="joystick-label"
                                                         initial={{ opacity: 0, y: 10 }}
                                                         animate={{ opacity: 1, y: -45 }}
-                                                        className="absolute whitespace-nowrap bg-blue-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20"
+                                                        className="absolute whitespace-nowrap bg-blue-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20 shadow-lg"
                                                     >
                                                         {item.label}
                                                     </motion.div>
@@ -174,7 +180,7 @@ export function AnimatedInputBar({ input, onInputChange, onSubmit, isTyping }) {
                                     <motion.div
                                         initial={{ scale: 0, opacity: 0 }}
                                         animate={{ scale: 1, opacity: 1 }}
-                                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border border-white/5 bg-white/5 -z-10"
+                                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-44 h-44 rounded-full border border-white/5 bg-white/5 -z-10"
                                     />
                                 </div>
                             )}
@@ -188,20 +194,28 @@ export function AnimatedInputBar({ input, onInputChange, onSubmit, isTyping }) {
                             onPointerMove={handlePointerMove}
                             onPointerUp={handlePointerUp}
                             onPointerLeave={handlePointerUp}
-                            className={`w-10 h-10 rounded-full transition-all shadow-lg flex-shrink-0 touch-none ${isMenuOpen ? 'scale-125 bg-blue-600' :
-                                    input.trim()
-                                        ? 'bg-gradient-to-tr from-indigo-500 to-purple-500 text-white scale-100'
-                                        : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 scale-90'
+                            className={`w-10 h-10 rounded-full transition-all shadow-lg flex-shrink-0 touch-none active:scale-95 ${isMenuOpen ? 'scale-125 bg-blue-600 shadow-blue-500/30' :
+                                input.trim()
+                                    ? 'bg-gradient-to-tr from-indigo-500 to-purple-500 text-white'
+                                    : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400'
                                 }`}
-                            disabled={!input.trim() || isTyping}
                         >
                             <MoveUp className={`h-5 w-5 transition-transform ${isMenuOpen ? 'scale-0' : 'scale-100'}`} />
-                            {isMenuOpen && <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute inset-0 flex items-center justify-center"><div className="w-2 h-2 rounded-full bg-white animate-ping" /></motion.div>}
+                            {isMenuOpen && (
+                                <motion.div
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    className="absolute inset-0 flex items-center justify-center"
+                                >
+                                    <div className="w-2 h-2 rounded-full bg-white animate-ping" />
+                                </motion.div>
+                            )}
                         </Button>
                     </div>
                 </div>
             </form>
         </motion.div>
-    )
+    );
 }
 
+export default AnimatedInputBar;
