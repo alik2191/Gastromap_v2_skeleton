@@ -21,10 +21,10 @@ export function AnimatedInputBar({ input, onInputChange, onSubmit, isTyping }) {
     const isLongPressing = useRef(false)
 
     const navItems = [
-        { icon: Home, label: 'Dashboard', path: '/dashboard', angle: -45 },
-        { icon: Map, label: 'Explore', path: '/explore', angle: -15 },
-        { icon: Heart, label: 'Saved', path: '/saved', angle: 15 },
-        { icon: CheckCircle, label: 'Visited', path: '/visited', angle: 45 },
+        { icon: Home, label: 'Dashboard', path: '/dashboard', angle: -80 },
+        { icon: Map, label: 'Explore', path: '/explore', angle: -55 },
+        { icon: Heart, label: 'Saved', path: '/saved', angle: -30 },
+        { icon: CheckCircle, label: 'Visited', path: '/visited', angle: -5 },
     ]
 
     const handlePointerDown = (e) => {
