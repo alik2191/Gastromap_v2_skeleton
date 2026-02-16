@@ -6,11 +6,33 @@ import { useTheme } from '@/hooks/useTheme'
 const SubscriptionGate = ({ children }) => {
     // This is a MOCK subscription state. 
     // In a real app, you would fetch this from your auth/user store.
-    const [hasSubscription, setHasSubscription] = useState(false) // Set to false to see the gate
+    const [hasSubscription, setHasSubscription] = useState(false)
+    const [isTransitioning, setIsTransitioning] = useState(false)
     const { theme } = useTheme()
     const isDark = theme === 'dark'
 
+    const handleSelectPlan = () => {
+        setIsTransitioning(true)
+        // Artificial delay to smooth out the transition and let the browser prepare
+        setTimeout(() => {
+            setHasSubscription(true)
+            setIsTransitioning(false)
+        }, 800)
+    }
+
     if (hasSubscription) return children
+
+    if (isTransitioning) {
+        return (
+            <div className="fixed inset-0 z-[110] bg-white dark:bg-[#0F1115] flex items-center justify-center">
+                <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full"
+                />
+            </div>
+        )
+    }
 
     const plans = [
         { name: 'Basic', price: '$9.99', features: ['Explore 10,000+ locations', 'Save your favorites', 'Basic AI Search'], color: 'from-blue-500/10 to-blue-600/10' },
@@ -67,7 +89,7 @@ const SubscriptionGate = ({ children }) => {
                                 </div>
 
                                 <button
-                                    onClick={() => setHasSubscription(true)}
+                                    onClick={handleSelectPlan}
                                     className={`w-full py-5 rounded-[24px] font-black text-sm transition-all active:scale-[0.98] ${plan.popular ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20' : 'bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white'}`}
                                 >
                                     Get Started

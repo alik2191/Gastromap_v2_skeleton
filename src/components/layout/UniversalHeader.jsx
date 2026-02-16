@@ -30,12 +30,15 @@ export function UniversalHeader() {
 
     const headerBg = isScrolled
         ? (isDark
-            ? 'bg-[#121212]/80 backdrop-blur-xl border-b border-white/5 shadow-2xl'
-            : 'bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm')
+            ? 'bg-[#121212]/80 backdrop-blur-xl border-b border-white/5 shadow-2xl md:bg-[#121212]/80'
+            : 'bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm md:bg-white/80')
         : 'bg-transparent'
 
+    // Force transparency on mobile regardless of scroll
+    const finalHeaderClass = `fixed top-0 left-0 right-0 z-[100] px-[2.5vw] md:px-[10px] py-3 transition-all duration-500 ${isScrolled ? 'md:' + headerBg : 'bg-transparent md:bg-transparent'} ${!isScrolled ? '' : 'max-md:bg-transparent max-md:border-none max-md:shadow-none'}`
+
     return (
-        <header className={`fixed top-0 left-0 right-0 z-[100] px-[2.5vw] md:px-[10px] py-3 transition-all duration-500 ${headerBg}`}>
+        <header className={finalHeaderClass}>
             <div className="flex justify-between items-center max-w-[1400px] mx-auto">
                 {/* Logo Capsule (PC Style) */}
                 <Link to="/dashboard" className={`flex items-center gap-2 hover:scale-105 transition-all backdrop-blur-md px-3 py-1.5 rounded-full border shadow-sm ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/40 border-white/40'}`}>

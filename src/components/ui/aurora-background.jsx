@@ -29,12 +29,11 @@ const AuroraBackground = ({ theme = 'light', children, className }) => {
     return (
         <div className={cn(`relative w-full h-full min-h-screen ${bgClass} transition-colors duration-1000`, className)}>
             {/* Ambient Background Blobs */}
-            {/* Optimized: Used fixed positioning to keep blobs in viewport and prevent huge render layer on scroll */}
             <div className="fixed inset-0 pointer-events-none transform-gpu overflow-hidden">
                 {/* Blob 1 (Top Left) */}
                 <div
                     className={cn(
-                        "absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full blur-[100px] mix-blend-multiply filter will-change-transform animate-aurora-1 opacity-40",
+                        "absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full blur-[60px] md:blur-[100px] mix-blend-normal md:mix-blend-multiply filter will-change-transform animate-aurora-1 opacity-20 md:opacity-40",
                         blob1Class
                     )}
                 />
@@ -42,15 +41,15 @@ const AuroraBackground = ({ theme = 'light', children, className }) => {
                 {/* Blob 2 (Center Right) */}
                 <div
                     className={cn(
-                        "absolute top-[20%] right-[-10%] w-[60%] h-[60%] rounded-full blur-[100px] mix-blend-multiply filter will-change-transform animate-aurora-2 opacity-30 animation-delay-2000",
+                        "absolute top-[20%] right-[-10%] w-[60%] h-[60%] rounded-full blur-[60px] md:blur-[100px] mix-blend-normal md:mix-blend-multiply filter will-change-transform animate-aurora-2 opacity-15 md:opacity-30 animation-delay-2000",
                         blob2Class
                     )}
                 />
 
-                {/* Blob 3 (Bottom Left) */}
+                {/* Blob 3 (Bottom Left) - Keep as primary light source */}
                 <div
                     className={cn(
-                        "absolute bottom-[-10%] left-[10%] w-[80%] h-[50%] rounded-full blur-[120px] mix-blend-multiply filter will-change-transform animate-aurora-3 opacity-40 animation-delay-5000",
+                        "absolute bottom-[-10%] left-[10%] w-[80%] h-[50%] rounded-full blur-[80px] md:blur-[120px] mix-blend-normal md:mix-blend-multiply filter will-change-transform animate-aurora-3 opacity-20 md:opacity-40 animation-delay-5000",
                         blob3Class
                     )}
                 />
