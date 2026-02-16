@@ -132,7 +132,7 @@ const DashboardPage = () => {
     const textStyle = theme === 'light' ? "text-gray-900" : "text-white"
 
     return (
-        <PageTransition className="w-full max-w-7xl mx-auto h-[100dvh] flex flex-col relative z-0 overscroll-none overflow-y-auto scrollbar-hide">
+        <PageTransition className="w-full max-w-7xl mx-auto flex flex-col relative z-0">
             <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} theme={theme} />
 
             {/* MOBILE VIEW (Horizontal Sliders) */}
