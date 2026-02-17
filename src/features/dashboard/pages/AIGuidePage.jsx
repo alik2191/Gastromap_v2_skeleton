@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
-import { Sparkles, ArrowLeft } from 'lucide-react'
+import { Sparkles } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useGastroAI, ChatInterface } from '@/features/shared/components/GastroAIChat'
 import { AnimatedInputBar } from '@/components/layout/AnimatedInputBar'
-import { Button } from '@/components/ui/button'
 
 const AIGuidePage = () => {
     const { messages, isTyping, sendMessage } = useGastroAI()
@@ -16,10 +15,6 @@ const AIGuidePage = () => {
         if (!input.trim()) return
         sendMessage(input)
         setInput('')
-    }
-
-    const handleBack = () => {
-        navigate(-1)
     }
 
     return (
@@ -51,42 +46,36 @@ const AIGuidePage = () => {
                 </div>
             )}
 
-            {/* Fixed Header Section with Back Button - Ultra Glassmorphism */}
-            <div className="fixed top-14 left-0 right-0 z-[60]">
-                <div className="relative px-4 py-3 bg-white/5 dark:bg-black/5 backdrop-blur-3xl backdrop-saturate-[180%]">
-                    <div className="flex items-center justify-between max-w-lg mx-auto">
-                        {/* Back Button - Mobile Only - КРУГЛАЯ */}
-                        <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="md:hidden"
-                        >
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={handleBack}
-                                className="w-10 h-10 rounded-full bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 hover:bg-black/10 dark:hover:bg-white/20 backdrop-blur-sm p-0"
-                            >
-                                <ArrowLeft className="h-5 w-5 text-slate-900 dark:text-white" />
-                            </Button>
-                        </motion.div>
-
-                        {/* Title */}
+            {/* Fixed Header Section - Minimalist & Animated */}
+            <motion.div
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="fixed top-12 left-0 right-0 z-[60]"
+            >
+                <div className="relative px-4 py-3 bg-white/5 dark:bg-black/5 backdrop-blur-3xl backdrop-saturate-[180%] border-b border-white/10">
+                    <div className="flex items-center justify-center max-w-lg mx-auto">
+                        {/* Centered Logo & Title */}
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                            <motion.div
+                                initial={{ scale: 0.8 }}
+                                animate={{ scale: 1 }}
+                                transition={{ delay: 0.2, type: "spring" }}
+                                className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20"
+                            >
                                 <Sparkles size={20} className="text-white" />
-                            </div>
-                            <div className="text-center md:text-left">
-                                <h1 className="text-xl font-black text-slate-900 dark:text-white">GastroGuide</h1>
-                            </div>
+                            </motion.div>
+                            <motion.div
+                                initial={{ x: 10, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ delay: 0.3 }}
+                            >
+                                <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">GastroGuide</h1>
+                            </motion.div>
                         </div>
-
-                        {/* Spacer for symmetry on mobile */}
-                        <div className="w-10 md:hidden" />
                     </div>
                 </div>
-            </div>
+            </motion.div>
 
             {/* Chat Interface - Positioned absolutely to fill screen, content padded internally */}
             <div className="absolute inset-0 z-0">
