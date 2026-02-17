@@ -37,7 +37,7 @@ export function AnimatedInputBar({ input, onInputChange, onSubmit, isTyping }) {
                 damping: 15,
                 duration: 0.6
             }}
-            className="fixed left-0 right-0 bottom-6 z-[70] px-4 md:hidden pointer-events-none"
+            className="fixed left-0 right-0 bottom-6 z-[70] px-4 pointer-events-none"
             style={{ perspective: 1000 }}
         >
             <form
@@ -60,32 +60,14 @@ export function AnimatedInputBar({ input, onInputChange, onSubmit, isTyping }) {
                         : 'bg-white/70 border-white/30 shadow-[0_10px_30px_rgba(0,0,0,0.08)]'
                         } ${isFocused ? 'ring-2 ring-blue-500/20 border-blue-500/30' : ''}`}
                 >
-                    {/* Left Navigation Hint (Dashboard) */}
-                    <div className="absolute left-0 top-0 bottom-0 flex items-center pl-4 pr-10 pointer-events-none z-10">
-                        <div className={`absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-80`} />
-                        <div className="flex flex-col items-start relative z-20">
-                            <ChevronLeft className="w-4 h-4 text-blue-500/60 mb-0.5" />
-                            <span className="text-[8px] font-black text-blue-500/40 uppercase tracking-tighter">Back</span>
-                        </div>
-                    </div>
-
                     <Input
                         value={input}
                         onChange={onInputChange}
                         onFocus={() => setIsFocused(true)}
                         onBlur={() => setIsFocused(false)}
                         placeholder="Ask GastroGuide..."
-                        className="flex-1 bg-transparent border-none shadow-none outline-none focus:outline-none focus:border-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-full text-base py-2 px-12 placeholder:font-medium text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-zinc-500"
+                        className="flex-1 bg-transparent border-none shadow-none outline-none focus:outline-none focus:border-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-full text-base py-2 px-6 placeholder:font-medium text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-zinc-500"
                     />
-
-                    {/* Right Navigation Hint (Saved) */}
-                    <div className="absolute right-0 top-0 bottom-0 flex items-center pr-4 pl-10 pointer-events-none z-10">
-                        <div className={`absolute inset-0 bg-gradient-to-l from-indigo-500/10 to-transparent opacity-80`} />
-                        <div className="flex flex-col items-end relative z-20">
-                            <ChevronRight className="w-4 h-4 text-indigo-500/60 mb-0.5" />
-                            <span className="text-[8px] font-black text-indigo-500/40 uppercase tracking-tighter">Next</span>
-                        </div>
-                    </div>
 
                     <div className="relative pr-4 z-20">
                         <Button

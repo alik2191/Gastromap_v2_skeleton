@@ -53,7 +53,7 @@ const AIGuidePage = () => {
                     onSendMessage={sendMessage}
                     className="[&_form]:hidden md:[&_form]:block"
                     transparent={true}
-                    contentClassName="pt-24 md:pt-32" // Adjusted padding for the global header
+                    contentClassName="pt-40 md:pt-48" // Sufficient padding to avoid overlap with two-level header
                 />
             </div>
 

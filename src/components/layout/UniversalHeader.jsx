@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Link, useLocation } from 'react-router-dom'
-import { Moon, Sun, ShieldCheck } from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Moon, Sun, ShieldCheck, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTheme } from '@/hooks/useTheme'
 import { useAuthStore } from '@/features/auth/hooks/useAuthStore'
 
 export function UniversalHeader() {
     const { theme, toggleTheme } = useTheme()
+    const navigate = useNavigate()
     const { user: authUser } = useAuthStore()
     const user = authUser || { name: 'Alex Johnson', email: 'alex@gastromap.com' }
     const isAdmin = true // Placeholder for admin check
@@ -30,17 +31,24 @@ export function UniversalHeader() {
 
     const isAIGuide = location.pathname === '/ai-guide'
 
-    const headerBg = isScrolled
+    const headerBgClass = isScrolled || isAIGuide
         ? (isDark
-            ? 'bg-black/40 backdrop-blur-3xl border-b border-white/10 shadow-2xl'
-            : 'bg-white/60 backdrop-blur-3xl border-b border-white/20 shadow-sm')
+            ? 'bg-gradient-to-b from-black/90 via-black/80 to-transparent backdrop-blur-xl'
+            : 'bg-gradient-to-b from-white/90 via-white/80 to-transparent backdrop-blur-xl')
         : 'bg-transparent'
 
-    const finalHeaderClass = `fixed top-0 left-0 right-0 z-[100] px-[2.5vw] md:px-[20px] py-4 transition-all duration-700 ${headerBg}`
-
     return (
-        <header className={finalHeaderClass}>
-            <div className="flex justify-between items-center max-w-[1400px] mx-auto relative h-10">
+        <header className="fixed top-0 left-0 right-0 z-[100] transition-none">
+            {/* Background Layer with Smooth Mask */}
+            <div
+                className={`absolute inset-0 w-full h-full transition-all duration-700 pointer-events-none ${headerBgClass}`}
+                style={{
+                    maskImage: 'linear-gradient(to bottom, black 0%, black 60%, transparent 100%)',
+                    WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 60%, transparent 100%)'
+                }}
+            />
+
+            <div className="max-w-[1400px] mx-auto relative min-h-[40px] px-[2.5vw] md:px-[20px] py-4">
                 <AnimatePresence mode="wait">
                     {!isAIGuide ? (
                         <motion.div
@@ -48,7 +56,7 @@ export function UniversalHeader() {
                             initial={{ y: -10, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             exit={{ y: -10, opacity: 0 }}
-                            className="flex justify-between items-center w-full"
+                            className="flex justify-between items-center w-full h-10"
                         >
                             {/* Logo Capsule */}
                             <Link to="/dashboard" className={`flex items-center gap-2 hover:scale-105 transition-all backdrop-blur-md px-3 py-1.5 rounded-full border shadow-sm ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/40 border-white/40'}`}>
@@ -74,24 +82,48 @@ export function UniversalHeader() {
                     ) : (
                         <motion.div
                             key="ai-header"
-                            initial={{ x: -20, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            exit={{ x: -20, opacity: 0 }}
-                            className="flex items-center w-full"
+                            initial={{ y: -10, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: -10, opacity: 0 }}
+                            className="w-full flex flex-col items-center pt-1 pb-2"
                         >
-                            <div className="flex items-center gap-2.5">
-                                <motion.div
-                                    initial={{ scale: 0.8 }}
-                                    animate={{ scale: 1 }}
-                                    className="flex items-center justify-center"
-                                >
-                                    <ShieldCheck size={18} className="text-blue-600 dark:text-blue-500" />
-                                </motion.div>
-                                <motion.h1
-                                    className="text-sm font-black text-slate-900 dark:text-white tracking-widest uppercase"
-                                >
+                            {/* Level 1: Branding - Compact */}
+                            <div className="flex items-center gap-2 mb-0.5">
+                                <Sparkles size={18} className="text-blue-500" />
+                                <h1 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
                                     Gastro Guide
-                                </motion.h1>
+                                </h1>
+                            </div>
+
+                            {/* Level 2: Navigation - Compact Height */}
+                            <div className="flex justify-between items-center w-full px-4 h-10 relative overflow-visible">
+                                {/* Dashboard Hint (Left) */}
+                                <motion.button
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => navigate('/dashboard')}
+                                    className="relative flex items-center gap-2 pr-8 group pointer-events-auto h-full"
+                                >
+                                    {/* Natural Glow - No clipping */}
+                                    <div className={`absolute -left-10 inset-y-0 w-32 bg-gradient-to-r ${isDark ? 'from-blue-600/30' : 'from-blue-500/20'} to-transparent blur-xl pointer-events-none`} />
+                                    <div className="relative z-10 flex flex-col items-start">
+                                        <ChevronLeft className="w-5 h-5 text-blue-500 animate-pulse" />
+                                        <span className="text-[7px] font-black uppercase tracking-tighter text-blue-500/60 leading-none">Back</span>
+                                    </div>
+                                </motion.button>
+
+                                {/* Saved Hint (Right) */}
+                                <motion.button
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => navigate('/saved')}
+                                    className="relative flex items-center gap-2 pl-8 group pointer-events-auto text-right h-full"
+                                >
+                                    {/* Natural Glow - No clipping */}
+                                    <div className={`absolute -right-10 inset-y-0 w-32 bg-gradient-to-l ${isDark ? 'from-indigo-600/30' : 'from-indigo-500/20'} to-transparent blur-xl pointer-events-none`} />
+                                    <div className="relative z-10 flex flex-col items-end">
+                                        <ChevronRight className="w-5 h-5 text-indigo-500 animate-pulse" />
+                                        <span className="text-[7px] font-black uppercase tracking-tighter text-indigo-500/60 leading-none">Saved</span>
+                                    </div>
+                                </motion.button>
                             </div>
                         </motion.div>
                     )}
