@@ -30,10 +30,10 @@ export function UniversalHeader() {
 
     const isAIGuide = location.pathname === '/ai-guide'
 
-    const headerBg = isScrolled || isAIGuide
+    const headerBg = isScrolled
         ? (isDark
             ? 'bg-black/40 backdrop-blur-3xl border-b border-white/10 shadow-2xl'
-            : 'bg-white/60 backdrop-blur-3xl border-b-white/20 shadow-sm')
+            : 'bg-white/60 backdrop-blur-3xl border-b border-white/20 shadow-sm')
         : 'bg-transparent'
 
     const finalHeaderClass = `fixed top-0 left-0 right-0 z-[100] px-[2.5vw] md:px-[20px] py-4 transition-all duration-700 ${headerBg}`
@@ -45,9 +45,9 @@ export function UniversalHeader() {
                     {!isAIGuide ? (
                         <motion.div
                             key="standard-header"
-                            initial={{ y: -20, opacity: 0 }}
+                            initial={{ y: -10, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
-                            exit={{ y: -20, opacity: 0 }}
+                            exit={{ y: -10, opacity: 0 }}
                             className="flex justify-between items-center w-full"
                         >
                             {/* Logo Capsule */}
@@ -74,25 +74,21 @@ export function UniversalHeader() {
                     ) : (
                         <motion.div
                             key="ai-header"
-                            initial={{ y: 20, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            exit={{ y: 20, opacity: 0 }}
-                            className="absolute inset-x-0 flex items-center justify-center"
+                            initial={{ x: -20, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: -20, opacity: 0 }}
+                            className="flex items-center w-full"
                         >
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2.5">
                                 <motion.div
-                                    initial={{ scale: 0.8, rotate: -20 }}
-                                    animate={{ scale: 1, rotate: 0 }}
-                                    transition={{ type: "spring", stiffness: 200 }}
-                                    className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30"
+                                    initial={{ scale: 0.8 }}
+                                    animate={{ scale: 1 }}
+                                    className="flex items-center justify-center"
                                 >
-                                    <ShieldCheck size={22} className="text-white" />
+                                    <ShieldCheck size={18} className="text-blue-600 dark:text-blue-500" />
                                 </motion.div>
                                 <motion.h1
-                                    initial={{ x: 10, opacity: 0 }}
-                                    animate={{ x: 0, opacity: 1 }}
-                                    transition={{ delay: 0.1 }}
-                                    className="text-xl font-black text-slate-900 dark:text-white tracking-tighter"
+                                    className="text-sm font-black text-slate-900 dark:text-white tracking-widest uppercase"
                                 >
                                     Gastro Guide
                                 </motion.h1>
