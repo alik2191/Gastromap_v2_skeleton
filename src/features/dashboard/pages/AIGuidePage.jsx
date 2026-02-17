@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { Sparkles } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useGastroAI, ChatInterface } from '@/features/shared/components/GastroAIChat'
@@ -46,38 +45,7 @@ const AIGuidePage = () => {
                 </div>
             )}
 
-            {/* Fixed Header Section - Minimalist & Animated */}
-            <motion.div
-                initial={{ y: -20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="fixed top-12 left-0 right-0 z-[60]"
-            >
-                <div className="relative px-4 py-3 bg-white/5 dark:bg-black/5 backdrop-blur-3xl backdrop-saturate-[180%] border-b border-white/10">
-                    <div className="flex items-center justify-center max-w-lg mx-auto">
-                        {/* Centered Logo & Title */}
-                        <div className="flex items-center gap-3">
-                            <motion.div
-                                initial={{ scale: 0.8 }}
-                                animate={{ scale: 1 }}
-                                transition={{ delay: 0.2, type: "spring" }}
-                                className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20"
-                            >
-                                <Sparkles size={20} className="text-white" />
-                            </motion.div>
-                            <motion.div
-                                initial={{ x: 10, opacity: 0 }}
-                                animate={{ x: 0, opacity: 1 }}
-                                transition={{ delay: 0.3 }}
-                            >
-                                <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">GastroGuide</h1>
-                            </motion.div>
-                        </div>
-                    </div>
-                </div>
-            </motion.div>
-
-            {/* Chat Interface - Positioned absolutely to fill screen, content padded internally */}
+            {/* Chat Interface - Positioned to fill screen under the new Global Header */}
             <div className="absolute inset-0 z-0">
                 <ChatInterface
                     messages={messages}
@@ -85,7 +53,7 @@ const AIGuidePage = () => {
                     onSendMessage={sendMessage}
                     className="[&_form]:hidden md:[&_form]:block"
                     transparent={true}
-                    contentClassName="pt-32 md:pt-40" // Internal padding for content to clear fixed headers
+                    contentClassName="pt-24 md:pt-32" // Adjusted padding for the global header
                 />
             </div>
 
