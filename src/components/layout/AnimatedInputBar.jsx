@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Home, Map, Heart, CheckCircle, MoveUp } from 'lucide-react'
+import { Home, Heart, MoveUp, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTheme } from '@/hooks/useTheme'
 import { useNavigate } from 'react-router-dom'
 
@@ -12,95 +12,19 @@ export function AnimatedInputBar({ input, onInputChange, onSubmit, isTyping }) {
     const navigate = useNavigate()
     const isDark = theme === 'dark'
     const [isFocused, setIsFocused] = useState(false)
-    const [isMenuOpen, setIsMenuOpen] = useState(false)
-    const [selectedIndex, setSelectedIndex] = useState(-1)
+    const [dragX, setDragX] = useState(0)
+    const DRAG_THRESHOLD = 80
 
-    // Joystick logic refs
-    const longPressTimer = useRef(null)
-    const buttonRef = useRef(null)
-    const isLongPressing = useRef(false)
-
-    const navItems = [
-        { icon: Home, label: 'Dashboard', path: '/dashboard', angle: -80 },
-        { icon: Map, label: 'Explore', path: '/explore', angle: -55 },
-        { icon: Heart, label: 'Saved', path: '/saved', angle: -30 },
-        { icon: CheckCircle, label: 'Visited', path: '/visited', angle: -5 },
-    ]
-
-    const handlePointerDown = (e) => {
-        // Only trigger joystick if NOT typing
-        if (isTyping) return
-
-        isLongPressing.current = false
-        longPressTimer.current = setTimeout(() => {
-            setIsMenuOpen(true)
-            isLongPressing.current = true
-            if (window.navigator.vibrate) window.navigator.vibrate(10)
-        }, 300)
+    const navItems = {
+        left: { icon: Home, label: 'Dashboard', path: '/dashboard' },
+        right: { icon: Heart, label: 'Saved', path: '/saved' }
     }
-
-    const handlePointerMove = (e) => {
-        if (!isMenuOpen) return
-
-        // Calculate angle from button center
-        const rect = buttonRef.current.getBoundingClientRect()
-        const centerX = rect.left + rect.width / 2
-        const centerY = rect.top + rect.height / 2
-
-        const dx = e.clientX - centerX
-        const dy = e.clientY - centerY
-        const distance = Math.sqrt(dx * dx + dy * dy)
-
-        // Only trigger if dragged far enough
-        if (distance > 30) {
-            const rad = Math.atan2(dy, dx)
-            const deg = rad * (180 / Math.PI)
-
-            // Find closest item by angle (offset by 90 to make up = -90)
-            let closest = -1
-            let minDiff = Infinity
-
-            navItems.forEach((item, index) => {
-                const diff = Math.abs(deg - (item.angle - 90))
-                if (diff < minDiff && diff < 35) {
-                    minDiff = diff
-                    closest = index
-                }
-            })
-
-            if (closest !== selectedIndex) {
-                setSelectedIndex(closest)
-                if (window.navigator.vibrate) window.navigator.vibrate(5)
-            }
-        } else {
-            setSelectedIndex(-1)
-        }
-    }
-
-    const handlePointerUp = (e) => {
-        clearTimeout(longPressTimer.current)
-
-        if (isMenuOpen) {
-            if (selectedIndex !== -1) {
-                navigate(navItems[selectedIndex].path)
-            }
-            setIsMenuOpen(false)
-            setSelectedIndex(-1)
-        }
-    }
-
-    // New form submit handler to prevent empty sends
+    // New form submit handler
     const handleLocalSubmit = (e) => {
         e.preventDefault()
-        if (isLongPressing.current) return
         if (!input.trim() || isTyping) return
         onSubmit(e)
     }
-
-    // Cleanup timers
-    useEffect(() => {
-        return () => clearTimeout(longPressTimer.current)
-    }, [])
 
     return (
         <motion.div
@@ -120,13 +44,28 @@ export function AnimatedInputBar({ input, onInputChange, onSubmit, isTyping }) {
                 onSubmit={handleLocalSubmit}
                 className="max-w-md mx-auto pointer-events-auto"
             >
-                <div className={`relative flex items-center h-[60px] px-5 rounded-[32px] border backdrop-blur-md transition-all duration-300 ${isDark
-                    ? 'bg-black/30 border-white/10 shadow-lg shadow-black/20'
-                    : 'bg-white/40 border-white/30 shadow-lg shadow-black/5'
-                    } ${isFocused
-                        ? 'border-white/40 ring-1 ring-white/20'
-                        : 'border-white/10'
-                    }`}>
+                <motion.div
+                    onPan={(e, info) => setDragX(info.offset.x)}
+                    onPanEnd={(e, info) => {
+                        if (info.offset.x > DRAG_THRESHOLD) {
+                            navigate(navItems.left.path)
+                        } else if (info.offset.x < -DRAG_THRESHOLD) {
+                            navigate(navItems.right.path)
+                        }
+                        setDragX(0)
+                    }}
+                    animate={{
+                        x: dragX * 0.4,
+                        backgroundColor: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.6)'
+                    }}
+                    className={`relative flex items-center h-[60px] px-5 rounded-[32px] border backdrop-blur-md transition-all duration-300 ${isDark
+                        ? 'border-white/10 shadow-2xl shadow-black/40'
+                        : 'border-white/20 shadow-xl shadow-black/5'
+                        } ${isFocused
+                            ? 'border-blue-500/50 ring-4 ring-blue-500/10'
+                            : 'border-white/10'
+                        }`}
+                >
                     <Input
                         value={input}
                         onChange={onInputChange}
@@ -137,82 +76,72 @@ export function AnimatedInputBar({ input, onInputChange, onSubmit, isTyping }) {
                     />
 
                     <div className="relative">
-                        {/* Joystick Menu Items */}
-                        <AnimatePresence>
-                            {isMenuOpen && (
-                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 pb-14 pointer-events-none">
-                                    {navItems.map((item, idx) => {
-                                        const isActive = selectedIndex === idx
-                                        const angle = item.angle - 90 // align to top
-                                        const dist = isActive ? 95 : 75
-
-                                        return (
-                                            <motion.div
-                                                key={item.path}
-                                                initial={{ scale: 0.5, opacity: 0, x: 0, y: 0 }}
-                                                animate={{
-                                                    scale: isActive ? 1.4 : 1,
-                                                    opacity: 1,
-                                                    x: Math.cos(angle * Math.PI / 180) * dist,
-                                                    y: Math.sin(angle * Math.PI / 180) * dist
-                                                }}
-                                                exit={{ scale: 0, opacity: 0, x: 0, y: 0 }}
-                                                className={`absolute transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center shadow-2xl border transition-colors ${isActive
-                                                    ? 'bg-blue-600 border-white/40 text-white z-20 shadow-blue-500/40'
-                                                    : 'bg-black/60 border-white/10 text-white/70 z-10 backdrop-blur-md'
-                                                    }`}
-                                            >
-                                                <item.icon className="h-5 w-5" />
-                                                {isActive && (
-                                                    <motion.div
-                                                        layoutId="joystick-label"
-                                                        initial={{ opacity: 0, y: 10 }}
-                                                        animate={{ opacity: 1, y: -45 }}
-                                                        className="absolute whitespace-nowrap bg-blue-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20 shadow-lg"
-                                                    >
-                                                        {item.label}
-                                                    </motion.div>
-                                                )}
-                                            </motion.div>
-                                        )
-                                    })}
-
-                                    <motion.div
-                                        initial={{ scale: 0, opacity: 0 }}
-                                        animate={{ scale: 1, opacity: 1 }}
-                                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-44 h-44 rounded-full border border-white/5 bg-white/5 -z-10"
-                                    />
-                                </div>
-                            )}
-                        </AnimatePresence>
-
                         <Button
-                            ref={buttonRef}
                             type="submit"
                             size="icon"
-                            onPointerDown={handlePointerDown}
-                            onPointerMove={handlePointerMove}
-                            onPointerUp={handlePointerUp}
-                            onPointerLeave={handlePointerUp}
-                            className={`w-10 h-10 rounded-full transition-all shadow-lg flex-shrink-0 touch-none active:scale-95 ${isMenuOpen ? 'scale-125 bg-blue-600 shadow-blue-500/30' :
-                                input.trim()
-                                    ? 'bg-gradient-to-tr from-indigo-500 to-purple-500 text-white'
-                                    : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400'
+                            disabled={!input.trim() || isTyping}
+                            className={`w-10 h-10 rounded-full transition-all shadow-lg flex-shrink-0 touch-none active:scale-95 ${input.trim()
+                                ? 'bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-blue-500/40'
+                                : 'bg-gray-300 dark:bg-zinc-800 text-gray-500 dark:text-zinc-600'
                                 }`}
                         >
-                            <MoveUp className={`h-5 w-5 transition-transform ${isMenuOpen ? 'scale-0' : 'scale-100'}`} />
-                            {isMenuOpen && (
-                                <motion.div
-                                    initial={{ scale: 0 }}
-                                    animate={{ scale: 1 }}
-                                    className="absolute inset-0 flex items-center justify-center"
-                                >
-                                    <div className="w-2 h-2 rounded-full bg-white animate-ping" />
-                                </motion.div>
-                            )}
+                            <MoveUp className={`h-5 w-5`} />
                         </Button>
                     </div>
-                </div>
+
+                    {/* Permanent Subtle Hints */}
+                    <div className="absolute -left-10 top-1/2 -translate-y-1/2 opacity-30 pointer-events-none group-hover:opacity-50 transition-opacity">
+                        <ChevronLeft className="w-5 h-5 text-current" />
+                    </div>
+                    <div className="absolute -right-10 top-1/2 -translate-y-1/2 opacity-30 pointer-events-none group-hover:opacity-50 transition-opacity">
+                        <ChevronRight className="w-5 h-5 text-current" />
+                    </div>
+                </motion.div>
+
+                {/* Visual Feedback Overlays - Premium Indicators */}
+                <AnimatePresence>
+                    {Math.abs(dragX) > 10 && (
+                        <>
+                            {/* Left Side: Back to Dashboard */}
+                            <motion.div
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{
+                                    opacity: Math.min(dragX / DRAG_THRESHOLD, 1),
+                                    x: -10 + (dragX * 0.1)
+                                }}
+                                exit={{ opacity: 0, x: -20 }}
+                                className="fixed left-4 bottom-7 flex items-center gap-2 pointer-events-none z-[80]"
+                            >
+                                <div className="p-3 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
+                                    <Home className="w-6 h-6 text-white" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Swipe Back</span>
+                                    <span className="text-sm font-bold text-white uppercase tracking-wider">Dashboard</span>
+                                </div>
+                            </motion.div>
+
+                            {/* Right Side: To Saved */}
+                            <motion.div
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{
+                                    opacity: Math.min(-dragX / DRAG_THRESHOLD, 1),
+                                    x: 10 + (dragX * 0.1)
+                                }}
+                                exit={{ opacity: 0, x: 20 }}
+                                className="fixed right-4 bottom-7 flex items-center gap-2 flex-row-reverse pointer-events-none z-[80]"
+                            >
+                                <div className="p-3 rounded-full bg-blue-600/20 backdrop-blur-xl border border-blue-400/30 shadow-2xl shadow-blue-500/20">
+                                    <Heart className="w-6 h-6 text-white" />
+                                </div>
+                                <div className="flex flex-col items-end">
+                                    <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Next Tab</span>
+                                    <span className="text-sm font-bold text-white uppercase tracking-wider">Saved</span>
+                                </div>
+                            </motion.div>
+                        </>
+                    )}
+                </AnimatePresence>
             </form>
         </motion.div>
     );
