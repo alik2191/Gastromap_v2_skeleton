@@ -7,7 +7,7 @@ const PublicNavbar = () => (
         <div className="w-full pointer-events-auto">
             <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 dark:border-slate-800/50 p-2 pl-5 pr-2 rounded-[24px] md:rounded-full shadow-2xl shadow-black/5 flex justify-between items-center transition-all duration-500">
                 <Link to="/" className="flex items-center gap-3 hover:scale-105 transition-transform text-base-content group">
-                    <div className="w-8 h-8 md:w-10 md:h-10 bg-blue-600 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-bold text-sm md:text-base shadow-lg shadow-blue-500/20 group-hover:rotate-6 transition-transform">G</div>
+                    <img src="/pwa-icon-192.png" alt="GastroMap Logo" className="w-8 h-8 md:w-10 md:h-10 object-cover rounded-full hover:rotate-6 transition-transform" />
                     <span className="font-bold text-sm md:text-lg tracking-tight">GastroMap</span>
                 </Link>
 

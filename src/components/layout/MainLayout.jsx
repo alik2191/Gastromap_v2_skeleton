@@ -3,7 +3,6 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { BottomNav } from './BottomNav'
 import { UniversalHeader } from './UniversalHeader'
 import GastroGuideChat from '@/features/public/components/GastroGuideChat'
-import SubscriptionGate from '@/components/auth/SubscriptionGate'
 import { Button } from '@/components/ui/button'
 import { Sparkles } from 'lucide-react'
 import AuroraBackground from '@/components/ui/aurora-background'
@@ -23,9 +22,7 @@ export function MainLayout() {
             <div className="flex flex-col min-h-screen text-foreground relative">
                 <UniversalHeader />
                 <main className={`flex-1 transition-all duration-300 ${isAIGuide || isExplore ? 'pb-0' : 'pb-24'} md:pb-0`}>
-                    <SubscriptionGate>
-                        <Outlet />
-                    </SubscriptionGate>
+                    <Outlet />
                 </main>
                 <BottomNav />
 

@@ -6,13 +6,13 @@ import { Instagram, Twitter, Linkedin } from 'lucide-react'
 const PublicFooter = () => (
     <div className="bg-slate-50 dark:bg-slate-950 transition-colors duration-500 mt-auto">
         <footer className="relative bg-black text-white py-12 md:py-20 rounded-t-[30px] md:rounded-t-[40px] overflow-hidden">
-            {/* Aurora Background Effect */}
-            <div className="absolute inset-0 pointer-events-none">
+            {/* Aurora Background Effect - Blue Theme */}
+            <div className="absolute inset-0 pointer-events-none opacity-60">
                 <motion.div
                     animate={{
                         scale: [1, 1.2, 1],
-                        opacity: [0.3, 0.5, 0.3],
-                        backgroundColor: ["#1e3a8a", "#581c87", "#1e3a8a"] // Blue-900 to Purple-900
+                        opacity: [0.3, 0.6, 0.3],
+                        backgroundColor: ["#1d4ed8", "#1e40af", "#1d4ed8"] // Blue-700 to Blue-800
                     }}
                     transition={{
                         duration: 15,
@@ -24,8 +24,8 @@ const PublicFooter = () => (
                 <motion.div
                     animate={{
                         scale: [1, 1.5, 1],
-                        opacity: [0.2, 0.4, 0.2],
-                        backgroundColor: ["#581c87", "#0f172a", "#581c87"] // Purple-900 to Slate-900
+                        opacity: [0.2, 0.5, 0.2],
+                        backgroundColor: ["#2563eb", "#1e3a8a", "#2563eb"] // Blue-600 to Blue-900
                     }}
                     transition={{
                         duration: 20,
@@ -40,8 +40,8 @@ const PublicFooter = () => (
             <div className="w-full relative z-10 px-4 md:px-8">
                 <div className="flex flex-col lg:flex-row justify-between items-start gap-12">
                     <div>
-                        <div className="bg-white/10 w-fit px-4 py-2 rounded-full flex items-center gap-2 mb-6 backdrop-blur-md border border-white/5">
-                            <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xs">G</div>
+                        <div className="bg-white/10 w-fit px-4 py-2 rounded-full flex items-center gap-2 mb-6 backdrop-blur-md border border-white/5 text-white">
+                            <img src="/pwa-icon-192.png" alt="GastroMap Logo" className="w-6 h-6 object-cover rounded-full" />
                             <span className="font-semibold text-sm">GastroMap</span>
                         </div>
                         <p className="text-gray-400 text-sm max-w-xs leading-relaxed">
@@ -64,18 +64,16 @@ const PublicFooter = () => (
                         {[
                             {
                                 head: "Product", links: [
-                                    { name: 'Features', path: '/features' },
-                                    { name: 'Pricing', path: '/pricing' },
-                                    { name: 'API', path: '/api' },
-                                    { name: 'Showcase', path: '/showcase' }
+                                    { name: 'Dashboard', path: '/dashboard' },
+                                    { name: 'Add a Place', path: '/auth/signup?action=add-place' },
+                                    { name: 'Supporter Options', path: '/pricing' }
                                 ]
                             },
                             {
-                                head: "Company", links: [
-                                    { name: 'About', path: '/about' },
-                                    { name: 'Careers', path: '/careers' },
-                                    { name: 'Blog', path: '/blog' },
-                                    { name: 'Contact', path: '/contact' }
+                                head: "Community", links: [
+                                    { name: 'Leaderboard', path: '/dashboard/leaderboard' },
+                                    { name: 'Rules', path: '/rules' },
+                                    { name: 'Blog', path: '/blog' }
                                 ]
                             },
                             {

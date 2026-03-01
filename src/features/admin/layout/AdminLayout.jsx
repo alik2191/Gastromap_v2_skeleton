@@ -4,7 +4,7 @@ import {
     MapPin, Users, BarChart3, ArrowLeft, LogOut,
     LayoutDashboard, CreditCard, Bot, ChevronRight,
     Menu, X, Bell, Search, Sun, Moon, PanelsTopLeft,
-    ChevronLeft, Settings, HelpCircle, Activity, Shield
+    ChevronLeft, Settings, HelpCircle, Activity, Shield, ShieldCheck
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
@@ -30,6 +30,7 @@ export default function AdminLayout() {
         { icon: Users, label: 'Пользователи', path: '/admin/users' },
         { icon: CreditCard, label: 'Подписки', path: '/admin/subscriptions' },
         { icon: Bot, label: 'ИИ Агенты', path: '/admin/ai' },
+        { icon: ShieldCheck, label: 'Модерация', path: '/admin/moderation' },
         { icon: BarChart3, label: 'Аналитика', path: '/admin/stats' },
         { icon: Settings, label: 'Настройки', path: '/admin/settings' },
     ]

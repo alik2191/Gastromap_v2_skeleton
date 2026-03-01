@@ -8,10 +8,14 @@ import PricingPage from '@/features/public/pages/PricingPage'
 import AboutPage from '@/features/public/pages/AboutPage'
 import ContactPage from '@/features/public/pages/ContactPage'
 import LoginPage from '@/features/auth/pages/LoginPage'
+import SignUpPage from '@/features/auth/pages/SignUpPage'
 import DashboardPage from '@/features/dashboard/pages/DashboardPage'
+import AddPlacePage from '@/features/dashboard/pages/AddPlacePage'
+import LeaderboardPage from '@/features/dashboard/pages/LeaderboardPage'
 import AdminLayout from '@/features/admin/layout/AdminLayout'
 import AdminDashboardPage from '@/features/admin/pages/AdminDashboardPage'
 import AdminLocationsPage from '@/features/admin/pages/AdminLocationsPage'
+import AdminModerationPage from '@/features/admin/pages/AdminModerationPage'
 import AdminUsersPage from '@/features/admin/pages/AdminUsersPage'
 import AdminSubscriptionsPage from '@/features/admin/pages/AdminSubscriptionsPage'
 import AdminAIPage from '@/features/admin/pages/AdminAIPage'
@@ -39,6 +43,7 @@ export const AppRouter = () => {
         <Routes>
             {/* Standalone Pages */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/auth/signup" element={<SignUpPage />} />
 
             {/* Public Routes (Wrapped in PublicLayout) */}
             <Route element={<PublicLayout />}>
@@ -69,6 +74,8 @@ export const AppRouter = () => {
                 <Route path="/explore/:country/:city" element={<ExploreWrapper />} />
                 <Route path="/location/:id" element={<LocationDetailsPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/dashboard/add-place" element={<AddPlacePage />} />
+                <Route path="/dashboard/leaderboard" element={<LeaderboardPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/profile/edit" element={<ProfileEditPage />} />
                 <Route path="/profile/language" element={<LanguageSettingsPage />} />
@@ -86,6 +93,7 @@ export const AppRouter = () => {
                 <Route path="locations" element={<AdminLocationsPage />} />
                 <Route path="users" element={<AdminUsersPage />} />
                 <Route path="subscriptions" element={<AdminSubscriptionsPage />} />
+                <Route path="moderation" element={<AdminModerationPage />} />
                 <Route path="ai" element={<AdminAIPage />} />
                 <Route path="stats" element={<AdminStatsPage />} />
                 <Route path="settings" element={<AdminSettingsPage />} />

@@ -46,6 +46,7 @@ const LocationCardMobile = ({ loc, type = 'recommended' }) => {
                 <img
                     src={loc.image || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2070&auto=format&fit=crop'}
                     alt={loc.title || 'Location'}
+                    crossOrigin="anonymous"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
 
@@ -178,7 +179,7 @@ const DashboardPage = () => {
                     <div className="flex gap-[12px] overflow-x-auto pb-4 -mx-[2.5vw] px-[2.5vw] scrollbar-hide snap-x snap-mandatory transition-all">
                         {countries.map((country, i) => (
                             <div key={i} onClick={() => navigate(`/explore/${country.name.toLowerCase()}`)} className="relative flex-shrink-0 w-[240px] h-[160px] rounded-[24px] overflow-hidden shadow-2xl snap-center group">
-                                <img src={country.image} alt={country.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                                <img src={country.image} crossOrigin="anonymous" alt={country.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
                                 <div className="absolute top-3 right-3 bg-blue-600 text-white text-[9px] font-black uppercase px-3 py-1 rounded-full shadow-lg">
                                     {country.newCount} New
@@ -402,7 +403,7 @@ const DesktopDashboard = ({ locations, recommended, authUser, countries, theme, 
                             {recommended.map((item) => (
                                 <motion.div key={item.id} onClick={() => navigate(`/location/${item.id}`)} whileHover={{ y: -8 }} className={`${frameCardStyle} transition-all duration-300 group cursor-pointer`}>
                                     <div className="relative h-56 mb-4 overflow-hidden rounded-2xl shadow-inner">
-                                        <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                        <img src={item.image} crossOrigin="anonymous" alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                                         <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg text-xs font-bold text-gray-900 flex items-center gap-1 shadow-md">
                                             <Star size={14} className="text-yellow-500 fill-yellow-500" /> {item.rating}
                                         </div>
@@ -445,7 +446,7 @@ const DesktopDashboard = ({ locations, recommended, authUser, countries, theme, 
                             {[...locations].reverse().slice(0, 3).map((item) => (
                                 <motion.div key={item.id} onClick={() => navigate(`/location/${item.id}`)} whileHover={{ y: -8 }} className={`${frameCardStyle} transition-all duration-300 group cursor-pointer`}>
                                     <div className="relative h-56 mb-4 overflow-hidden rounded-2xl shadow-inner">
-                                        <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                        <img src={item.image} crossOrigin="anonymous" alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                                         <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg text-xs font-bold text-gray-900 flex items-center gap-1 shadow-md">
                                             <Star size={14} className="text-yellow-500 fill-yellow-500" /> {item.rating}
                                         </div>

@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import {
     Star, MapPin, Utensils, Coffee, ChevronRight, Award,
     Settings, LogOut, User, Lock, MessageSquare, FileText,
-    HelpCircle, Mail, Shield, Globe, UserX
+    HelpCircle, Mail, Shield, Globe, UserX, PlusCircle, CheckCircle2, Clock, Sparkles, Users
 } from 'lucide-react'
 import { useAuthStore } from '../../auth/hooks/useAuthStore'
 import { useTheme } from '@/hooks/useTheme'
@@ -68,6 +68,11 @@ const ProfilePage = () => {
         { label: 'Reward', val: 'Coffee', icon: Coffee, color: 'text-purple-500 bg-purple-500/10' },
     ]
 
+    const contributions = [
+        { id: 1, name: 'The Artisan Bakery', status: 'Approved', points: '+50 XP', date: '2 days ago' },
+        { id: 2, name: 'Mucha Macha', status: 'Pending', points: 'In Review', date: 'Just now' },
+    ]
+
     const menuItems = [
         {
             section: "Account",
@@ -90,6 +95,28 @@ const ProfilePage = () => {
                 { icon: FileText, label: "Terms of Service", link: "/terms" },
                 { icon: Shield, label: "Privacy Policy", link: "/privacy" },
                 { icon: UserX, label: "Request Data Deletion (GDPR)", link: "/privacy/delete-request" },
+            ]
+        },
+        {
+            section: "Application",
+            items: [
+                {
+                    icon: Shield,
+                    label: "Check for Updates",
+                    action: async () => {
+                        if ('serviceWorker' in navigator) {
+                            const registration = await navigator.serviceWorker.getRegistration();
+                            if (registration) {
+                                await registration.update();
+                                alert('Checking for updates... If a new version is available, it will download in the background.');
+                            } else {
+                                alert('Service Worker not registered. PWA might not be installed.');
+                            }
+                        } else {
+                            alert('Offline mode not supported by this browser.');
+                        }
+                    }
+                },
             ]
         }
     ];
@@ -134,6 +161,50 @@ const ProfilePage = () => {
                 </div>
             </div>
 
+            {/* My Contributions Section */}
+            <div className="px-5 mt-8">
+                <div className="flex items-center justify-between mb-4 px-2">
+                    <h3 className={`text-[15px] font-black uppercase tracking-tight ${textStyle}`}>My Contributions</h3>
+                    <Link to="/dashboard/add-place" className="flex items-center gap-1.5 text-xs font-bold text-blue-500 hover:text-blue-600">
+                        <PlusCircle size={14} /> Add Place
+                    </Link>
+                </div>
+                <div className={`rounded-[24px] overflow-hidden border backdrop-blur-sm ${cardBg}`}>
+                    {contributions.length > 0 ? (
+                        contributions.map((item, idx) => (
+                            <div
+                                key={item.id}
+                                className={`flex items-center justify-between p-4 ${idx !== contributions.length - 1 ? (isDark ? 'border-b border-white/5' : 'border-b border-gray-100') : ''}`}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${item.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'
+                                        }`}>
+                                        {item.status === 'Approved' ? <CheckCircle2 size={18} /> : <Clock size={18} />}
+                                    </div>
+                                    <div>
+                                        <h4 className={`text-sm font-bold ${textStyle}`}>{item.name}</h4>
+                                        <p className="text-xs text-slate-400 font-medium">{item.date}</p>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${item.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'
+                                        }`}>
+                                        {item.status}
+                                    </span>
+                                    {item.status === 'Approved' && (
+                                        <p className="text-[10px] font-black text-blue-500 mt-1">{item.points}</p>
+                                    )}
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="p-6 text-center">
+                            <p className={`text-sm ${subTextStyle}`}>You haven't added any places yet.</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
             {/* Taste Preferences Section - "The Foodie DNA" */}
             <div className="px-5 mt-8">
                 <div className={`p-6 rounded-[32px] border backdrop-blur-md ${cardBg}`}>
@@ -174,6 +245,54 @@ const ProfilePage = () => {
                                 </p>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Experimental Features - Bio-Sync & Social */}
+            <div className="px-5 mt-8">
+                <div className="flex items-center justify-between mb-4 px-2">
+                    <h3 className={`text-[15px] font-black uppercase tracking-tight ${textStyle} flex items-center gap-2`}>
+                        <Sparkles size={16} className="text-amber-500" /> Labs & Social
+                    </h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Bio-Sync AI Placeholder */}
+                    <div className={`p-5 rounded-[24px] border border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-transparent relative overflow-hidden group`}>
+                        <div className="flex items-center gap-3 mb-3 relative z-10">
+                            <div className="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+                                <Sparkles size={20} />
+                            </div>
+                            <div>
+                                <h4 className={`text-base font-bold ${textStyle}`}>Bio-Sync AI</h4>
+                                <p className="text-xs text-blue-500 font-bold tracking-wide uppercase">Coming Soon</p>
+                            </div>
+                        </div>
+                        <p className={`text-sm ${subTextStyle} relative z-10 leading-relaxed`}>
+                            Connect your wearable to get personalized restaurant recommendations based on your current physical state and energy levels.
+                        </p>
+                        <button className="mt-4 px-4 py-2 rounded-xl bg-blue-500/20 text-blue-600 dark:text-blue-400 font-bold text-xs relative z-10 hover:bg-blue-500/30 transition-colors">
+                            Join Waitlist
+                        </button>
+                    </div>
+
+                    {/* Dine With Me Placeholder */}
+                    <div className={`p-5 rounded-[24px] border border-purple-500/30 bg-gradient-to-br from-purple-500/10 to-transparent relative overflow-hidden group`}>
+                        <div className="flex items-center gap-3 mb-3 relative z-10">
+                            <div className="w-10 h-10 rounded-xl bg-purple-500 flex items-center justify-center text-white shadow-lg shadow-purple-500/30">
+                                <Users size={20} />
+                            </div>
+                            <div>
+                                <h4 className={`text-base font-bold ${textStyle}`}>Dine With Me</h4>
+                                <p className="text-xs text-purple-500 font-bold tracking-wide uppercase">Beta</p>
+                            </div>
+                        </div>
+                        <p className={`text-sm ${subTextStyle} relative z-10 leading-relaxed`}>
+                            Find a dining buddy! Match with fellow foodies nearby who share your taste Profile and are looking for company.
+                        </p>
+                        <button className="mt-4 px-4 py-2 rounded-xl bg-purple-500/20 text-purple-600 dark:text-purple-400 font-bold text-xs relative z-10 hover:bg-purple-500/30 transition-colors">
+                            Find a Buddy
+                        </button>
                     </div>
                 </div>
             </div>

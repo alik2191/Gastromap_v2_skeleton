@@ -8,16 +8,17 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'pwa-icon-192.png', 'pwa-icon-512.png'],
       manifest: {
-        name: 'GastroMap',
+        name: 'GastroMap — Smart AI Dining Guide',
         short_name: 'GastroMap',
-        description: 'Smart Restaurant Discovery & AI Dining Guide',
+        description: 'Откройте для себя лучшие рестораны с помощью ИИ. Ваш персональный гастрономический эксперт.',
         theme_color: '#0f172a',
         background_color: '#0f172a',
         display: 'standalone',
         orientation: 'portrait',
+        categories: ['food', 'lifestyle', 'travel'],
         icons: [
           {
             src: 'pwa-icon-192.png',

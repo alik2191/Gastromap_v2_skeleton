@@ -4,10 +4,13 @@ import { Sparkles, Map, List, Globe, ArrowUpRight, Search, Check, ChevronDown, C
 import { Button } from '@/components/ui/button'
 import { motion, AnimatePresence } from 'framer-motion'
 
-// --- Animations ---
+// --- Animations (Apple-like Springs) ---
+const SPRING_TRANSITION = { type: "spring", stiffness: 100, damping: 20 }
+const STAGGER_TIMING = 0.08
+
 const fadeInUp = {
     hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+    visible: { opacity: 1, y: 0, transition: SPRING_TRANSITION }
 }
 
 const staggerContainer = {
@@ -15,32 +18,35 @@ const staggerContainer = {
     visible: {
         opacity: 1,
         transition: {
-            staggerChildren: 0.1
+            staggerChildren: STAGGER_TIMING,
+            delayChildren: 0.1
         }
     }
 }
+
+// Reuseable subtle Apple border/shadow classes
+const surfaceApple = "bg-white dark:bg-[#1C1C1E] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(255,255,255,0.02)] border border-black/[0.03] dark:border-white/[0.04]"
+const bgAppleBase = "bg-[#F5F5F7] dark:bg-black"
 
 // --- Component: Hero (Bento) ---
 const BentoHero = () => {
     // Stats Review Logic
     const [reviewIndex, setReviewIndex] = React.useState(0)
     // Smart List Toggle Logic
-    const [listMode, setListMode] = React.useState('wishlist') // 'wishlist' | 'visited'
+    const [listMode, setListMode] = React.useState('wishlist')
 
     const reviews = [
-        { name: "Anna K.", loc: "Warsaw, Poland", text: "Found an amazing café in Warsaw! Incredible atmosphere ☕", img: "https://i.pravatar.cc/100?img=5" },
-        { name: "James L.", loc: "London, UK", text: "Best hidden bar I've ever visited. Thanks for the tip! 🥃", img: "https://i.pravatar.cc/100?img=3" },
-        { name: "Sarah M.", loc: "NYC, USA", text: "The vegan options here were outstanding. 🥗", img: "https://i.pravatar.cc/100?img=9" },
-        { name: "David R.", loc: "Tokyo, Japan", text: "Sushi Arai was a life-changing experience. 🍣", img: "https://i.pravatar.cc/100?img=11" }
+        { name: "Anna K.", loc: "Warsaw", text: "Incredible atmosphere ☕", img: "https://i.pravatar.cc/100?img=5" },
+        { name: "James L.", loc: "London", text: "Best hidden bar I've visited. 🥃", img: "https://i.pravatar.cc/100?img=3" },
+        { name: "Sarah M.", loc: "NYC", text: "Outstanding vegan options. 🥗", img: "https://i.pravatar.cc/100?img=9" },
+        { name: "David R.", loc: "Tokyo", text: "Life-changing experience. 🍣", img: "https://i.pravatar.cc/100?img=11" }
     ]
 
     React.useEffect(() => {
-        // Stats rotation
         const statTimer = setInterval(() => {
             setReviewIndex((prev) => (prev + 1) % reviews.length)
         }, 4000)
 
-        // Smart List rotation
         const listTimer = setInterval(() => {
             setListMode(prev => prev === 'wishlist' ? 'visited' : 'wishlist')
         }, 3000)
@@ -52,104 +58,99 @@ const BentoHero = () => {
     }, [])
 
     return (
-        <section className="pt-24 md:pt-32 pb-12 md:pb-20 bg-slate-50 dark:bg-slate-950 hero-section transition-colors duration-500">
-            <div className="w-full px-4 md:px-8">
+        <section className={`pt-24 md:pt-32 pb-12 md:pb-20 ${bgAppleBase} transition-colors duration-500`}>
+            <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-8">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 mb-6">
+                    {/* Main Banner */}
                     <motion.div
                         initial="hidden"
                         animate="visible"
                         variants={fadeInUp}
-                        className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-[30px] md:rounded-[40px] p-6 sm:p-10 md:p-16 flex flex-col justify-center shadow-sm relative overflow-hidden border border-slate-200/50 dark:border-slate-800/50"
+                        className={`lg:col-span-7 rounded-[32px] md:rounded-[40px] p-8 sm:p-12 md:p-16 flex flex-col justify-center relative overflow-hidden ${surfaceApple}`}
                     >
-                        <div className="bg-blue-50 dark:bg-blue-900/20 w-fit px-3 py-1 rounded-full text-xs font-semibold text-blue-600 dark:text-blue-400 mb-8 border border-blue-100 dark:border-blue-900/30">
-                            ● Beta Version Live
+                        <div className="bg-black/5 dark:bg-white/10 w-fit px-3 py-1.5 rounded-full text-xs font-semibold text-black/60 dark:text-white/70 mb-8 flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                            100% Free Community Guide
                         </div>
-                        <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight leading-[1.1] md:leading-[1] mb-6 md:mb-8 text-base-content">
-                            Explore flavors <br className="hidden sm:block" /> <span className="text-blue-600">without borders.</span>
+                        <h1 className="text-4xl sm:text-5xl md:text-7xl font-semibold tracking-[-0.03em] leading-[1.05] text-black/90 dark:text-white mb-6 md:mb-8">
+                            Discover places. <br className="hidden sm:block" /> Share with <span className="text-blue-600 dark:text-blue-500">friends.</span>
                         </h1>
-                        <p className="text-base md:text-lg text-base-content/70 mb-8 md:mb-10 max-w-md leading-relaxed">
-                            AI-powered guide with route planning and personalized recommendations.
+                        <p className="text-base md:text-xl text-black/50 dark:text-white/50 mb-8 md:mb-10 max-w-md leading-relaxed font-medium tracking-tight">
+                            Join the community-driven map to find the best local spots or add your own discoveries.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                            <Link to="/explore" className="w-full sm:w-auto">
-                                <Button size="lg" className="w-full h-12 md:h-14 rounded-full px-8 text-base bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-200 dark:shadow-none transition-transform hover:scale-105">
+                            <Link to="/auth/signup" className="w-full sm:w-auto">
+                                <Button size="lg" className="w-full h-12 md:h-14 rounded-full px-8 text-base bg-blue-600 hover:bg-blue-700 text-white font-medium transition-transform active:scale-95 duration-200 shadow-lg shadow-blue-500/20">
                                     Get Started
                                 </Button>
                             </Link>
-                            <Button variant="outline" size="lg" className="w-full h-12 md:h-14 btn btn-outline rounded-full px-8 text-base transition-transform hover:scale-105">
-                                How it Works
-                            </Button>
+                            <Link to="/auth/signup?action=add-place" className="w-full sm:w-auto">
+                                <Button variant="outline" size="lg" className="w-full h-12 md:h-14 rounded-full px-8 text-base bg-transparent border-blue-600/20 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 font-medium transition-transform active:scale-95 duration-200">
+                                    Add a Place
+                                </Button>
+                            </Link>
                         </div>
                     </motion.div>
 
-                    <div className="lg:col-span-5 flex flex-col gap-6">
+                    <div className="lg:col-span-5 flex flex-col gap-4 md:gap-6">
+                        {/* Immersive Photo Card */}
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
+                            initial={{ opacity: 0, scale: 0.98 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.2, duration: 0.6 }}
-                            className="flex-1 bg-black rounded-[30px] md:rounded-[40px] relative overflow-hidden group min-h-[200px] md:min-h-[300px]"
+                            transition={{ delay: 0.1, ...SPRING_TRANSITION }}
+                            className="flex-1 bg-[#1C1C1E] rounded-[32px] md:rounded-[40px] relative overflow-hidden group min-h-[200px] md:min-h-[300px]"
                         >
-                            <img src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2940&auto=format&fit=crop" alt="Bar" className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-[1.5s] ease-out" />
-                            <div className="absolute bottom-6 left-6 right-6 z-10">
-                                <div className="bg-white/10 backdrop-blur-md border border-white/20 p-5 rounded-3xl text-white">
-                                    <h3 className="font-bold text-lg mb-1">Hidden Bars</h3>
-                                    <p className="text-sm text-white/70">For insiders only</p>
+                            <img src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2940&auto=format&fit=crop" alt="Hidden Bar" className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-[2s] ease-out" />
+                            <div className="absolute bottom-6 left-6 right-6 z-10 flex items-end justify-between">
+                                <div className="bg-white/20 backdrop-blur-2xl border border-white/20 px-5 py-3 rounded-[24px] text-white/90">
+                                    <h3 className="font-semibold text-lg tracking-tight leading-tight">The Aviary</h3>
+                                    <p className="text-sm text-white/70 font-medium">Chicago, IL</p>
                                 </div>
                             </div>
                         </motion.div>
 
-                        {/* Stats Card */}
+                        {/* Review / Stats Card */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.4, duration: 0.6 }}
-                            className="bg-blue-50/80 dark:bg-blue-900/10 rounded-[30px] md:rounded-[40px] p-6 md:p-8 relative overflow-hidden min-h-[220px] md:min-h-[260px] flex flex-col justify-between border border-blue-100/50 dark:border-blue-900/20"
+                            transition={{ delay: 0.2, ...SPRING_TRANSITION }}
+                            className={`rounded-[32px] md:rounded-[40px] p-6 md:p-8 relative min-h-[200px] md:min-h-[220px] flex flex-col justify-between ${surfaceApple}`}
                         >
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <h3 className="text-4xl md:text-5xl font-bold text-blue-900 dark:text-blue-100 mb-1 tracking-tight">200+</h3>
-                                    <p className="text-sm md:text-base text-blue-600 dark:text-blue-400 font-medium">Verified Locations</p>
+                                    <h3 className="text-4xl md:text-5xl font-semibold text-black/90 dark:text-white mb-1 tracking-tight">12k+</h3>
+                                    <p className="text-sm md:text-base text-black/40 dark:text-white/40 font-medium">Curated Locations</p>
                                 </div>
-                                <ArrowUpRight className="w-5 h-5 md:w-6 md:h-6 text-blue-600 dark:text-blue-400" />
+                                <div className="w-10 h-10 rounded-full bg-black/5 dark:bg-white/10 flex items-center justify-center">
+                                    <ArrowUpRight className="w-5 h-5 text-black/60 dark:text-white/60" />
+                                </div>
                             </div>
 
-                            <motion.div
-                                key={reviewIndex}
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.5 }}
-                                className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-blue-100 dark:border-blue-900/30 mt-4 relative"
-                            >
-                                <p className="text-sm text-slate-700 dark:text-slate-300 font-medium leading-relaxed h-[3.5rem] flex items-center">
-                                    "{reviews[reviewIndex].text}"
-                                </p>
-                                <div className="mt-2 flex items-center gap-2">
-                                    <div className="text-xs font-bold text-blue-600 dark:text-blue-400">{reviews[reviewIndex].name}</div>
-                                    <div className="text-xs text-blue-300 dark:text-blue-800">•</div>
-                                    <div className="text-xs text-slate-400 dark:text-slate-500">{reviews[reviewIndex].loc}</div>
-                                </div>
-                            </motion.div>
-
-                            <div className="flex -space-x-2 mt-4 items-center">
-                                {reviews.map((r, i) => (
-                                    <motion.div
-                                        key={i}
-                                        animate={{
-                                            scale: i === reviewIndex ? 1.2 : 1,
-                                            zIndex: i === reviewIndex ? 10 : 0,
-                                            borderColor: i === reviewIndex ? "rgb(37 99 235)" : "white"
-                                        }}
-                                        className="w-10 h-10 rounded-full border-2 bg-gray-200 overflow-hidden relative"
-                                    >
-                                        <img src={r.img} alt="User" className="w-full h-full object-cover" />
-                                    </motion.div>
-                                ))}
-                            </div>
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={reviewIndex}
+                                    initial={{ opacity: 0, y: 5 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -5 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="mt-6 flex gap-4 items-center"
+                                >
+                                    <img src={reviews[reviewIndex].img} alt="User" className="w-12 h-12 rounded-full ring-2 ring-black/5 dark:ring-white/10 object-cover" />
+                                    <div>
+                                        <p className="text-sm font-medium text-black/80 dark:text-white/80 leading-snug line-clamp-2">
+                                            "{reviews[reviewIndex].text}"
+                                        </p>
+                                        <div className="text-xs text-black/40 dark:text-white/40 font-medium mt-1">
+                                            {reviews[reviewIndex].name} &middot; {reviews[reviewIndex].loc}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            </AnimatePresence>
                         </motion.div>
                     </div>
                 </div>
 
+                {/* 4 Feature Columns */}
                 <motion.div
                     variants={staggerContainer}
                     initial="hidden"
@@ -157,100 +158,78 @@ const BentoHero = () => {
                     viewport={{ once: true, margin: "-50px" }}
                     className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"
                 >
-                    {/* 1. AI Guide Card */}
-                    <motion.div variants={fadeInUp} className="bg-white dark:bg-slate-900 rounded-[32px] p-6 shadow-sm hover:shadow-xl transition-all feature-card-sm group overflow-hidden relative border border-slate-200 dark:border-slate-800 h-full flex flex-col">
-                        <div className="flex items-start gap-4 mb-6">
-                            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0">
-                                <Sparkles size={24} />
+                    {/* 1. AI Bio-Sync Card */}
+                    <motion.div variants={fadeInUp} className={`rounded-[32px] p-6 h-full flex flex-col ${surfaceApple}`}>
+                        <div className="mb-6">
+                            <div className="w-12 h-12 bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-4">
+                                <Heart size={24} className="fill-blue-500/20" />
                             </div>
-                            <div>
-                                <h3 className="font-bold text-lg text-slate-900 dark:text-white leading-tight">GastroGuide</h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400">Routes & Memory</p>
-                            </div>
+                            <h3 className="font-semibold text-lg text-black/90 dark:text-white tracking-tight">Bio-Sync AI</h3>
+                            <p className="text-sm text-black/50 dark:text-white/50 font-medium mt-1">Health-aware dining</p>
                         </div>
-                        <div className="bg-slate-50 dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-pink-100/50 dark:border-pink-900/20 mt-auto">
+                        <div className="bg-[#F5F5F7] dark:bg-white/5 rounded-[20px] p-4 mt-auto">
                             <motion.p
                                 initial={{ opacity: 0 }}
                                 whileInView={{ opacity: 1 }}
-                                transition={{ duration: 0.5 }}
-                                className="text-[11px] leading-relaxed text-gray-600 font-medium"
+                                transition={{ delay: 0.3, duration: 0.5 }}
+                                className="text-xs leading-relaxed text-black/70 dark:text-white/70 font-medium"
                             >
-                                "Perfect! I'll plan a route for you: Start at <span className="font-bold text-pink-600">Cafe Mozart</span> (specialty coffee)..."
+                                "You walked 10k steps today. How about a healthy lunch at <span className="font-semibold text-blue-600 dark:text-blue-400">Green Bowl</span>?"
                                 <motion.span
                                     animate={{ opacity: [0, 1, 0] }}
                                     transition={{ repeat: Infinity, duration: 0.8 }}
-                                    className="inline-block w-1.5 h-3 bg-pink-500 ml-1 align-middle"
+                                    className="inline-block w-1.5 h-3 bg-blue-500 ml-1 align-middle rounded-full"
                                 />
                             </motion.p>
                         </div>
                     </motion.div>
 
-                    {/* 2. Smart Lists Card - Toggling content */}
-                    <motion.div variants={fadeInUp} className="bg-base-100 rounded-[32px] p-6 border border-base-200 shadow-sm hover:shadow-xl transition-all feature-card-sm group overflow-hidden relative h-full flex flex-col">
-                        <div className="flex items-start gap-4 mb-6">
-                            <div className="w-12 h-12 bg-black rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0">
+                    {/* 2. Smart Lists Card */}
+                    <motion.div variants={fadeInUp} className={`rounded-[32px] p-6 h-full flex flex-col ${surfaceApple}`}>
+                        <div className="mb-6">
+                            <div className="w-12 h-12 bg-black/5 dark:bg-white/10 text-black/80 dark:text-white/80 rounded-2xl flex items-center justify-center mb-4">
                                 <List size={24} />
                             </div>
-                            <div>
-                                <h3 className="font-bold text-lg leading-tight">Smart Lists</h3>
-                                <p className="text-sm text-gray-500">Wish-list & Visited</p>
-                            </div>
+                            <h3 className="font-semibold text-lg text-black/90 dark:text-white tracking-tight">Collections</h3>
+                            <p className="text-sm text-black/50 dark:text-white/50 font-medium mt-1">Wishlists & histories</p>
                         </div>
 
-                        <div className="h-24 relative mt-auto">
+                        <div className="relative h-[88px] mt-auto">
                             <AnimatePresence mode="wait">
                                 {listMode === 'wishlist' ? (
                                     <motion.div
                                         key="wishlist"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                        transition={{ duration: 0.4 }}
-                                        className="space-y-2 absolute inset-0"
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.95 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="absolute inset-0 space-y-2"
                                     >
-                                        <div className="flex items-center gap-2 text-xs text-gray-400">
-                                            <Heart size={12} className="text-pink-400 fill-pink-400" />
-                                            <span className="font-semibold text-gray-600 uppercase tracking-wider text-[10px]">Wish-list</span>
+                                        <div className="bg-[#F5F5F7] dark:bg-white/5 p-3 rounded-[16px] flex items-center gap-3">
+                                            <Heart size={14} className="text-rose-500 fill-rose-500" />
+                                            <span className="text-xs font-semibold text-black/80 dark:text-white/80">Jazz Club Tokyo</span>
                                         </div>
-                                        <div className="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-xl flex items-center gap-3">
-                                            <div className="w-2 h-2 rounded-full bg-pink-400" />
-                                            <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Hidden Jazz Club</span>
-                                        </div>
-                                        <div className="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-xl flex items-center gap-3 opacity-60">
-                                            <div className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600" />
-                                            <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Ramen Shop</span>
+                                        <div className="bg-[#F5F5F7] dark:bg-white/5 p-3 rounded-[16px] flex items-center gap-3 opacity-50">
+                                            <div className="w-3.5 h-3.5 rounded-full bg-black/10 dark:bg-white/20" />
+                                            <span className="text-xs font-semibold text-black/80 dark:text-white/80">Omakase Room</span>
                                         </div>
                                     </motion.div>
                                 ) : (
                                     <motion.div
                                         key="visited"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                        transition={{ duration: 0.4 }}
-                                        className="space-y-2 absolute inset-0"
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.95 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="absolute inset-0 space-y-2"
                                     >
-                                        <div className="flex items-center gap-2 text-xs text-slate-400">
-                                            <CheckCircle2 size={12} className="text-green-500" />
-                                            <span className="font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider text-[10px]">Visited</span>
+                                        <div className="bg-[#F5F5F7] dark:bg-white/5 p-3 rounded-[16px] flex items-center gap-3 border border-green-500/20">
+                                            <CheckCircle2 size={14} className="text-green-500" />
+                                            <span className="text-xs font-semibold text-black/80 dark:text-white/80">Cafe Leon</span>
                                         </div>
-                                        <div className="bg-green-50 dark:bg-green-950/20 p-2.5 rounded-xl flex items-center gap-3 border border-green-100 dark:border-green-900/30">
-                                            <motion.div
-                                                initial={{ scale: 0 }} animate={{ scale: 1 }}
-                                                className="text-green-600 dark:text-green-500"
-                                            >
-                                                <CheckCircle2 size={12} fill="currentColor" className="text-white dark:text-slate-900" />
-                                            </motion.div>
-                                            <span className="text-xs font-medium text-green-800 dark:text-green-200">Cafe Mozart</span>
-                                        </div>
-                                        <div className="bg-green-50 dark:bg-green-950/20 p-2.5 rounded-xl flex items-center gap-3 border border-green-100 dark:border-green-900/30 opacity-80">
-                                            <motion.div
-                                                initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.1 }}
-                                                className="text-green-600 dark:text-green-500"
-                                            >
-                                                <CheckCircle2 size={12} fill="currentColor" className="text-white dark:text-slate-900" />
-                                            </motion.div>
-                                            <span className="text-xs font-medium text-green-800 dark:text-green-200">La Bottega</span>
+                                        <div className="bg-[#F5F5F7] dark:bg-white/5 p-3 rounded-[16px] flex items-center gap-3 opacity-50">
+                                            <CheckCircle2 size={14} className="text-green-500" />
+                                            <span className="text-xs font-semibold text-black/80 dark:text-white/80">Bottega</span>
                                         </div>
                                     </motion.div>
                                 )}
@@ -258,81 +237,56 @@ const BentoHero = () => {
                         </div>
                     </motion.div>
 
-                    {/* 3. Interactive Maps Card - 2D City Scheme */}
-                    <motion.div variants={fadeInUp} className="bg-white dark:bg-slate-900 rounded-[32px] p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all feature-card-sm hover:-translate-y-1 duration-300 h-full flex flex-col">
-                        <div className="flex items-start gap-4 mb-6">
-                            <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0">
-                                <Map size={24} />
+                    {/* 3. Social Radar Card */}
+                    <motion.div variants={fadeInUp} className={`rounded-[32px] p-6 h-full flex flex-col ${surfaceApple}`}>
+                        <div className="mb-6">
+                            <div className="w-12 h-12 bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center mb-4">
+                                <User size={24} />
                             </div>
-                            <div>
-                                <h3 className="font-bold text-lg leading-tight text-slate-900 dark:text-white">Interactive Maps</h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400">Navigation</p>
-                            </div>
+                            <h3 className="font-semibold text-lg text-black/90 dark:text-white tracking-tight">Dine With Me</h3>
+                            <p className="text-sm text-black/50 dark:text-white/50 font-medium mt-1">Social dining radar</p>
                         </div>
-                        {/* 2D Map Visualization */}
-                        <div className="bg-blue-50/30 dark:bg-blue-900/10 rounded-2xl mt-auto relative overflow-hidden h-28 border border-blue-100 dark:border-blue-900/20">
-                            {/* Map Streets Style */}
-                            <div className="absolute inset-0">
-                                <svg width="100%" height="100%" className="opacity-20">
-                                    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                                        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="currentColor" strokeWidth="1" className="text-blue-400" />
-                                    </pattern>
-                                    <rect width="100%" height="100%" fill="url(#grid)" />
-                                    {/* Random Block Shapes */}
-                                    <rect x="20" y="20" width="30" height="30" fill="currentColor" className="text-blue-200" />
-                                    <rect x="80" y="50" width="40" height="20" fill="currentColor" className="text-blue-200" />
-                                    <rect x="140" y="10" width="20" height="40" fill="currentColor" className="text-blue-200" />
-                                </svg>
+                        <div className="bg-[#F5F5F7] dark:bg-white/5 rounded-[20px] mt-auto relative overflow-hidden h-[88px] flex items-center justify-center">
+                            {/* Simple minimalist grid */}
+                            <svg className="absolute inset-0 w-full h-full opacity-10 dark:opacity-[0.05]">
+                                <pattern id="appleGrid" width="16" height="16" patternUnits="userSpaceOnUse">
+                                    <path d="M 16 0 L 0 0 0 16" fill="none" stroke="currentColor" strokeWidth="1" />
+                                </pattern>
+                                <rect width="100%" height="100%" fill="url(#appleGrid)" />
+                            </svg>
+                            {/* Social avatars pulsing */}
+                            <div className="relative flex gap-4">
+                                <div className="relative">
+                                    <div className="absolute inset-0 bg-emerald-500 rounded-full animate-ping opacity-20"></div>
+                                    <img src="https://i.pravatar.cc/100?img=5" alt="Friend" className="w-8 h-8 rounded-full border-2 border-white dark:border-[#1C1C1E] shadow-sm relative z-10" />
+                                </div>
+                                <div className="relative top-3">
+                                    <div className="absolute inset-0 bg-blue-500 rounded-full animate-ping opacity-20" style={{ animationDelay: '1s' }}></div>
+                                    <img src="https://i.pravatar.cc/100?img=3" alt="Friend" className="w-8 h-8 rounded-full border-2 border-white dark:border-[#1C1C1E] shadow-sm relative z-10" />
+                                </div>
                             </div>
-
-                            {/* Blinking Pins */}
-                            {[
-                                { t: '20%', l: '30%', d: 0, c: "bg-blue-500" },
-                                { t: '60%', l: '60%', d: 1, c: "bg-purple-500" },
-                                { t: '40%', l: '85%', d: 2, c: "bg-pink-500" },
-                                { t: '75%', l: '20%', d: 0.5, c: "bg-blue-600" }
-                            ].map((p, i) => (
-                                <motion.div
-                                    key={i}
-                                    initial={{ scale: 0, opacity: 0 }}
-                                    animate={{ scale: [1, 1.2, 1], opacity: [0, 1, 0] }}
-                                    transition={{ repeat: Infinity, duration: 3, delay: p.d, repeatDelay: 1 }}
-                                    className={`absolute w-3 h-3 ${p.c} rounded-full border-2 border-white shadow-md z-10`}
-                                    style={{ top: p.t, left: p.l }}
-                                />
-                            ))}
                         </div>
                     </motion.div>
 
-                    {/* 4. Global Search Card */}
-                    <motion.div variants={fadeInUp} className="bg-white dark:bg-slate-900 rounded-[32px] p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all feature-card-sm hover:-translate-y-1 duration-300 h-full flex flex-col">
-                        <div className="flex items-start gap-4 mb-6">
-                            <div className="w-12 h-12 bg-slate-950 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0">
+                    {/* 4. Global Search */}
+                    <motion.div variants={fadeInUp} className={`rounded-[32px] p-6 h-full flex flex-col ${surfaceApple}`}>
+                        <div className="mb-6">
+                            <div className="w-12 h-12 bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 rounded-2xl flex items-center justify-center mb-4">
                                 <Globe size={24} />
                             </div>
-                            <div>
-                                <h3 className="font-bold text-lg leading-tight text-slate-900 dark:text-white">Global Search</h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400">Find anywhere</p>
-                            </div>
+                            <h3 className="font-semibold text-lg text-black/90 dark:text-white tracking-tight">Global</h3>
+                            <p className="text-sm text-black/50 dark:text-white/50 font-medium mt-1">Find anywhere</p>
                         </div>
-                        {/* City Scroll Animation */}
-                        <div className="relative h-24 overflow-hidden mt-auto mask-gradient rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
-                            <div className="absolute inset-x-0 top-0 h-4 bg-gradient-to-b from-slate-50 dark:from-slate-800 to-transparent z-10" />
-                            <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-slate-50 dark:from-slate-800 to-transparent z-10" />
-
+                        <div className="relative h-[88px] overflow-hidden mt-auto rounded-[20px] bg-[#F5F5F7] dark:bg-white/5 mask-gradient-vertical">
                             <motion.div
-                                animate={{ y: [0, -120] }}
+                                animate={{ y: [0, -100] }}
                                 transition={{ repeat: Infinity, duration: 8, ease: "linear" }}
-                                className="py-2 px-4 space-y-3"
+                                className="py-2 px-4 space-y-4"
                             >
-                                {[
-                                    "New York, USA", "Paris, France", "Tokyo, Japan", "London, UK",
-                                    "Berlin, Germany", "Rome, Italy", "Dubai, UAE", "Singapore",
-                                    "New York, USA", "Paris, France", "Tokyo, Japan" // duplicates for loop
-                                ].map((city, i) => (
-                                    <div key={i} className="flex items-center gap-3 opacity-60">
-                                        <Search size={12} className="text-gray-400" />
-                                        <span className="text-sm font-medium text-gray-600">{city}</span>
+                                {["New York", "Paris", "Tokyo", "London", "Milan", "New York", "Paris"].map((city, i) => (
+                                    <div key={i} className="flex items-center gap-3">
+                                        <Search size={14} className="text-black/30 dark:text-white/30" />
+                                        <span className="text-xs font-semibold text-black/60 dark:text-white/60">{city}</span>
                                     </div>
                                 ))}
                             </motion.div>
@@ -347,48 +301,47 @@ const BentoHero = () => {
 // --- Component: Features Grid ---
 const FeaturesGrid = () => {
     const features = [
-        { icon: Award, title: "AI Rank", desc: "Grades locations based on your preferences." },
-        { icon: Zap, title: "Instant Book", desc: "Reserve a table in seconds." },
-        { icon: Shield, title: "Best Practices", desc: "Only verified, high-quality spots." },
-        { icon: Utensils, title: "Local Gems", desc: "Discover places locals love." },
-        { icon: Coffee, title: "Perfect Vibe", desc: "Filter by noise level, lighting, spacing." },
-        { icon: Heart, title: "Health First", desc: "Detailed allergen and diet info." },
-        { icon: User, title: "Made for You", desc: "The more you use it, the smarter it gets." },
-        { icon: Map, title: "Multi-level", desc: "Floor plans and seat selection." },
-        { icon: Globe, title: "Global Access", desc: "Works intl. with auto-translation." },
+        { icon: Heart, title: "Bio-Sync AI", desc: "Integrates with your daily activity to suggest the perfect meal." },
+        { icon: User, title: "Dine With Me", desc: "Find friends or colleagues nearby who are ready for lunch." },
+        { icon: Award, title: "Earn Rewards", desc: "Get badges and recognition for contributing to the community." },
+        { icon: Zap, title: "Anti-Decision", desc: "Group swipe mechanic to instantly solve the 'where to eat' debate." },
+        { icon: Shield, title: "Community Vetted", desc: "All locations are proposed by locals and verified by moderators." },
+        { icon: Globe, title: "100% Free", desc: "Unrestricted access to the global map and all intelligent features." }
     ]
 
     return (
-        <section className="py-16 md:py-24 bg-slate-50 dark:bg-slate-950">
-            <div className="w-full px-4 md:px-8">
+        <section className={`py-20 md:py-32 bg-white dark:bg-[#000000]`}>
+            <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-6 md:px-8">
                 <motion.div
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
-                    className="text-center mb-12 md:mb-16"
+                    variants={fadeInUp}
+                    className="text-center mb-16 md:mb-24"
                 >
-                    <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight text-slate-900 dark:text-white">More than just a <span className="text-blue-600">guide.</span></h2>
-                    <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">We curated the best features to ensure your culinary journey is seamless.</p>
+                    <h2 className="text-3xl md:text-5xl lg:text-6xl font-semibold mb-6 tracking-[-0.03em] text-black/90 dark:text-white leading-[1.1]">
+                        Thoughtfully crafted. <br className="hidden sm:block" />
+                        <span className="text-blue-600 dark:text-blue-500">Powerfully intelligent.</span>
+                    </h2>
                 </motion.div>
-                <motion.div
-                    variants={staggerContainer}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, margin: "-50px" }}
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-                >
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-12 gap-x-8 md:gap-x-12">
                     {features.map((f, i) => (
-                        <motion.div variants={fadeInUp} key={i} className="bg-white dark:bg-slate-900 p-8 rounded-[32px] shadow-sm hover:shadow-md transition-all border border-slate-100 dark:border-slate-800">
-                            <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4">
-                                <f.icon size={20} />
+                        <motion.div
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            variants={fadeInUp}
+                            key={i}
+                            className="flex flex-col items-center text-center px-4"
+                        >
+                            <div className="w-16 h-16 bg-[#F5F5F7] dark:bg-[#1C1C1E] rounded-[22px] flex items-center justify-center text-black/80 dark:text-white/80 mb-6 mx-auto">
+                                <f.icon size={26} strokeWidth={1.5} />
                             </div>
-                            <h3 className="font-bold text-lg mb-2 text-slate-900 dark:text-white">{f.title}</h3>
-                            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{f.desc}</p>
+                            <h3 className="font-semibold text-xl mb-3 text-black/90 dark:text-white tracking-tight">{f.title}</h3>
+                            <p className="text-base text-black/50 dark:text-white/50 leading-relaxed font-medium">{f.desc}</p>
                         </motion.div>
                     ))}
-                </motion.div>
+                </div>
             </div>
         </section>
     )
@@ -396,38 +349,41 @@ const FeaturesGrid = () => {
 
 // --- Component: Collection ---
 const CollectionPreview = () => (
-    <section className="py-16 md:py-24 bg-white dark:bg-slate-900 collection-section">
-        <div className="w-full px-4 md:px-8">
+    <section className={`py-20 md:py-32 ${bgAppleBase}`}>
+        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-8">
             <motion.div
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeInUp}
-                className="text-center mb-12 md:mb-16"
+                className="text-left md:text-center mb-12 md:mb-20 max-w-2xl mx-auto"
             >
-                <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight text-slate-900 dark:text-white">Peek into the <span className="text-blue-600">collection.</span></h2>
-                <p className="text-slate-500 dark:text-slate-400">Just a small sample of the 12,000+ curated locations waiting for you.</p>
+                <h2 className="text-3xl md:text-5xl font-semibold mb-6 tracking-[-0.03em] text-black/90 dark:text-white">
+                    The <span className="text-blue-600 dark:text-blue-500">Collection</span>
+                </h2>
+                <p className="text-lg md:text-xl font-medium text-black/50 dark:text-white/50 leading-relaxed">
+                    A highly curated selection of the world’s finest rooms, hidden haunts, and culinary landmarks.
+                </p>
             </motion.div>
             <motion.div
                 variants={staggerContainer}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-50px" }}
-                className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"
             >
                 {[
-                    { title: "La Delicaze del Caffe", sub: "Venice, Italy", img: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2947&auto=format&fit=crop" },
-                    { title: "The Blind Tiger", sub: "New York, USA", img: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2940&auto=format&fit=crop" },
-                    { title: "Mercardo San Miguel", sub: "Madrid, Spain", img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=2874&auto=format&fit=crop" },
-                    { title: "Sushi Arai", sub: "Tokyo, Japan", img: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=2940&auto=format&fit=crop" }
+                    { title: "Venice", sub: "La Delicaze del Caffe", img: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2947&auto=format&fit=crop" },
+                    { title: "New York", sub: "The Blind Tiger", img: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2940&auto=format&fit=crop" },
+                    { title: "Madrid", sub: "Mercardo San Miguel", img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=2874&auto=format&fit=crop" },
+                    { title: "Tokyo", sub: "Sushi Arai", img: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=2940&auto=format&fit=crop" }
                 ].map((item, i) => (
-                    <motion.div key={i} variants={fadeInUp} className="group relative h-[250px] sm:h-[300px] md:h-[400px] rounded-[30px] md:rounded-[40px] overflow-hidden bg-gray-100 cursor-pointer">
-                        <img src={item.img} alt={item.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                        <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 text-white">
-                            <span className="bg-blue-600 text-[10px] font-bold px-2 py-1 rounded-full mb-3 inline-block">MUST VISIT</span>
-                            <h3 className="text-xl md:text-2xl font-bold">{item.title}</h3>
-                            <p className="text-xs md:text-base opacity-80 flex items-center gap-2 mt-1"><MapPinIcon className="w-3 h-3" /> {item.sub}</p>
+                    <motion.div key={i} variants={fadeInUp} className="group relative h-[350px] md:h-[480px] rounded-[32px] md:rounded-[40px] overflow-hidden bg-[#1C1C1E] cursor-pointer">
+                        <img src={item.img} alt={item.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-[2s] ease-out group-hover:scale-105 opacity-90" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                        <div className="absolute bottom-6 left-6 right-6 md:bottom-8 md:left-8 text-white">
+                            <h3 className="text-sm font-semibold uppercase tracking-widest text-white/50 mb-1">{item.title}</h3>
+                            <h4 className="text-2xl font-semibold tracking-tight">{item.sub}</h4>
                         </div>
                     </motion.div>
                 ))}
@@ -436,68 +392,71 @@ const CollectionPreview = () => (
     </section>
 )
 
-const MapPinIcon = ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
-
-
 // --- Component: Pricing ---
 const Pricing = () => (
-    <section className="py-16 md:py-24 bg-slate-50 dark:bg-slate-950 pricing-section">
-        <div className="w-full px-4 md:px-8">
+    <section className="py-20 md:py-32 bg-white dark:bg-[#000000]">
+        <div className="w-full max-w-[1200px] mx-auto px-4 md:px-8">
             <motion.div
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeInUp}
-                className="text-center mb-12 md:mb-16"
+                className="text-center mb-16 md:mb-24"
             >
-                <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight text-slate-900 dark:text-white">Invest in <span className="text-blue-600">experiences.</span></h2>
+                <div className="bg-blue-500/10 dark:bg-blue-500/20 w-fit mx-auto px-4 py-2 rounded-full text-sm font-semibold text-blue-600 dark:text-blue-400 mb-6 flex items-center gap-2">
+                    <Heart size={16} /> Community First
+                </div>
+                <h2 className="text-3xl md:text-5xl font-semibold mb-6 tracking-[-0.03em] text-black/90 dark:text-white">
+                    100% Free. <br className="hidden sm:block" />
+                    <span className="text-blue-600 dark:text-blue-500">Support the community.</span>
+                </h2>
+                <p className="text-lg md:text-xl font-medium text-black/50 dark:text-white/50 max-w-2xl mx-auto">
+                    GastroMap is built by locals for travelers. Enjoy full access forever, or become a supporter.
+                </p>
             </motion.div>
             <motion.div
                 variants={staggerContainer}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-50px" }}
-                className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-end"
+                className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto items-stretch"
             >
-                {/* Basic */}
-                <motion.div variants={fadeInUp} className="bg-white dark:bg-slate-900 p-8 rounded-[40px] shadow-sm border border-slate-100 dark:border-slate-800 h-fit hover:shadow-xl transition-shadow duration-300 group">
-                    <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Basic</div>
-                    <div className="text-4xl font-bold mb-2 text-slate-900 dark:text-white">$9.99<span className="text-base font-normal text-slate-400">/mo</span></div>
-                    <p className="text-xs text-slate-400 mb-8">For casual explorers</p>
-                    <ul className="space-y-4 mb-8 text-sm font-medium text-slate-600 dark:text-slate-400">
-                        <li className="flex gap-3"><Check className="w-4 h-4 text-blue-600" /> 5 Searches/day</li>
-                        <li className="flex gap-3"><Check className="w-4 h-4 text-blue-600" /> Basic Maps</li>
-                        <li className="flex gap-3"><Check className="w-4 h-4 text-blue-600" /> Read Reviews</li>
+                {/* Explorer (Free) */}
+                <motion.div variants={fadeInUp} className={`p-8 md:p-10 rounded-[40px] flex flex-col ${surfaceApple}`}>
+                    <div className="text-xs font-semibold text-black/40 dark:text-white/40 uppercase tracking-widest mb-6">Explorer</div>
+                    <div className="text-5xl font-semibold tracking-tight mb-2 text-black/90 dark:text-white">Free</div>
+                    <p className="text-sm font-medium text-black/50 dark:text-white/50 mb-10">Everything you need to discover and share.</p>
+                    <ul className="space-y-5 mb-12 text-sm font-medium text-black/70 dark:text-white/70 flex-1">
+                        <li className="flex items-center gap-3"><Check className="w-5 h-5 text-blue-600/50" /> Add & Review Places</li>
+                        <li className="flex items-center gap-3"><Check className="w-5 h-5 text-blue-600/50" /> Full AI Guidance</li>
+                        <li className="flex items-center gap-3"><Check className="w-5 h-5 text-blue-600/50" /> Earn Points & Badges</li>
+                        <li className="flex items-center gap-3"><Check className="w-5 h-5 text-blue-600/50" /> "Dine With Me" Radar</li>
                     </ul>
-                    <Button className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full h-12 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors">Start Free</Button>
+                    <Link to="/auth/signup">
+                        <Button className="w-full bg-[#F5F5F7] hover:bg-blue-50 text-blue-600 dark:bg-[#1C1C1E] dark:text-white dark:hover:bg-blue-900/20 rounded-full h-14 font-medium transition-colors">
+                            Join for Free
+                        </Button>
+                    </Link>
                 </motion.div>
 
-                {/* Pro (Black) */}
-                <motion.div variants={fadeInUp} className="bg-black text-white p-10 rounded-[40px] shadow-2xl relative overflow-hidden transform md:-translate-y-4">
-                    <div className="absolute top-6 right-6 bg-blue-600 text-[10px] font-bold px-3 py-1 rounded-full">POPULAR</div>
-                    <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Pro</div>
-                    <div className="text-5xl font-bold mb-2">$49.99<span className="text-base font-normal text-gray-400">/mo</span></div>
-                    <p className="text-xs text-gray-400 mb-8">For serious foodies</p>
-                    <ul className="space-y-4 mb-10 text-sm font-medium">
-                        <li className="flex gap-3"><Check className="w-4 h-4 text-blue-500" /> Unlimited AI</li>
-                        <li className="flex gap-3"><Check className="w-4 h-4 text-blue-500" /> Smart Lists</li>
-                        <li className="flex gap-3"><Check className="w-4 h-4 text-blue-500" /> Offline Mode</li>
-                        <li className="flex gap-3"><Check className="w-4 h-4 text-blue-500" /> No Ads</li>
-                    </ul>
-                    <Button className="w-full bg-white text-black rounded-full h-12 hover:bg-gray-100 font-bold">Choose Pro</Button>
-                </motion.div>
+                {/* Supporter (Highlighted) */}
+                <motion.div variants={fadeInUp} className="bg-gradient-to-br from-blue-900 to-black text-white p-8 md:p-10 rounded-[40px] shadow-2xl flex flex-col relative overflow-hidden">
+                    {/* Background glow */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600 rounded-full blur-[100px] opacity-20 pointer-events-none"></div>
 
-                {/* Ultimate (Blue) */}
-                <motion.div variants={fadeInUp} className="bg-blue-600 text-white p-8 rounded-[40px] shadow-xl h-fit hover:shadow-2xl transition-shadow duration-300">
-                    <div className="text-xs font-bold text-blue-200 uppercase tracking-widest mb-4">Ultimate</div>
-                    <div className="text-4xl font-bold mb-2">$149.99<span className="text-base font-normal text-blue-200">/mo</span></div>
-                    <p className="text-xs text-blue-200 mb-8">For concierge service</p>
-                    <ul className="space-y-4 mb-8 text-sm font-medium">
-                        <li className="flex gap-3"><Check className="w-4 h-4 text-white" /> Priority Reservations</li>
-                        <li className="flex gap-3"><Check className="w-4 h-4 text-white" /> 24/7 Support</li>
-                        <li className="flex gap-3"><Check className="w-4 h-4 text-white" /> Exclusive Events</li>
+                    <div className="absolute top-8 right-8 bg-white/10 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase text-white backdrop-blur-md">Optional</div>
+                    <div className="text-xs font-semibold text-blue-400 uppercase tracking-widest mb-6">Supporter</div>
+                    <div className="text-5xl font-semibold tracking-tight mb-2">$5<span className="text-lg text-white/40 font-medium">/mo</span></div>
+                    <p className="text-sm font-medium text-white/50 mb-10">Help keep the servers running.</p>
+                    <ul className="space-y-5 mb-12 text-sm font-medium text-white/90 flex-1 relative z-10">
+                        <li className="flex items-center gap-3"><Check className="w-5 h-5 text-blue-400" /> Exclusive "Supporter" Badge</li>
+                        <li className="flex items-center gap-3"><Check className="w-5 h-5 text-blue-400" /> Early access to new features</li>
+                        <li className="flex items-center gap-3"><Check className="w-5 h-5 text-blue-400" /> Skip the moderation queue</li>
+                        <li className="flex items-center gap-3"><Heart className="w-5 h-5 text-rose-400" /> Developer gratitude</li>
                     </ul>
-                    <Button className="w-full bg-white text-blue-600 rounded-full h-12 hover:bg-blue-50 font-bold">Choose Ultimate</Button>
+                    <Button className="w-full bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-500/20 rounded-full h-14 font-medium transition-all relative z-10">
+                        Become a Supporter
+                    </Button>
                 </motion.div>
             </motion.div>
         </div>
@@ -513,83 +472,73 @@ const FAQ = () => {
     }
 
     const questions = [
-        {
-            category: "General Questions", icon: List, items: [
-                { q: 'How does the AI Guide work?', a: 'Our AI analyzes your taste preferences and past visits to suggest perfect spots and even plans full day routes.' },
-                { q: 'Can I book tables directly?', a: 'Yes! Pro and Ultimate users can book tables instantly at partner venues.' },
-                { q: 'Is it available offline?', a: 'Absolutely. Download maps and lists for offline access in any city.' }
-            ]
-        },
-        {
-            category: "Account & Billing", icon: User, items: [
-                { q: 'Do you offer a free trial?', a: 'Yes, try the Pro plan free for 14 days. No commitment.' },
-                { q: 'Can I share my subscription?', a: 'Ultimate plans allow up to 3 family members to share one account.' },
-                { q: 'Are there student discounts?', a: 'Valid students get 50% off the Pro plan with verified ID.' }
-            ]
-        }
+        { q: 'Is GastroMap really free?', a: 'Yes! Access to the global map, AI features, and community tools is 100% free. We believe finding great food should not be behind a paywall.' },
+        { q: 'How do I add a new place?', a: 'Simply register for a free account, click "Add a Place", and fill out the details. Our community moderators will review it, and you will earn points when it goes live!' },
+        { q: 'How does the Bio-Sync AI work?', a: 'It utilizes advanced machine learning combined with optional Apple Health / Google Fit data to recommend meals based on your daily activity level.' },
+        { q: 'Why is there a Supporter tier?', a: 'GastroMap is built by a small team. The optional Supporter tier helps us keep the servers running and independent from intrusive ads.' }
     ]
 
     return (
-        <section className="py-16 md:py-24 bg-slate-50 dark:bg-slate-950">
-            <div className="w-full px-4 md:px-8">
-                <div className="text-center mb-12 md:mb-16">
-                    <h2 className="text-2xl md:text-3xl font-bold mb-2 text-slate-900 dark:text-white">Questions? <span className="text-blue-600">We've got answers.</span></h2>
+        <section className={`py-20 md:py-32 ${bgAppleBase}`}>
+            <div className="w-full max-w-[800px] mx-auto px-4 md:px-8">
+                <div className="text-center mb-16">
+                    <h2 className="text-3xl md:text-5xl font-semibold tracking-[-0.03em] text-black/90 dark:text-white">
+                        Common <span className="text-blue-600 dark:text-blue-500">Questions</span>
+                    </h2>
                 </div>
-                <div className="grid md:grid-cols-2 gap-x-12 gap-y-8">
-                    {questions.map((section, secIdx) => (
-                        <div key={secIdx} className="space-y-4">
-                            <h3 className="font-bold text-sm text-base-content/50 uppercase mb-4 flex gap-2 items-center">
-                                <section.icon size={14} /> {section.category}
-                            </h3>
-                            {section.items.map((item, i) => {
-                                const index = `${secIdx}-${i}`
-                                const isOpen = openIndex === index
-                                return (
-                                    <div
-                                        key={i}
-                                        onClick={() => toggleFAQ(index)}
-                                        className={`p-5 rounded-2xl cursor-pointer border transition-all duration-300 ${isOpen ? 'bg-white dark:bg-slate-800 shadow-md border-blue-100 dark:border-blue-900/50 ring-1 ring-blue-50 dark:ring-blue-900/10' : 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'}`}
-                                    >
-                                        <div className="flex justify-between items-center">
-                                            <span className={`font-medium text-sm transition-colors ${isOpen ? 'text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'}`}>{item.q}</span>
-                                            <ChevronDown size={16} className={`text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180 text-blue-600 dark:text-blue-400' : ''}`} />
-                                        </div>
-                                        <AnimatePresence>
-                                            {isOpen && (
-                                                <motion.div
-                                                    initial={{ height: 0, opacity: 0, marginTop: 0 }}
-                                                    animate={{ height: "auto", opacity: 1, marginTop: 8 }}
-                                                    exit={{ height: 0, opacity: 0, marginTop: 0 }}
-                                                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                                                    className="overflow-hidden"
-                                                >
-                                                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                                                        {item.a}
-                                                    </p>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    ))}
+                <div className="space-y-2">
+                    {questions.map((item, i) => {
+                        const isOpen = openIndex === i
+                        return (
+                            <div
+                                key={i}
+                                onClick={() => toggleFAQ(i)}
+                                className={`cursor-pointer overflow-hidden transition-all duration-300 rounded-[28px] ${isOpen ? 'bg-white dark:bg-[#1C1C1E] shadow-[0_8px_30px_rgb(0,0,0,0.04)] px-6 py-6' : 'hover:bg-black/5 dark:hover:bg-white/5 px-6 py-5'}`}
+                            >
+                                <div className="flex justify-between items-center">
+                                    <span className={`font-semibold text-lg transition-colors ${isOpen ? 'text-black/90 dark:text-white' : 'text-black/70 dark:text-white/70'}`}>{item.q}</span>
+                                    <ChevronDown size={20} className={`text-black/30 dark:text-white/30 transition-transform duration-300 ease-[cubic-bezier(0.87,0,0.13,1)] ${isOpen ? 'rotate-180' : ''}`} />
+                                </div>
+                                <AnimatePresence>
+                                    {isOpen && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: "auto", opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            transition={{ ...SPRING_TRANSITION, duration: 0.3 }}
+                                        >
+                                            <p className="text-base text-black/50 dark:text-white/50 leading-relaxed font-medium mt-4">
+                                                {item.a}
+                                            </p>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        )
+                    })}
                 </div>
             </div>
         </section>
     )
 }
 
-
-
 export default function LandingPage() {
     return (
-        <>
+        <div className="bg-[#F5F5F7] dark:bg-black min-h-screen">
             <BentoHero />
             <FeaturesGrid />
             <CollectionPreview />
             <Pricing />
             <FAQ />
-        </>
+
+            {/* Global style overrides needed for mask-gradients */}
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                .mask-gradient-vertical {
+                    -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+                    mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+                }
+            `}} />
+        </div>
     )
 }
