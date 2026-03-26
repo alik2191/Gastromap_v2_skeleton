@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-    Users, MapPin, Eye, MessageSquare,
-    Zap, Clock, Bot, Plus, Download,
-    Settings, Shield, Activity, Sparkles,
-    ListFilter, ChevronDown, ChevronUp, BarChart3,
-    ArrowRight, Upload
+    MapPin, Star,
+    Clock, Bot, Plus, Download,
+    Sparkles,
+    ChevronDown, ChevronUp, BarChart3,
+    ArrowRight, Upload, Building2, UtensilsCrossed
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { cn } from '@/lib/utils'
@@ -31,40 +31,89 @@ const StatCard = ({ title, value, icon: Icon, color, delay }) => (
     </motion.div>
 )
 
-const QuickAction = ({ icon: Icon, label, color, description }) => (
-    <button className="flex items-center gap-2 lg:gap-4 p-2 lg:p-5 bg-slate-50/50 dark:bg-white/[0.03] hover:bg-white dark:hover:bg-white/[0.05] rounded-[24px] border border-transparent hover:border-slate-100 dark:hover:border-white/5 transition-all group text-left w-full shadow-sm">
-        <div className={cn("w-10 h-10 lg:w-12 lg:h-12 rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0", color)}>
-            <Icon size={18} className="lg:w-5 lg:h-5" />
-        </div>
-        <div className="min-w-0">
-            <p className="text-sm lg:text-base font-bold text-slate-900 dark:text-white leading-none truncate">{label}</p>
-            <p className="text-[10px] lg:text-xs text-slate-400 mt-1.5 font-bold uppercase tracking-wide truncate opacity-60 leading-none">{description}</p>
-        </div>
-        <ArrowRight size={14} className="ml-auto text-slate-300 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
-    </button>
-)
-
 const AdminDashboardPage = () => {
     const navigate = useNavigate()
     const [isStatsCollapsed, setIsStatsCollapsed] = useState(false)
+
     const locations = useLocationsStore(s => s.locations)
 
-    const stats = [
-        { title: 'Locations', value: locations.length > 0 ? locations.length.toLocaleString() : '—', icon: MapPin, color: 'bg-orange-500' },
-        { title: 'Users', value: '1,284', icon: Users, color: 'bg-blue-500' },
-        { title: 'Subscriptions', value: '890', icon: MessageSquare, color: 'bg-emerald-500' },
-        { title: 'Page Views', value: '45.2k', icon: Eye, color: 'bg-purple-500' },
-    ]
+    // Derive real stats from actual location data
+    const stats = useMemo(() => {
+        const cities = new Set(locations.map(l => l.city).filter(Boolean))
+        const categories = new Set(locations.map(l => l.category).filter(Boolean))
+        const avgRating = locations.length > 0
+            ? (locations.reduce((sum, l) => sum + (l.rating ?? 0), 0) / locations.length).toFixed(1)
+            : '—'
+
+        return [
+            {
+                title: 'Локации',
+                value: locations.length > 0 ? locations.length.toLocaleString() : '—',
+                icon: MapPin,
+                color: 'bg-orange-500',
+            },
+            {
+                title: 'Города',
+                value: cities.size > 0 ? cities.size.toLocaleString() : '—',
+                icon: Building2,
+                color: 'bg-blue-500',
+            },
+            {
+                title: 'Категории',
+                value: categories.size > 0 ? categories.size.toLocaleString() : '—',
+                icon: UtensilsCrossed,
+                color: 'bg-emerald-500',
+            },
+            {
+                title: 'Ср. Рейтинг',
+                value: avgRating !== '—' ? `★ ${avgRating}` : '—',
+                icon: Star,
+                color: 'bg-purple-500',
+            },
+        ]
+    }, [locations])
+
+    // AI insight derived from real data
+    const aiInsight = useMemo(() => {
+        if (locations.length === 0) return 'Загрузка данных...'
+        const topRated = locations.filter(l => l.rating >= 4.8)
+        const cafes = locations.filter(l => l.category?.toLowerCase() === 'cafe')
+        const restaurants = locations.filter(l => l.category?.toLowerCase() === 'restaurant')
+        if (topRated.length > 0) {
+            return `${topRated.length} локаци${topRated.length === 1 ? 'я' : 'и'} с рейтингом 4.8+ — топ подборка для гостей города.`
+        }
+        if (cafes.length > restaurants.length) {
+            return `Кафе составляют ${cafes.length} из ${locations.length} точек — преобладающий формат в базе.`
+        }
+        return `В базе ${locations.length} локаций по ${new Set(locations.map(l => l.city)).size} город${new Set(locations.map(l => l.city)).size === 1 ? 'у' : 'ам'}.`
+    }, [locations])
+
+    // Recent activity derived from actual locations (last 3 added)
+    const recentActivity = useMemo(() => {
+        return [...locations]
+            .slice(-3)
+            .reverse()
+            .map(loc => ({
+                name: loc.title,
+                action: `добавлена в ${loc.city ?? 'базу'} · ${loc.category ?? ''}`,
+                initial: (loc.title?.[0] ?? '?').toUpperCase(),
+                badge: loc.rating ? `★ ${loc.rating}` : null,
+            }))
+    }, [locations])
 
     return (
         <div className="space-y-8 pb-20">
-            {/* Header Section matches AdminLocationsPage */}
+            {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6">
                 <div>
                     <h1 className="text-xl lg:text-3xl font-bold text-slate-900 dark:text-white leading-none tracking-tight">Панель управления</h1>
                     <div className="flex items-center gap-2 mt-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                        <p className="text-slate-500 dark:text-slate-400 font-medium text-xs lg:text-sm">Все системы работают в штатном режиме.</p>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium text-xs lg:text-sm">
+                            {locations.length > 0
+                                ? `${locations.length} локаций в базе · все системы работают`
+                                : 'Все системы работают в штатном режиме'}
+                        </p>
                     </div>
                 </div>
 
@@ -91,8 +140,9 @@ const AdminDashboardPage = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-                {/* Statistics Box - Left Column */}
+                {/* Left column */}
                 <div className="lg:col-span-1 space-y-6">
+                    {/* Analytics stats */}
                     <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/50 rounded-[32px] overflow-hidden shadow-sm">
                         <div className="p-3 lg:p-5 flex items-center justify-between border-b border-slate-50 dark:border-slate-800/50">
                             <div className="flex items-center gap-3 pl-2">
@@ -125,7 +175,7 @@ const AdminDashboardPage = () => {
                         </AnimatePresence>
                     </div>
 
-                    {/* Compact AI Insight */}
+                    {/* AI Insight — derived from real data */}
                     <div className="bg-slate-900 rounded-[32px] p-3 lg:p-6 text-white relative overflow-hidden shadow-xl">
                         <div className="absolute -right-2 -bottom-2 opacity-10">
                             <Bot size={120} />
@@ -135,49 +185,64 @@ const AdminDashboardPage = () => {
                                 <Sparkles size={16} className="text-indigo-400" />
                                 <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-400">GastroAI</span>
                             </div>
-                            <h4 className="text-base font-bold leading-tight mb-5">Weekend brunch venues up 24% in popularity</h4>
+                            <h4 className="text-base font-bold leading-tight mb-5">{aiInsight}</h4>
                             <button
                                 onClick={() => navigate('/admin/stats')}
                                 className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors group uppercase tracking-widest"
                             >
-                                View report <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                                Подробный отчёт <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                             </button>
                         </div>
                     </div>
                 </div>
 
-                {/* Right Area: Commands & Activity */}
+                {/* Right area */}
                 <div className="lg:col-span-2 space-y-6">
                     <LocationHierarchyExplorer />
 
+                    {/* Recent activity from real location data */}
                     <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/50 rounded-[32px] p-5 shadow-sm">
                         <div className="flex items-center justify-between mb-6">
                             <div className="flex items-center gap-3">
                                 <Clock size={20} className="text-slate-400" />
-                                <h2 className="text-[10px] lg:text-xs font-bold text-slate-900 dark:text-white uppercase tracking-widest">Последние действия</h2>
+                                <h2 className="text-[10px] lg:text-xs font-bold text-slate-900 dark:text-white uppercase tracking-widest">Последние добавления</h2>
                             </div>
-                            <button onClick={() => navigate('/admin/users')} className="text-[10px] font-bold text-indigo-500 hover:text-indigo-600 transition-colors uppercase tracking-widest">Все</button>
+                            <button
+                                onClick={() => navigate('/admin/locations')}
+                                className="text-[10px] font-bold text-indigo-500 hover:text-indigo-600 transition-colors uppercase tracking-widest"
+                            >
+                                Все
+                            </button>
                         </div>
-                        <div className="space-y-3">
-                            {[
-                                { user: 'Dmitri S.', action: 'added photo to Pasta Bar', time: '2M AGO', initial: 'D' },
-                                { user: 'Anna K.', action: 'activated Premium subscription', time: '12M AGO', initial: 'A' },
-                                { user: 'System', action: 'database sync completed', time: '1H AGO', initial: 'S' },
-                            ].map((item, i) => (
-                                <div key={i} className="flex items-center justify-between p-2 lg:p-4 bg-slate-50/50 dark:bg-slate-800/30 rounded-[20px] border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all">
-                                    <div className="flex items-center gap-5 min-w-0">
-                                        <div className="w-12 h-12 rounded-[18px] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/50 flex items-center justify-center font-bold text-xs text-slate-400">
-                                            {item.initial}
+
+                        {recentActivity.length > 0 ? (
+                            <div className="space-y-3">
+                                {recentActivity.map((item, i) => (
+                                    <div
+                                        key={i}
+                                        className="flex items-center justify-between p-2 lg:p-4 bg-slate-50/50 dark:bg-slate-800/30 rounded-[20px] border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all cursor-pointer"
+                                        onClick={() => navigate('/admin/locations')}
+                                    >
+                                        <div className="flex items-center gap-5 min-w-0">
+                                            <div className="w-12 h-12 rounded-[18px] bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 flex items-center justify-center font-bold text-sm text-indigo-500 shrink-0">
+                                                {item.initial}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="text-[13px] font-bold text-slate-900 dark:text-white leading-none mb-1.5 truncate">{item.name}</p>
+                                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wide truncate opacity-60 leading-none">{item.action}</p>
+                                            </div>
                                         </div>
-                                        <div className="min-w-0">
-                                            <p className="text-[13px] font-bold text-slate-900 dark:text-white leading-none mb-1.5">{item.user}</p>
-                                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wide truncate opacity-60 leading-none">{item.action}</p>
-                                        </div>
+                                        {item.badge && (
+                                            <span className="text-[10px] font-bold text-amber-500 whitespace-nowrap ml-4 bg-amber-50 dark:bg-amber-500/10 px-2 py-1 rounded-lg">{item.badge}</span>
+                                        )}
                                     </div>
-                                    <span className="text-[9px] font-bold text-slate-300 whitespace-nowrap ml-4 uppercase tracking-widest">{item.time}</span>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="py-8 text-center text-slate-400 text-xs font-bold uppercase tracking-widest opacity-50">
+                                Нет данных
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
