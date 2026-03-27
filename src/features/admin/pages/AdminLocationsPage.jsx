@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
     Plus, Search, Filter, MoreHorizontal, Edit, Trash2,
@@ -52,15 +52,30 @@ const AdminLocationsPage = () => {
     const [isImportWizardOpen, setIsImportWizardOpen] = useState(false)
     const [viewMode, setViewMode] = useState('list') // 'list' | 'map'
     const [formData, setFormData] = useState(null)
+    const [openMenuId, setOpenMenuId] = useState(null) // MoreHorizontal dropdown
+    const [toast, setToast] = useState(null) // { message, type }
     const location = useLocation()
     const navigate = useNavigate()
+    const menuRef = useRef(null)
 
-    const [locationsList, setLocationsList] = useState([
-        { id: 1, name: 'Zen Garden', category: 'Restaurant', cuisine: 'Китайская', city: 'Krakow', country: 'Poland', status: 'Active', rating: 4.8, description: 'Лучший дзен в Кракове', address: 'ul. Kanonicza 12', special_labels: ['Китайская'] },
-        { id: 2, name: 'Coffee Hub', category: 'Cafe', cuisine: 'Французская', city: 'Warsaw', country: 'Poland', status: 'Pending', rating: 4.5, description: 'Кофе и работа', address: 'ul. Marszałkowska 8', special_labels: ['Вкусные десерты'] },
-        { id: 3, name: 'Pasta Viva', category: 'Restaurant', cuisine: 'Итальянская', city: 'Berlin', country: 'Germany', status: 'Active', rating: 4.2, description: 'Итальянская страсть', address: 'Müllerstraße 15', special_labels: ['Итальянская'] },
-        { id: 4, name: 'Sushi Wave', category: 'Sushi', cuisine: 'Японская', city: 'Krakow', country: 'Poland', status: 'Draft', rating: 0.0, description: 'Японская волна', address: 'ul. Grodzka 3', special_labels: ['Японская'] },
-    ])
+    // Real locations from store
+    const { locations, addLocation, updateLocation, deleteLocation } = useLocationsStore()
+
+    // Close menu on outside click
+    useEffect(() => {
+        const handler = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) setOpenMenuId(null)
+        }
+        document.addEventListener('mousedown', handler)
+        return () => document.removeEventListener('mousedown', handler)
+    }, [])
+
+    // Auto-dismiss toast
+    useEffect(() => {
+        if (!toast) return
+        const t = setTimeout(() => setToast(null), 3000)
+        return () => clearTimeout(t)
+    }, [toast])
 
     const handleCreateNew = () => {
         const emptyLocation = {
@@ -90,42 +105,46 @@ const AdminLocationsPage = () => {
             cuisine: '',
             is_hidden_gem: false,
             is_featured: false,
-            status: 'Draft'
+            status: 'Active'
         }
         setSelectedLocation(emptyLocation)
         setFormData(emptyLocation)
         setIsSlideOverOpen(true)
     }
 
+    // Map store location fields → form fields
     const handleEdit = (loc) => {
         setSelectedLocation(loc)
         setFormData({
             id: loc.id,
-            name: loc.name || '',
+            name: loc.title || loc.name || '',
             category: loc.category || 'Cafe',
             city: loc.city || '',
             country: loc.country || '',
             address: loc.address || '',
             description: loc.description || '',
             insider_tip: loc.insider_tip || '',
-            must_try: loc.must_try || '',
-            price_range: loc.price_range || '$$',
+            must_try: Array.isArray(loc.what_to_try)
+                ? loc.what_to_try.join(', ')
+                : (loc.must_try || loc.what_to_try || ''),
+            price_range: loc.priceLevel || loc.price_range || '$$',
             website: loc.website || '',
             phone: loc.phone || '',
-            opening_hours: loc.opening_hours || '',
+            opening_hours: loc.openingHours || loc.opening_hours || '',
             booking_url: loc.booking_url || '',
             social_instagram: loc.social_instagram || '',
             social_facebook: loc.social_facebook || '',
-            image_url: loc.image_url || '',
-            images: loc.images || (loc.image_url ? [loc.image_url] : []),
-            latitude: loc.latitude || 50.0647,
-            longitude: loc.longitude || 19.9450,
+            image_url: loc.image || loc.image_url || '',
+            images: loc.images || (loc.image ? [loc.image] : loc.image_url ? [loc.image_url] : []),
+            latitude: loc.coordinates?.lat || loc.latitude || 50.0647,
+            longitude: loc.coordinates?.lng || loc.longitude || 19.9450,
             tags: loc.tags || [],
             best_time: loc.best_time || [],
             special_labels: loc.special_labels || [],
             cuisine: loc.cuisine || '',
             is_hidden_gem: loc.is_hidden_gem || false,
-            is_featured: loc.is_featured || false
+            is_featured: loc.is_featured || false,
+            status: loc.status || 'Active',
         })
         setIsSlideOverOpen(true)
     }
@@ -143,13 +162,88 @@ const AdminLocationsPage = () => {
     }, [location.search])
 
 
-    const stats = [
-        { label: 'Всего', val: '456', icon: MapPin, color: 'text-indigo-600', bg: 'bg-indigo-50 dark:bg-indigo-500/10' },
-        { label: 'В очереди', val: '12', icon: Clock, color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-500/10' },
-        { label: 'Сегодня', val: '+5', icon: Zap, color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-500/10' },
-    ]
+    // Save form → store
+    const handleSave = () => {
+        if (!formData?.name?.trim()) return
+        const locationData = {
+            title: formData.name,
+            name: formData.name,
+            category: formData.category,
+            city: formData.city,
+            country: formData.country,
+            address: formData.address,
+            description: formData.description,
+            insider_tip: formData.insider_tip,
+            what_to_try: formData.must_try
+                ? formData.must_try.split(',').map(s => s.trim()).filter(Boolean)
+                : [],
+            must_try: formData.must_try,
+            priceLevel: formData.price_range,
+            price_range: formData.price_range,
+            website: formData.website,
+            phone: formData.phone,
+            openingHours: formData.opening_hours,
+            opening_hours: formData.opening_hours,
+            booking_url: formData.booking_url,
+            social_instagram: formData.social_instagram,
+            social_facebook: formData.social_facebook,
+            image: formData.image_url || formData.images?.[0] || '',
+            image_url: formData.image_url,
+            images: formData.images || [],
+            coordinates: { lat: Number(formData.latitude), lng: Number(formData.longitude) },
+            latitude: Number(formData.latitude),
+            longitude: Number(formData.longitude),
+            tags: formData.tags || [],
+            best_time: formData.best_time || [],
+            special_labels: formData.special_labels || [],
+            cuisine: formData.cuisine,
+            is_hidden_gem: formData.is_hidden_gem || false,
+            is_featured: formData.is_featured || false,
+            status: formData.status || 'Active',
+            rating: selectedLocation?.rating || 0,
+        }
+        const isNew = selectedLocation?.id === 'NEW'
+        if (isNew) {
+            addLocation(locationData)
+        } else {
+            updateLocation(selectedLocation.id, locationData)
+        }
+        setIsSlideOverOpen(false)
+        setToast({ message: isNew ? '✓ Объект создан' : '✓ Изменения сохранены', type: 'success' })
+    }
 
-    const handleApprove = (id) => setLocationsList(prev => prev.map(l => l.id === id ? { ...l, status: 'Active' } : l))
+    // Approve from moderation queue → update status in store
+    const handleApprove = (id) => {
+        updateLocation(id, { status: 'Active' })
+        setToast({ message: '✓ Объект одобрен', type: 'success' })
+    }
+
+    // Derived stats from real data
+    const pendingCount = useMemo(
+        () => locations.filter(l => l.status === 'Pending').length,
+        [locations]
+    )
+    const categoryCount = useMemo(
+        () => new Set(locations.map(l => l.category).filter(Boolean)).size,
+        [locations]
+    )
+    const stats = useMemo(() => [
+        { label: 'Всего', val: locations.length > 0 ? locations.length.toLocaleString() : '—', icon: MapPin, color: 'text-indigo-600', bg: 'bg-indigo-50 dark:bg-indigo-500/10' },
+        { label: 'В очереди', val: pendingCount > 0 ? pendingCount.toString() : '0', icon: Clock, color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-500/10' },
+        { label: 'Категории', val: categoryCount > 0 ? categoryCount.toString() : '—', icon: Zap, color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-500/10' },
+    ], [locations, pendingCount, categoryCount])
+
+    // Filtered list by search query
+    const filteredLocations = useMemo(() => {
+        if (!searchQuery.trim()) return locations
+        const q = searchQuery.toLowerCase()
+        return locations.filter(l =>
+            (l.title || l.name || '').toLowerCase().includes(q) ||
+            l.category?.toLowerCase().includes(q) ||
+            l.city?.toLowerCase().includes(q) ||
+            l.cuisine?.toLowerCase().includes(q)
+        )
+    }, [locations, searchQuery])
 
     const categories = [
         'Cafe', 'Restaurant', 'Street Food', 'Bar', 'Market',
@@ -223,15 +317,25 @@ const AdminLocationsPage = () => {
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
-                    {filtered.map((loc, i) => (
+                    {filtered.length === 0 ? (
+                        <tr>
+                            <td colSpan={5} className="px-6 py-16 text-center text-slate-400 text-xs font-bold uppercase tracking-widest opacity-50">
+                                {searchQuery ? 'Ничего не найдено' : 'Нет локаций'}
+                            </td>
+                        </tr>
+                    ) : filtered.map((loc) => (
                         <tr key={loc.id} onClick={() => handleEdit(loc)} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-all group cursor-pointer border-none leading-none">
                             <td className="px-6 py-4 pl-8 lg:pl-10">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-inner shrink-0">
-                                        <Building2 size={18} />
-                                    </div>
+                                    {loc.image ? (
+                                        <img src={loc.image} alt={loc.title || loc.name} className="w-10 h-10 rounded-xl object-cover shrink-0" />
+                                    ) : (
+                                        <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-inner shrink-0">
+                                            <Building2 size={18} />
+                                        </div>
+                                    )}
                                     <div className="min-w-0">
-                                        <p className="text-[13px] font-bold text-slate-900 dark:text-white truncate leading-tight">{loc.name}</p>
+                                        <p className="text-[13px] font-bold text-slate-900 dark:text-white truncate leading-tight">{loc.title || loc.name}</p>
                                         <div className="flex items-center gap-2 mt-1">
                                             <p className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest font-black shrink-0">{loc.category}</p>
                                             {loc.cuisine && (
@@ -261,16 +365,44 @@ const AdminLocationsPage = () => {
                                 <div className={cn(
                                     "inline-flex items-center p-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider",
                                     loc.status === 'Active' ? 'bg-green-50 dark:bg-green-500/5 text-green-600' :
-                                        loc.status === 'Pending' ? 'bg-orange-50 dark:bg-orange-500/5 text-orange-600' : 'bg-slate-50 dark:bg-slate-800 text-slate-400'
+                                    loc.status === 'Pending' ? 'bg-orange-50 dark:bg-orange-500/5 text-orange-600' :
+                                    'bg-slate-50 dark:bg-slate-800 text-slate-400'
                                 )}>
-                                    <div className={cn("w-1.5 h-1.5 rounded-full mr-2", loc.status === 'Active' ? 'bg-green-500' : loc.status === 'Pending' ? 'bg-orange-500' : 'bg-slate-300')} />
-                                    {loc.status}
+                                    <div className={cn("w-1.5 h-1.5 rounded-full mr-2",
+                                        loc.status === 'Active' ? 'bg-green-500' :
+                                        loc.status === 'Pending' ? 'bg-orange-500' : 'bg-slate-300'
+                                    )} />
+                                    {loc.status || 'Active'}
                                 </div>
                             </td>
-                            <td className="px-6 py-4 text-right pr-8 lg:pr-10">
-                                <button className="p-2 rounded-xl text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all">
-                                    <MoreHorizontal size={18} />
-                                </button>
+                            <td className="px-6 py-4 text-right pr-8 lg:pr-10 relative">
+                                <div ref={openMenuId === loc.id ? menuRef : null} className="inline-block">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === loc.id ? null : loc.id) }}
+                                        className="p-2 rounded-xl text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all"
+                                    >
+                                        <MoreHorizontal size={18} />
+                                    </button>
+                                    {openMenuId === loc.id && (
+                                        <div
+                                            onClick={e => e.stopPropagation()}
+                                            className="absolute right-8 top-12 z-50 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden min-w-[140px]"
+                                        >
+                                            <button
+                                                onClick={() => { setOpenMenuId(null); handleEdit(loc) }}
+                                                className="flex items-center gap-2.5 w-full px-4 py-3 text-[11px] font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors uppercase tracking-widest"
+                                            >
+                                                <Edit size={13} /> Редактировать
+                                            </button>
+                                            <button
+                                                onClick={() => { setOpenMenuId(null); deleteLocation(loc.id); setToast({ message: '✓ Объект удалён', type: 'success' }) }}
+                                                className="flex items-center gap-2.5 w-full px-4 py-3 text-[11px] font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors uppercase tracking-widest border-t border-slate-50 dark:border-slate-700"
+                                            >
+                                                <Trash2 size={13} /> Удалить
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                             </td>
                         </tr>
                     ))}
@@ -324,7 +456,7 @@ const AdminLocationsPage = () => {
                     <div className="flex gap-1.5 p-1 bg-slate-50 dark:bg-slate-950/50 rounded-2xl w-full lg:w-fit overflow-x-auto no-scrollbar border border-slate-100/50 dark:border-slate-800/50">
                         {[
                             { id: 'list', label: 'Все объекты', icon: ListIcon },
-                            { id: 'moderation', label: 'В очереди', icon: AlertCircle, count: 2 }
+                            { id: 'moderation', label: 'В очереди', icon: AlertCircle, count: pendingCount }
                         ].map(tab => (
                             <button key={tab.id} onClick={() => setView(tab.id)} className={cn(
                                 "flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all whitespace-nowrap",
@@ -360,7 +492,13 @@ const AdminLocationsPage = () => {
 
                         <div className="relative flex-1 lg:w-80 group">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-500 transition-colors" size={16} />
-                            <input type="text" placeholder="Поиск объектов..." className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950/30 border-none rounded-2xl text-[13px] font-medium outline-none focus:ring-2 ring-indigo-500/10 transition-all font-black leading-none" />
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={e => setSearchQuery(e.target.value)}
+                                placeholder="Поиск объектов..."
+                                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950/30 border-none rounded-2xl text-[13px] font-medium outline-none focus:ring-2 ring-indigo-500/10 transition-all font-black leading-none"
+                            />
                         </div>
                     </div>
                 </div>
@@ -369,31 +507,53 @@ const AdminLocationsPage = () => {
                     <AnimatePresence mode="wait">
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} key={view}>
                             {view === 'list' && (
-                                viewMode === 'list' ? renderListView(locationsList) : (
+                                viewMode === 'list' ? renderListView(filteredLocations) : (
                                     <div className="h-[600px] w-full p-4 lg:p-10">
                                         <MapTab />
                                     </div>
                                 )
                             )}
-                            {view === 'moderation' && (
-                                <div className="p-8 lg:p-14 space-y-6">
-                                    {locationsList.filter(l => l.status === 'Pending').map(loc => (
-                                        <div key={loc.id} className="bg-slate-50/50 dark:bg-slate-800/30 rounded-[32px] border border-slate-100 dark:border-slate-800/50 p-6 flex flex-col sm:flex-row items-center justify-between gap-6 group hover:border-indigo-500/10 transition-all">
-                                            <div className="flex items-center gap-6">
-                                                <div className="w-16 h-16 rounded-[24px] bg-white dark:bg-slate-800 flex items-center justify-center text-slate-300 shadow-sm group-hover:scale-105 transition-transform"><Building2 size={24} /></div>
-                                                <div>
-                                                    <h3 className="text-lg lg:text-xl font-bold text-slate-900 dark:text-white leading-none mb-2">{loc.name}</h3>
-                                                    <p className="text-xs font-medium text-slate-400 flex items-center gap-1.5"><MapPin size={12} /> {loc.city}, {loc.country}</p>
+                            {view === 'moderation' && (() => {
+                                const pending = locations.filter(l => l.status === 'Pending')
+                                return pending.length === 0 ? (
+                                    <div className="py-16 text-center text-slate-400 text-xs font-bold uppercase tracking-widest opacity-50">
+                                        Нет объектов на модерации
+                                    </div>
+                                ) : (
+                                    <div className="p-8 lg:p-14 space-y-6">
+                                        {pending.map(loc => (
+                                            <div key={loc.id} className="bg-slate-50/50 dark:bg-slate-800/30 rounded-[32px] border border-slate-100 dark:border-slate-800/50 p-6 flex flex-col sm:flex-row items-center justify-between gap-6 group hover:border-indigo-500/10 transition-all">
+                                                <div className="flex items-center gap-6">
+                                                    {loc.image ? (
+                                                        <img src={loc.image} alt={loc.title || loc.name} className="w-16 h-16 rounded-[24px] object-cover shadow-sm" />
+                                                    ) : (
+                                                        <div className="w-16 h-16 rounded-[24px] bg-white dark:bg-slate-800 flex items-center justify-center text-slate-300 shadow-sm"><Building2 size={24} /></div>
+                                                    )}
+                                                    <div>
+                                                        <h3 className="text-lg lg:text-xl font-bold text-slate-900 dark:text-white leading-none mb-2">{loc.title || loc.name}</h3>
+                                                        <p className="text-xs font-medium text-slate-400 flex items-center gap-1.5"><MapPin size={12} /> {loc.city}, {loc.country}</p>
+                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{loc.category} · {loc.priceLevel || loc.price_range || ''}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-3 w-full sm:w-auto">
+                                                    <button
+                                                        onClick={() => handleApprove(loc.id)}
+                                                        className="flex-1 sm:px-8 py-3.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[20px] font-bold text-[10px] uppercase tracking-widest active:scale-95 transition-all"
+                                                    >
+                                                        Одобрить
+                                                    </button>
+                                                    <button
+                                                        onClick={() => { deleteLocation(loc.id); setToast({ message: '✓ Объект отклонён', type: 'success' }) }}
+                                                        className="flex-1 sm:px-8 py-3.5 bg-white dark:bg-slate-800 text-red-500 rounded-[20px] font-bold text-[10px] uppercase tracking-widest border border-slate-100 dark:border-slate-700 transition-all active:scale-95"
+                                                    >
+                                                        Отклонить
+                                                    </button>
                                                 </div>
                                             </div>
-                                            <div className="flex gap-3 w-full sm:w-auto">
-                                                <button onClick={() => handleApprove(loc.id)} className="flex-1 sm:px-8 py-3.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[20px] font-bold text-[10px] uppercase tracking-widest active:scale-95 transition-all">Одобрить</button>
-                                                <button className="flex-1 sm:px-8 py-3.5 bg-white dark:bg-slate-800 text-red-500 rounded-[20px] font-bold text-[10px] uppercase tracking-widest border border-slate-100 dark:border-slate-700 transition-all">Отмена</button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                                        ))}
+                                    </div>
+                                )
+                            })()}
                         </motion.div>
                     </AnimatePresence>
                 </div>
@@ -938,7 +1098,11 @@ const AdminLocationsPage = () => {
 
                             {/* Footer */}
                             <div className="p-6 lg:p-10 border-t border-slate-50 dark:border-slate-800/50 flex gap-4 shrink-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl relative z-10">
-                                <button className="flex-1 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[20px] lg:rounded-[24px] font-bold text-[10px] lg:text-[11px] uppercase tracking-[0.2em] shadow-2xl active:scale-[0.97] transition-all hover:shadow-indigo-500/20 border-none outline-none">
+                                <button
+                                    onClick={handleSave}
+                                    disabled={!formData?.name?.trim()}
+                                    className="flex-1 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[20px] lg:rounded-[24px] font-bold text-[10px] lg:text-[11px] uppercase tracking-[0.2em] shadow-2xl active:scale-[0.97] transition-all hover:shadow-indigo-500/20 border-none outline-none disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
                                     {selectedLocation.id === 'NEW' ? 'Создать объект' : 'Сохранить изменения'}
                                 </button>
                                 <button onClick={() => setIsSlideOverOpen(false)} className="px-6 lg:px-10 py-4 bg-slate-50 dark:bg-slate-800 text-slate-400 rounded-[20px] lg:rounded-[24px] font-bold text-[10px] lg:text-[11px] uppercase tracking-[0.2em] hover:text-slate-900 dark:hover:text-white transition-all border-none outline-none">Отмена</button>
@@ -955,10 +1119,24 @@ const AdminLocationsPage = () => {
                         isOpen={isImportWizardOpen}
                         onClose={() => setIsImportWizardOpen(false)}
                         onImportComplete={() => {
-                            // Optionally refresh list
-                            console.log('Import successful')
+                            setIsImportWizardOpen(false)
+                            setToast({ message: '✓ Импорт завершён', type: 'success' })
                         }}
                     />
+                )}
+            </AnimatePresence>
+
+            {/* Toast notification */}
+            <AnimatePresence>
+                {toast && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 20 }}
+                        className="fixed bottom-6 right-6 z-[200] px-6 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl shadow-2xl text-[11px] font-bold uppercase tracking-widest"
+                    >
+                        {toast.message}
+                    </motion.div>
                 )}
             </AnimatePresence>
         </div>

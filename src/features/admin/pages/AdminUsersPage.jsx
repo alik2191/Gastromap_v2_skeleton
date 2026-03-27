@@ -9,12 +9,17 @@ import { Badge } from '@/components/ui/badge'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
+// Real admin users from auth.api.js + demo users to show a realistic list
 const INITIAL_USERS = [
-    { id: 1, name: 'Alex Johnson', email: 'alex@example.com', role: 'Premium', status: 'Active', joined: '2024-01-12', visits: 45, reviews: 12 },
-    { id: 2, name: 'Maria Peters', email: 'maria@example.com', role: 'User', status: 'Active', joined: '2024-01-15', visits: 12, reviews: 3 },
-    { id: 3, name: 'Dmitri Sokolov', email: 'dima@example.com', role: 'Moderator', status: 'Active', joined: '2024-01-05', visits: 89, reviews: 45 },
-    { id: 4, name: 'Elena Smirnova', email: 'elena@example.com', role: 'Premium', status: 'Inactive', joined: '2023-12-20', visits: 5, reviews: 1 },
+    { id: 'admin1', name: 'Admin User', email: 'admin@gastromap.com', role: 'Admin', status: 'Active', joined: '2024-01-01', visits: 320, reviews: 0 },
+    { id: 'admin2', name: 'Alik', email: 'alik2191@gmail.com', role: 'Admin', status: 'Active', joined: '2024-01-01', visits: 512, reviews: 0 },
+    { id: 'demo1', name: 'Maria Kowalska', email: 'maria.k@example.com', role: 'Premium', status: 'Active', joined: '2024-02-10', visits: 78, reviews: 14 },
+    { id: 'demo2', name: 'Jan Nowak', email: 'jan.nowak@example.com', role: 'User', status: 'Active', joined: '2024-03-05', visits: 23, reviews: 4 },
+    { id: 'demo3', name: 'Anna Wiśniewska', email: 'anna.w@example.com', role: 'Premium', status: 'Active', joined: '2024-01-20', visits: 156, reviews: 31 },
+    { id: 'demo4', name: 'Piotr Zając', email: 'piotr.z@example.com', role: 'User', status: 'Inactive', joined: '2023-12-15', visits: 8, reviews: 1 },
 ]
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 const AdminUsersPage = () => {
     const [searchQuery, setSearchQuery] = useState('')
@@ -64,6 +69,10 @@ const AdminUsersPage = () => {
 
     const handleAddUser = () => {
         if (!newUser.name.trim() || !newUser.email.trim()) return
+        if (!EMAIL_REGEX.test(newUser.email.trim())) {
+            showToast('Некорректный email адрес')
+            return
+        }
         const created = {
             id: Date.now(),
             name: newUser.name.trim(),

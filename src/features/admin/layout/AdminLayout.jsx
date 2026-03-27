@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '../../auth/hooks/useAuthStore'
 import { useTheme } from '@/hooks/useTheme'
+import { useLocationsStore } from '@/features/public/hooks/useLocationsStore'
 
 export default function AdminLayout() {
     const location = useLocation()
@@ -17,6 +18,8 @@ export default function AdminLayout() {
     const logout = useAuthStore(state => state.logout)
     const user = useAuthStore(state => state.user)
     const { theme, toggleTheme } = useTheme()
+    const locations = useLocationsStore(s => s.locations)
+    const pendingCount = locations.filter(l => l.status === 'Pending' || l.status === 'Draft').length
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
     const [isCollapsed, setIsCollapsed] = useState(false)
@@ -38,9 +41,9 @@ export default function AdminLayout() {
     ]
 
     const notifications = [
-        { id: 1, text: '3 new locations pending review', time: '2m ago', unread: true },
-        { id: 2, text: 'New user registered: john@example.com', time: '15m ago', unread: true },
-        { id: 3, text: 'AI Guide processed 150 requests', time: '1h ago', unread: false },
+        ...(pendingCount > 0 ? [{ id: 'pending', text: `${pendingCount} объект${pendingCount === 1 ? '' : 'ов'} ожидают модерации`, time: 'сейчас', unread: true }] : []),
+        { id: 'base', text: `База содержит ${locations.length} локаций`, time: '1h ago', unread: false },
+        { id: 'ai', text: 'AI Guide доступен для пользователей', time: '2h ago', unread: false },
     ]
 
     // Breadcrumbs Logic

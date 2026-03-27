@@ -117,7 +117,7 @@ const ModelCard = ({ model, selected, onSelect, disabled }) => (
 
 // ─── Agent card ───────────────────────────────────────────────────────────────
 
-const AgentCard = ({ name, role, isActive, onToggle, icon: Icon, color, description }) => (
+const AgentCard = ({ name, role, isActive, onToggle, onSettings, icon: Icon, color, description }) => (
     <div className="bg-white dark:bg-slate-900 p-6 rounded-[28px] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group hover:border-indigo-500/20 transition-all duration-300">
         <div className={cn('absolute top-0 right-0 w-32 h-32 blur-[80px] opacity-10 transition-opacity group-hover:opacity-20', color.replace('text-', 'bg-'))} />
         <div className="relative z-10">
@@ -148,7 +148,7 @@ const AgentCard = ({ name, role, isActive, onToggle, icon: Icon, color, descript
                     {isActive ? <Pause size={14} /> : <Play size={14} />}
                     {isActive ? 'STOP' : 'START'}
                 </button>
-                <button aria-label={`${name} settings`} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-all">
+                <button aria-label={`${name} settings`} onClick={onSettings} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-all">
                     <Settings size={18} />
                 </button>
             </div>
@@ -525,6 +525,7 @@ const AdminAIPage = () => {
                     role="User Support"
                     isActive={agentActive.guide}
                     onToggle={() => toggleAgent('guide')}
+                    onSettings={() => document.getElementById('model-config')?.scrollIntoView({ behavior: 'smooth' })}
                     icon={MessageSquare}
                     color="text-indigo-500"
                     description="Answers user questions, matches locations based on preferences, and helps plan dining routes."
@@ -534,6 +535,7 @@ const AdminAIPage = () => {
                     role="Admin Helper"
                     isActive={agentActive.assistant}
                     onToggle={() => toggleAgent('assistant')}
+                    onSettings={() => document.getElementById('model-config')?.scrollIntoView({ behavior: 'smooth' })}
                     icon={Brain}
                     color="text-purple-500"
                     description="Analyzes trends, monitors review moderation, alerts on critical events, and supports bulk operations."
@@ -541,7 +543,7 @@ const AdminAIPage = () => {
             </div>
 
             {/* ── SECTION: Model Parameters + Status ───────────────────────── */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+            <div id="model-config" className="grid grid-cols-1 xl:grid-cols-3 gap-5">
                 <div className="xl:col-span-2 bg-white dark:bg-slate-900 rounded-[28px] border border-slate-100 dark:border-slate-800 shadow-sm p-6">
                     <div className="flex items-center gap-3 mb-8">
                         <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 flex items-center justify-center">
@@ -632,7 +634,9 @@ const AdminAIPage = () => {
                                 <div className="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-300 flex items-center justify-center"><Star size={16} /></div>
                                 <span className="text-sm font-bold text-slate-600 dark:text-slate-400">Cost</span>
                             </div>
-                            <span className="text-sm font-bold text-emerald-500">$0 / mo</span>
+                            <span className="text-sm font-bold text-emerald-500">
+                                {appConfig.aiApiKey ? 'Pay-as-you-go' : '$0 / mo'}
+                            </span>
                         </div>
                     </div>
                     <div className="mt-8 p-5 rounded-[24px] bg-slate-50 dark:bg-slate-800/20 border border-slate-100 dark:border-slate-800">
