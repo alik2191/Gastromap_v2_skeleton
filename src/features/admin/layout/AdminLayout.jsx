@@ -75,8 +75,12 @@ export default function AdminLayout() {
 
             {/* Logo Section */}
             <div className={cn("p-6 flex items-center gap-4 transition-all relative z-10", collapsed ? "justify-center" : "px-8")}>
-                <div className="w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-500/30 active:scale-95 transition-transform cursor-pointer">
-                    <Bot size={22} className="fill-white/20" />
+                <div className="w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-500/30 active:scale-95 transition-transform cursor-pointer overflow-hidden">
+                    {logoDark ? (
+                        <img src={logoDark} alt="Logo" className="w-full h-full object-cover" />
+                    ) : (
+                        <Bot size={22} className="fill-white/20" />
+                    )}
                 </div>
                 {!collapsed && (
                     <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
