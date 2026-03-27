@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -36,7 +36,7 @@ const LocationDetailsPage = () => {
 
     // Connect to real stores
     const { isFavorite, toggleFavorite } = useFavoritesStore()
-    const { prefs, addVisited } = useUserPrefsStore()
+    const { prefs, addVisited, saveNote } = useUserPrefsStore()
     const { user } = useAuthStore()
     const isSaved = isFavorite(location?.id)
     const isVisited = prefs.lastVisited?.includes(location?.id)
@@ -51,7 +51,8 @@ const LocationDetailsPage = () => {
     const [showScrollHint, setShowScrollHint] = useState(true)
 
     // User interaction states
-    const [userNote, setUserNote] = useState("")
+    const [noteText, setNoteText] = useState("")
+    const [noteSaved, setNoteSaved] = useState(false)
     const [isWritingReview, setIsWritingReview] = useState(false)
     const [newReview, setNewReview] = useState({ rating: 5, text: "" })
 
@@ -68,6 +69,14 @@ const LocationDetailsPage = () => {
             </button>
         </div>
     )
+
+    // Load stored note when Notes tab becomes active
+    useEffect(() => {
+        if (activeTab === 'notes' || activeTab === 'Notes') {
+            setNoteText(prefs.notes?.[location?.id] ?? '')
+            setNoteSaved(false)
+        }
+    }, [activeTab, location?.id])
 
     const handleScroll = (e) => {
         const { scrollLeft, scrollWidth, clientWidth } = e.target
@@ -369,36 +378,28 @@ const LocationDetailsPage = () => {
             )
         }
 
+        const menuItems = location.what_to_try?.length > 0
+            ? location.what_to_try
+            : location.mustTry?.length > 0
+                ? location.mustTry
+                : null
+
         return (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-                {[
-                    {
-                        title: "Signature Mains", items: [
-                            { name: "Truffle Pasta", desc: "Fresh house-made pasta with black truffle cream", price: "$28" },
-                            { name: "Roasted Duck", desc: "Slow-cooked with cherry glaze", price: "$34" }
-                        ]
-                    },
-                    {
-                        title: "Small Plates", items: [
-                            { name: "Burrata", desc: "Creamy cheese with basaltic pearls", price: "$16" }
-                        ]
-                    }
-                ].map((section, idx) => (
-                    <div key={idx} className="space-y-4">
-                        <h4 className={`text-lg font-black border-b pb-3 ${isDark ? 'border-white/10 text-white' : 'border-gray-100 text-gray-900'}`}>{section.title}</h4>
+                <div className="space-y-4">
+                    <h4 className={`text-lg font-black border-b pb-3 ${isDark ? 'border-white/10 text-white' : 'border-gray-100 text-gray-900'}`}>Must Try</h4>
+                    {menuItems ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {section.items.map((item, i) => (
-                                <div key={i} className={`p-6 rounded-3xl border ${cardBg} flex justify-between items-start group hover:border-blue-500/50 transition-colors`}>
-                                    <div className="space-y-1">
-                                        <p className={`font-black group-hover:text-blue-500 transition-colors ${textStyle}`}>{item.name}</p>
-                                        <p className={`text-xs ${subTextStyle}`}>{item.desc}</p>
-                                    </div>
-                                    <span className="text-blue-500 font-black">{item.price}</span>
+                            {menuItems.map((item, i) => (
+                                <div key={i} className={`p-6 rounded-3xl border ${cardBg} group hover:border-blue-500/50 transition-colors`}>
+                                    <p className={`font-bold text-sm group-hover:text-blue-500 transition-colors ${textStyle}`}>{item}</p>
                                 </div>
                             ))}
                         </div>
-                    </div>
-                ))}
+                    ) : (
+                        <p className="text-slate-400 text-sm text-center py-8">Menu coming soon</p>
+                    )}
+                </div>
             </motion.div>
         )
     }
@@ -548,16 +549,30 @@ const LocationDetailsPage = () => {
         )
     }
 
-    const renderPhotos = () => (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[...Array(8)].map((_, i) => (
-                <div key={i} className="aspect-square rounded-[32px] overflow-hidden group cursor-pointer relative bg-gray-100">
-                    <LazyImage src={`https://images.unsplash.com/photo-${1517248135467 + i}-4c7edcad34c4?q=80&w=400&fit=crop`} crossOrigin="anonymous" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="gallery" />
-                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-            ))}
-        </motion.div>
-    )
+    const renderPhotos = () => {
+        const galleryImages = location.images?.length > 0
+            ? location.images
+            : location.image
+                ? [location.image]
+                : []
+        return (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {galleryImages.length > 0 ? (
+                    galleryImages.map((img, i) => (
+                        <div key={i} className="aspect-square rounded-[32px] overflow-hidden group cursor-pointer relative bg-gray-100">
+                            <LazyImage src={img} crossOrigin="anonymous" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={`${location.title} ${i + 1}`} />
+                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                    ))
+                ) : (
+                    <div className="col-span-2 md:col-span-4 flex flex-col items-center justify-center py-16 gap-3 text-slate-400">
+                        <Camera size={40} className="opacity-30" />
+                        <p className="text-sm font-bold">No photos yet</p>
+                    </div>
+                )}
+            </motion.div>
+        )
+    }
 
     const renderNotes = () => (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
@@ -575,20 +590,27 @@ const LocationDetailsPage = () => {
 
                     <div className="space-y-4">
                         <textarea
-                            value={userNote}
-                            onChange={(e) => setUserNote(e.target.value)}
+                            value={noteText}
+                            onChange={(e) => { setNoteText(e.target.value); setNoteSaved(false) }}
                             placeholder="Remember their best table, your favorite wine, or a dish to avoid next time..."
                             className={`w-full p-8 rounded-[32px] border bg-transparent outline-none focus:border-blue-500 transition-all min-h-[200px] text-lg font-medium leading-relaxed ${isDark ? 'border-white/10 text-white' : 'border-gray-200 text-gray-900 shadow-inner'}`}
                         />
                         <div className="flex gap-3">
                             <button
-                                onClick={() => setUserNote("")}
+                                onClick={() => { setNoteText(""); setNoteSaved(false) }}
                                 className={`flex-1 py-4 rounded-2xl font-black text-sm flex items-center justify-center gap-2 border transition-all ${isDark ? 'border-white/10 text-white hover:bg-white/5' : 'border-gray-200 text-gray-500 hover:bg-gray-100'}`}
                             >
                                 <Trash2 size={18} /> Clear
                             </button>
-                            <button className="flex-[2] py-4 bg-blue-600 text-white font-black rounded-2xl shadow-xl shadow-blue-600/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2">
-                                <CheckCircle2 size={18} /> Save Note
+                            <button
+                                onClick={() => {
+                                    saveNote(location.id, noteText)
+                                    setNoteSaved(true)
+                                    setTimeout(() => setNoteSaved(false), 2000)
+                                }}
+                                className="flex-[2] py-4 bg-blue-600 text-white font-black rounded-2xl shadow-xl shadow-blue-600/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
+                            >
+                                <CheckCircle2 size={18} /> {noteSaved ? 'Saved!' : 'Save Note'}
                             </button>
                         </div>
                     </div>

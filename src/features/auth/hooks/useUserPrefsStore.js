@@ -29,6 +29,9 @@ const DEFAULT_PREFS = {
     // History (non-auth, non-AI)
     lastVisited: [],            // location IDs
     frequentSearches: [],       // search query strings
+
+    // Per-location private notes: { [locationId]: string }
+    notes: {},
 }
 
 export const useUserPrefsStore = create(
@@ -67,6 +70,14 @@ export const useUserPrefsStore = create(
                     }
                 })
             },
+
+            saveNote: (locationId, text) =>
+                set((state) => ({
+                    prefs: {
+                        ...state.prefs,
+                        notes: { ...state.prefs.notes, [locationId]: text },
+                    },
+                })),
 
             resetPrefs: () => set({ prefs: DEFAULT_PREFS }),
         }),
