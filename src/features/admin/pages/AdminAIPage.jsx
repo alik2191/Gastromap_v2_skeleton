@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
     Bot, MessageSquare, Zap, Shield, Settings,
@@ -10,9 +10,21 @@ import { cn } from '@/lib/utils'
 import { useAppConfigStore } from '@/store/useAppConfigStore'
 import { config } from '@/shared/config/env'
 
-// ─── Available OpenRouter free models ────────────────────────────────────────
+// ─── Static fallback model list (used when API key not set or fetch fails) ────
+// Keep IDs verified against https://openrouter.ai/models?q=free
 
-const FREE_MODELS = [
+const FALLBACK_FREE_MODELS = [
+    {
+        id: 'meta-llama/llama-3.1-8b-instruct:free',
+        name: 'Llama 3.1 8B',
+        provider: 'Meta',
+        context: '131K',
+        languages: 'EN / RU / PL',
+        badge: 'Fast & Reliable',
+        badgeColor: 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400',
+        description: 'Fast and reliable. Good for most tasks with lower rate-limit risk.',
+        toolUse: true,
+    },
     {
         id: 'meta-llama/llama-3.3-70b-instruct:free',
         name: 'Llama 3.3 70B',
@@ -20,30 +32,8 @@ const FREE_MODELS = [
         context: '131K',
         languages: 'EN / RU / PL',
         badge: 'Recommended',
-        badgeColor: 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400',
-        description: 'Best balance of quality and speed. Excellent for chat, recommendations, and tool use.',
-        toolUse: true,
-    },
-    {
-        id: 'qwen/qwen3-coder:free',
-        name: 'Qwen3 480B',
-        provider: 'Alibaba',
-        context: '262K',
-        languages: '100+ incl. RU / PL',
-        badge: 'Best Multilingual',
-        badgeColor: 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400',
-        description: 'Largest context window. Superior multilingual support for Russian, Polish and more.',
-        toolUse: true,
-    },
-    {
-        id: 'openai/gpt-oss-120b:free',
-        name: 'GPT-OSS 120B',
-        provider: 'OpenAI',
-        context: '131K',
-        languages: 'EN / multilingual',
-        badge: 'Best Tool Use',
         badgeColor: 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400',
-        description: 'Optimized for tool use, function calling and complex reasoning tasks.',
+        description: 'Best quality free model. May hit rate limits on heavy usage.',
         toolUse: true,
     },
     {
@@ -52,23 +42,84 @@ const FREE_MODELS = [
         provider: 'Google',
         context: '131K',
         languages: 'EN / multilingual',
-        badge: 'Fast',
+        badge: 'Balanced',
         badgeColor: 'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-600 dark:text-yellow-400',
-        description: 'Lightweight and fast. Good for quick responses and simple queries.',
+        description: 'Google\'s open model. Good multilingual support and fast responses.',
         toolUse: false,
     },
     {
-        id: 'deepseek/deepseek-r1:free',
-        name: 'DeepSeek R1',
+        id: 'mistralai/mistral-7b-instruct:free',
+        name: 'Mistral 7B',
+        provider: 'Mistral',
+        context: '32K',
+        languages: 'EN / FR / multilingual',
+        badge: 'Reliable',
+        badgeColor: 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400',
+        description: 'Consistently available. Great for simple queries and fast responses.',
+        toolUse: false,
+    },
+    {
+        id: 'deepseek/deepseek-r1-distill-llama-70b:free',
+        name: 'DeepSeek R1 Distill 70B',
         provider: 'DeepSeek',
         context: '131K',
         languages: 'EN / ZH',
         badge: 'Reasoning',
         badgeColor: 'bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400',
-        description: 'Strong chain-of-thought reasoning. Best for complex analytical queries.',
+        description: 'Distilled reasoning model. Better availability than full R1.',
         toolUse: false,
     },
 ]
+
+// ─── Helper: parse OpenRouter model list into our format ─────────────────────
+
+const PROVIDER_MAP = {
+    'meta-llama': 'Meta', 'google': 'Google', 'mistralai': 'Mistral',
+    'deepseek': 'DeepSeek', 'qwen': 'Alibaba', 'openai': 'OpenAI',
+    'microsoft': 'Microsoft', 'nousresearch': 'NousResearch',
+    'anthropic': 'Anthropic', 'cohere': 'Cohere',
+}
+
+const BADGE_COLORS = [
+    'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400',
+    'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400',
+    'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400',
+    'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-600 dark:text-yellow-400',
+    'bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400',
+    'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400',
+]
+
+function parseOpenRouterModels(data) {
+    return (data?.data ?? [])
+        .filter(m => m.id?.endsWith(':free') && m.context_length)
+        .map((m, i) => {
+            const [org] = m.id.split('/')
+            const ctxK = m.context_length >= 1000
+                ? `${Math.round(m.context_length / 1024)}K`
+                : String(m.context_length)
+            const hasTools = Array.isArray(m.supported_parameters)
+                ? m.supported_parameters.includes('tools')
+                : false
+            const cleanName = (m.name ?? m.id)
+                .replace(/\(free\)/gi, '').replace(/:free$/i, '').trim()
+            return {
+                id: m.id,
+                name: cleanName,
+                provider: PROVIDER_MAP[org] ?? org,
+                context: ctxK,
+                languages: 'multilingual',
+                badge: hasTools ? 'Tool Use' : 'Free',
+                badgeColor: BADGE_COLORS[i % BADGE_COLORS.length],
+                description: m.description ?? `${cleanName} — free tier on OpenRouter.`,
+                toolUse: hasTools,
+            }
+        })
+        .sort((a, b) => {
+            // Sort: tool-use first, then by context window size (larger = better)
+            if (a.toolUse !== b.toolUse) return a.toolUse ? -1 : 1
+            return parseInt(b.context) - parseInt(a.context)
+        })
+}
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
 
@@ -172,12 +223,18 @@ const AdminAIPage = () => {
         assistant: appConfig.aiAssistantActive ?? true,
     })
 
+    // ── Dynamic model list
+    const [freeModels, setFreeModels] = useState(FALLBACK_FREE_MODELS)
+    const [modelsLoading, setModelsLoading] = useState(false)
+    const [modelsError, setModelsError] = useState(null)
+    const [modelsLastFetch, setModelsLastFetch] = useState(null)
+
     // ── Models
     const [primaryModel, setPrimaryModel] = useState(
-        appConfig.aiPrimaryModel || 'meta-llama/llama-3.3-70b-instruct:free'
+        appConfig.aiPrimaryModel || 'meta-llama/llama-3.1-8b-instruct:free'
     )
     const [fallbackModel, setFallbackModel] = useState(
-        appConfig.aiFallbackModel || 'qwen/qwen3-coder:free'
+        appConfig.aiFallbackModel || 'meta-llama/llama-3.3-70b-instruct:free'
     )
 
     // ── API key (pre-load from store, then fall back to env var)
@@ -197,8 +254,41 @@ const AdminAIPage = () => {
 
     const toggleAgent = (key) => setAgentActive(prev => ({ ...prev, [key]: !prev[key] }))
 
-    const getPrimaryInfo = () => FREE_MODELS.find(m => m.id === primaryModel) ?? FREE_MODELS[0]
-    const getFallbackInfo = () => FREE_MODELS.find(m => m.id === fallbackModel) ?? FREE_MODELS[1]
+    // ── Fetch live model list from OpenRouter ──────────────────────────────────
+    const fetchModels = useCallback(async (key) => {
+        const activeKey = key || apiKey || appConfig.aiApiKey || config.ai.openRouterKey
+        if (!activeKey) return
+        setModelsLoading(true)
+        setModelsError(null)
+        try {
+            const res = await fetch('https://openrouter.ai/api/v1/models', {
+                headers: { 'Authorization': `Bearer ${activeKey}` },
+            })
+            if (!res.ok) throw new Error(`HTTP ${res.status}`)
+            const data = await res.json()
+            const parsed = parseOpenRouterModels(data)
+            if (parsed.length > 0) {
+                setFreeModels(parsed)
+                setModelsLastFetch(new Date().toLocaleTimeString())
+            } else {
+                setModelsError('No free models returned — showing fallback list.')
+            }
+        } catch (err) {
+            setModelsError(`Could not load live models: ${err.message}. Showing fallback list.`)
+        } finally {
+            setModelsLoading(false)
+        }
+    }, [apiKey, appConfig.aiApiKey])
+
+    // Auto-fetch when API key becomes available
+    useEffect(() => {
+        const key = apiKey || appConfig.aiApiKey || config.ai.openRouterKey
+        if (key) fetchModels(key)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    const getPrimaryInfo = () => freeModels.find(m => m.id === primaryModel) ?? freeModels[0]
+    const getFallbackInfo = () => freeModels.find(m => m.id === fallbackModel) ?? freeModels[1]
 
     const handleSave = () => {
         appConfig.updateSettings({
@@ -360,6 +450,24 @@ const AdminAIPage = () => {
             </div>
 
             {/* ── SECTION: Model Selection ─────────────────────────────────── */}
+            <div className="flex items-center justify-between px-1">
+                <p className="text-[11px] text-slate-400 font-medium">
+                    {modelsLastFetch
+                        ? `Live model list loaded at ${modelsLastFetch} · ${freeModels.length} free models`
+                        : 'Showing cached model list · click Refresh for live data'}
+                </p>
+                <button
+                    onClick={() => fetchModels()}
+                    disabled={modelsLoading}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-indigo-500 text-[10px] font-bold uppercase tracking-widest transition-all disabled:opacity-50"
+                >
+                    <RefreshCw size={12} className={modelsLoading ? 'animate-spin' : ''} />
+                    {modelsLoading ? 'Loading…' : 'Refresh'}
+                </button>
+            </div>
+            {modelsError && (
+                <p className="text-[11px] text-amber-600 dark:text-amber-400 px-1">{modelsError}</p>
+            )}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
                 {/* Primary model */}
@@ -394,7 +502,7 @@ const AdminAIPage = () => {
                                 initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
                                 className="overflow-hidden space-y-2"
                             >
-                                {FREE_MODELS.map(model => (
+                                {freeModels.map(model => (
                                     <ModelCard
                                         key={model.id}
                                         model={model}
@@ -440,7 +548,7 @@ const AdminAIPage = () => {
                                 initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
                                 className="overflow-hidden space-y-2"
                             >
-                                {FREE_MODELS.map(model => (
+                                {freeModels.map(model => (
                                     <ModelCard
                                         key={model.id}
                                         model={model}
