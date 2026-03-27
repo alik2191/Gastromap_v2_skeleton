@@ -33,6 +33,11 @@ export const MOCK_LOCATIONS = [
             'hidden courtyard', 'authentic old krakow', 'instagrammable interior'
         ],
         ai_context: 'Perfect for first dates or quiet solo time. Locals love it for its timeless vibe — unchanged since the 80s. Great for people who want to feel Krakow history.',
+        website: 'https://cafecamelot.pl',
+        bookingUrl: null,
+        socialLinks: { instagram: 'https://instagram.com/cafecamelot_krakow', facebook: 'https://facebook.com/cafecamelot', twitter: null },
+        menuUrl: null,
+        menuFormat: 'text',
     },
     {
         id: '2',
@@ -68,6 +73,11 @@ export const MOCK_LOCATIONS = [
             'halal', 'authentic hummus', 'instagrammable dishes'
         ],
         ai_context: 'Best hummus in Krakow — thick, warm, authentic. Great for vegans and vegetarians. Very loud and lively during weekends — not ideal for quiet conversation.',
+        website: 'https://hamsa.pl',
+        bookingUrl: 'https://resy.com/cities/krakow/hamsa-hummus-happiness',
+        socialLinks: { instagram: 'https://instagram.com/hamsa_krakow', facebook: 'https://facebook.com/hamsa.krakow', twitter: null },
+        menuUrl: null,
+        menuFormat: 'text',
     },
     {
         id: '3',
@@ -104,6 +114,11 @@ export const MOCK_LOCATIONS = [
             'best restaurant krakow', 'instagram worthy', 'luxury'
         ],
         ai_context: 'One of the best fine dining experiences in Krakow. Michelin Bib Gourmand. The duck is legendary. Attentive service, excellent wine selection. Splurge-worthy for special events.',
+        website: 'https://szarages.pl',
+        bookingUrl: 'https://resy.com/cities/krakow/szara-ges',
+        socialLinks: { instagram: 'https://instagram.com/szarageskrakow', facebook: 'https://facebook.com/szarageskrakow', twitter: null },
+        menuUrl: 'https://szarages.pl/menu',
+        menuFormat: 'text',
     },
     {
         id: '4',
@@ -142,6 +157,11 @@ export const MOCK_LOCATIONS = [
             'student bar', 'summer vibes', 'live music'
         ],
         ai_context: 'The go-to spot for casual drinks with a view. Perfect for groups and parties. Gets very busy after 22:00. Budget-friendly — perfect for long evenings without spending much.',
+        website: 'https://forumkrakow.eu',
+        bookingUrl: null,
+        socialLinks: { instagram: 'https://instagram.com/forum_przestrzenie', facebook: 'https://facebook.com/forumprzestrzenie', twitter: null },
+        menuUrl: null,
+        menuFormat: 'text',
     },
 
     // ── KRAKOW ──────────────────────────────────────────────────────────────

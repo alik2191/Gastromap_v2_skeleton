@@ -103,6 +103,7 @@ const AdminLocationsPage = () => {
             best_time: [],
             special_labels: [],
             cuisine: '',
+            ai_keywords: '',
             is_hidden_gem: false,
             is_featured: false,
             status: 'Active'
@@ -149,6 +150,9 @@ const AdminLocationsPage = () => {
             must_try: Array.isArray(loc.what_to_try)
                 ? loc.what_to_try.join(', ')
                 : (loc.must_try || loc.what_to_try || ''),
+            ai_keywords: Array.isArray(loc.ai_keywords)
+                ? loc.ai_keywords.join(', ')
+                : (loc.ai_keywords || ''),
             price_range: loc.priceLevel || loc.price_range || '$$',
             website: loc.website || '',
             phone: loc.phone || '',
@@ -203,6 +207,9 @@ const AdminLocationsPage = () => {
                 ? formData.must_try.split(',').map(s => s.trim()).filter(Boolean)
                 : [],
             must_try: formData.must_try,
+            ai_keywords: formData.ai_keywords
+                ? formData.ai_keywords.split(',').map(s => s.trim()).filter(Boolean)
+                : [],
             priceLevel: formData.price_range,
             price_range: formData.price_range,
             website: formData.website,
@@ -988,6 +995,17 @@ const AdminLocationsPage = () => {
                                                 onChange={e => setFormData({ ...formData, must_try: e.target.value })}
                                                 className="w-full px-6 py-4 bg-emerald-500/5 rounded-2xl border border-emerald-500/10 font-bold text-xs outline-none focus:ring-2 ring-emerald-500/10 transition-all text-emerald-900 dark:text-emerald-200 resize-y min-h-[80px]"
                                                 placeholder="Напр. Фирменный латте, Краковская паста"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2.5">
+                                            <label className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.2em] ml-1 text-indigo-400">AI Keywords (comma-separated)</label>
+                                            <input
+                                                type="text"
+                                                value={formData.ai_keywords}
+                                                onChange={e => setFormData({ ...formData, ai_keywords: e.target.value })}
+                                                className="w-full px-6 py-4 bg-indigo-500/5 rounded-2xl border border-indigo-500/10 font-bold text-xs outline-none focus:ring-2 ring-indigo-500/10 transition-all text-indigo-900 dark:text-indigo-200"
+                                                placeholder="romantic, cozy, date night, hidden gem..."
                                             />
                                         </div>
 
