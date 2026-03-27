@@ -3,15 +3,31 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { MapPin, Info, Tag, Coffee, CheckCircle2, ChevronRight, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useLocationsStore } from '@/features/public/hooks/useLocationsStore'
 
 export default function AddPlacePage() {
     const navigate = useNavigate()
     const { t } = useTranslation()
+    const { addLocation } = useLocationsStore()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSuccess, setIsSuccess] = useState(false)
 
     const [tags, setTags] = useState([])
     const [tagInput, setTagInput] = useState('')
+
+    const [formData, setFormData] = useState({
+        name: '',
+        category: '',
+        city: '',
+        address: '',
+        description: '',
+        mustTry: '',
+    })
+
+    const handleChange = (e) => {
+        const { name, value } = e.target
+        setFormData(prev => ({ ...prev, [name]: value }))
+    }
 
     const handleAddTag = (e) => {
         if (e.key === 'Enter' && tagInput.trim()) {
@@ -30,11 +46,18 @@ export default function AddPlacePage() {
     const handleSubmit = (e) => {
         e.preventDefault()
         setIsSubmitting(true)
-        // Simulate API call
-        setTimeout(() => {
-            setIsSubmitting(false)
-            setIsSuccess(true)
-        }, 1500)
+        addLocation({
+            title: formData.name,
+            address: formData.address,
+            category: formData.category,
+            description: formData.description,
+            tags,
+            city: formData.city,
+            mustTry: formData.mustTry,
+            status: 'Pending',
+        })
+        setIsSubmitting(false)
+        setIsSuccess(true)
     }
 
     if (isSuccess) {
@@ -56,7 +79,7 @@ export default function AddPlacePage() {
                     </p>
                     <div className="flex flex-col gap-4">
                         <button
-                            onClick={() => { setIsSuccess(false); setTags([]) }}
+                            onClick={() => { setIsSuccess(false); setTags([]); setFormData({ name: '', category: '', city: '', address: '', description: '', mustTry: '' }) }}
                             className="w-full py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shadow-lg active:scale-95"
                         >
                             {t('add_place.add_another')}
@@ -112,6 +135,9 @@ export default function AddPlacePage() {
                             <input
                                 required
                                 type="text"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
                                 placeholder={t('add_place.name_placeholder')}
                                 className="w-full h-14 px-5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all font-medium placeholder:text-slate-400"
                             />
@@ -122,7 +148,7 @@ export default function AddPlacePage() {
                             </label>
                             <div className="relative">
                                 <Coffee className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                                <select required className="w-full h-14 pl-12 pr-5 appearance-none bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all font-medium text-slate-700 dark:text-slate-200">
+                                <select required name="category" value={formData.category} onChange={handleChange} className="w-full h-14 pl-12 pr-5 appearance-none bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all font-medium text-slate-700 dark:text-slate-200">
                                     <option value="">{t('add_place.type_placeholder')}</option>
                                     <option value="Restaurant">{t('add_place.type_restaurant')}</option>
                                     <option value="Cafe">{t('add_place.type_cafe')}</option>
@@ -138,6 +164,9 @@ export default function AddPlacePage() {
                             <input
                                 required
                                 type="text"
+                                name="city"
+                                value={formData.city}
+                                onChange={handleChange}
                                 placeholder={t('add_place.city_placeholder')}
                                 className="w-full h-14 px-5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all font-medium placeholder:text-slate-400"
                             />
@@ -149,6 +178,9 @@ export default function AddPlacePage() {
                             <input
                                 required
                                 type="text"
+                                name="address"
+                                value={formData.address}
+                                onChange={handleChange}
                                 placeholder={t('add_place.address_placeholder')}
                                 className="w-full h-14 px-5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all font-medium placeholder:text-slate-400"
                             />
@@ -173,6 +205,9 @@ export default function AddPlacePage() {
                             <div className="relative">
                                 <Info className="absolute left-5 top-5 text-slate-400" size={18} />
                                 <textarea
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleChange}
                                     placeholder={t('add_place.tip_placeholder')}
                                     className="w-full py-4 pl-12 pr-5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all font-medium placeholder:text-slate-400 min-h-[120px] resize-none"
                                 />
@@ -186,6 +221,9 @@ export default function AddPlacePage() {
                             </label>
                             <input
                                 type="text"
+                                name="mustTry"
+                                value={formData.mustTry}
+                                onChange={handleChange}
                                 placeholder={t('add_place.must_try_placeholder')}
                                 className="w-full h-14 px-5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all font-medium placeholder:text-slate-400"
                             />
