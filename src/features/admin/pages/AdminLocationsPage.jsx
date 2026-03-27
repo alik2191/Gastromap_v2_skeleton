@@ -504,6 +504,61 @@ const AdminLocationsPage = () => {
         }
     }
 
+    const handleGenerateAISummary = async () => {
+        setIsAiEnhancing(true)
+        try {
+            const appCfg = useAppConfigStore.getState()
+            const apiKey = appCfg.aiApiKey || import.meta.env.VITE_OPENROUTER_API_KEY || ''
+            if (!apiKey) { setToast({ message: '⚠ API ключ не задан', type: 'error' }); return }
+            const model = appCfg.aiPrimaryModel || 'meta-llama/llama-3.3-70b-instruct:free'
+            const context = {
+                name: formData.name,
+                city: formData.city,
+                country: formData.country,
+                category: formData.category,
+                cuisine: formData.cuisine,
+                description: formData.description,
+                vibe: formData.vibe,
+                features: formData.features,
+                insider_tip: formData.insider_tip,
+                what_to_try: formData.must_try,
+                priceLevel: formData.price_range,
+                occasions: formData.occasions,
+                ambiance: formData.ambiance,
+                noiseLevel: formData.noiseLevel,
+            }
+            const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'HTTP-Referer': window.location.origin,
+                    'X-Title': 'GastroMap',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    model,
+                    messages: [
+                        { role: 'system', content: 'You generate rich AI search summaries for restaurants. Return ONLY the summary text, 3-4 sentences, no quotes, no prefix.' },
+                        { role: 'user', content: `Generate a rich AI search summary for this restaurant: ${JSON.stringify(context)}` }
+                    ],
+                    max_tokens: 300,
+                    temperature: 0.6,
+                })
+            })
+            if (!res.ok) throw new Error(`HTTP ${res.status}`)
+            const data = await res.json()
+            const summary = data.choices?.[0]?.message?.content?.trim()
+            if (summary) {
+                setFormData(prev => ({ ...prev, aiSummary: summary }))
+                setToast({ message: '✓ AI Summary сгенерирован', type: 'success' })
+            }
+        } catch (err) {
+            setToast({ message: '⚠ Ошибка генерации', type: 'error' })
+        } finally {
+            setIsAiEnhancing(false)
+        }
+    }
+
     const renderListView = (filtered) => (
         <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-left border-collapse min-w-[800px]">
@@ -1253,6 +1308,277 @@ const AdminLocationsPage = () => {
                                                     />
                                                 </div>
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Section: AI Data Layer */}
+                                <div className="bg-gradient-to-br from-violet-50/50 to-indigo-50/50 dark:from-violet-500/5 dark:to-indigo-500/5 rounded-[24px] border border-violet-100 dark:border-violet-500/20 p-5">
+                                    <div className="flex items-center gap-2 mb-5">
+                                        <Brain size={16} className="text-violet-500" />
+                                        <h3 className="font-bold text-sm text-slate-900 dark:text-white">AI Data Layer</h3>
+                                        <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 bg-violet-100 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 rounded-full">Расширенные данные</span>
+                                    </div>
+
+                                    <div className="space-y-6">
+                                        {/* Occasions */}
+                                        <div>
+                                            <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2">
+                                                Occasions (для каких случаев)
+                                            </label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {['date', 'solo', 'friends', 'family', 'business', 'celebration', 'anniversary', 'proposal', 'group'].map(tag => (
+                                                    <button
+                                                        key={tag}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const current = formData.occasions || []
+                                                            const updated = current.includes(tag) ? current.filter(t => t !== tag) : [...current, tag]
+                                                            setFormData(prev => ({ ...prev, occasions: updated }))
+                                                        }}
+                                                        className={cn('px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wide transition-all',
+                                                            (formData.occasions || []).includes(tag)
+                                                                ? 'bg-indigo-600 text-white'
+                                                                : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200'
+                                                        )}
+                                                    >{tag}</button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Meal Times */}
+                                        <div>
+                                            <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2">
+                                                Meal Times (время приёма пищи)
+                                            </label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {['breakfast', 'brunch', 'lunch', 'dinner', 'late_night', 'all_day'].map(tag => (
+                                                    <button
+                                                        key={tag}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const current = formData.mealTimes || []
+                                                            const updated = current.includes(tag) ? current.filter(t => t !== tag) : [...current, tag]
+                                                            setFormData(prev => ({ ...prev, mealTimes: updated }))
+                                                        }}
+                                                        className={cn('px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wide transition-all',
+                                                            (formData.mealTimes || []).includes(tag)
+                                                                ? 'bg-indigo-600 text-white'
+                                                                : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200'
+                                                        )}
+                                                    >{tag}</button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Noise Level */}
+                                        <div>
+                                            <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2">
+                                                Уровень шума
+                                            </label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {['quiet', 'moderate', 'loud', 'very_loud'].map(level => (
+                                                    <button
+                                                        key={level}
+                                                        type="button"
+                                                        onClick={() => setFormData(prev => ({ ...prev, noiseLevel: level }))}
+                                                        className={cn('px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wide transition-all',
+                                                            formData.noiseLevel === level
+                                                                ? 'bg-violet-600 text-white'
+                                                                : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200'
+                                                        )}
+                                                    >{level}</button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Ambiance Tags */}
+                                        <div>
+                                            <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2">
+                                                Ambiance Tags (атмосфера)
+                                            </label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {['cozy', 'romantic', 'energetic', 'industrial', 'rustic', 'modern', 'minimalist', 'lively', 'intimate', 'historic', 'sophisticated', 'bohemian', 'outdoor'].map(tag => (
+                                                    <button
+                                                        key={tag}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const current = formData.ambiance || []
+                                                            const updated = current.includes(tag) ? current.filter(t => t !== tag) : [...current, tag]
+                                                            setFormData(prev => ({ ...prev, ambiance: updated }))
+                                                        }}
+                                                        className={cn('px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wide transition-all',
+                                                            (formData.ambiance || []).includes(tag)
+                                                                ? 'bg-indigo-600 text-white'
+                                                                : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200'
+                                                        )}
+                                                    >{tag}</button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Price Per Person */}
+                                        <div>
+                                            <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2">
+                                                Цена на человека (напр. "20-50")
+                                            </label>
+                                            <input
+                                                type="text"
+                                                placeholder="напр. 20-50"
+                                                value={formData.pricePerPerson || ''}
+                                                onChange={e => setFormData(prev => ({ ...prev, pricePerPerson: e.target.value }))}
+                                                className="w-full px-6 py-4 bg-white dark:bg-slate-800/60 rounded-2xl border border-violet-100 dark:border-violet-500/20 font-bold text-xs outline-none focus:ring-2 ring-violet-500/20 transition-all"
+                                            />
+                                        </div>
+
+                                        {/* Reservation Policy */}
+                                        <div>
+                                            <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2">
+                                                Бронирование
+                                            </label>
+                                            <div className="relative">
+                                                <select
+                                                    value={formData.reservationPolicy || 'not_required'}
+                                                    onChange={e => setFormData(prev => ({ ...prev, reservationPolicy: e.target.value }))}
+                                                    className="w-full px-6 py-4 bg-white dark:bg-slate-800/60 rounded-2xl border border-violet-100 dark:border-violet-500/20 font-bold text-xs outline-none focus:ring-2 ring-violet-500/20 transition-all appearance-none"
+                                                >
+                                                    <option value="not_required">Не обязательно</option>
+                                                    <option value="recommended">Рекомендуется</option>
+                                                    <option value="required">Обязательно</option>
+                                                    <option value="walk_in_only">Только без брони</option>
+                                                </select>
+                                                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+                                            </div>
+                                        </div>
+
+                                        {/* Average Visit Duration */}
+                                        <div>
+                                            <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2">
+                                                Среднее время визита
+                                            </label>
+                                            <div className="relative">
+                                                <select
+                                                    value={formData.avgVisitDuration || '1-2h'}
+                                                    onChange={e => setFormData(prev => ({ ...prev, avgVisitDuration: e.target.value }))}
+                                                    className="w-full px-6 py-4 bg-white dark:bg-slate-800/60 rounded-2xl border border-violet-100 dark:border-violet-500/20 font-bold text-xs outline-none focus:ring-2 ring-violet-500/20 transition-all appearance-none"
+                                                >
+                                                    <option value="30min">30 минут</option>
+                                                    <option value="1h">1 час</option>
+                                                    <option value="1-2h">1–2 часа</option>
+                                                    <option value="2h+">2+ часа</option>
+                                                    <option value="flexible">Гибко</option>
+                                                </select>
+                                                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+                                            </div>
+                                        </div>
+
+                                        {/* Instagram Score */}
+                                        <div>
+                                            <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2">
+                                                Instagram Score: {formData.instagramScore || 3} / 5
+                                            </label>
+                                            <input
+                                                type="range"
+                                                min={1}
+                                                max={5}
+                                                step={1}
+                                                value={formData.instagramScore || 3}
+                                                onChange={e => setFormData(prev => ({ ...prev, instagramScore: Number(e.target.value) }))}
+                                                className="w-full accent-violet-500"
+                                            />
+                                        </div>
+
+                                        {/* Hidden Gem toggle */}
+                                        <div className="flex items-center justify-between">
+                                            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                                                Скрытое место (известно только местным)
+                                            </label>
+                                            <input
+                                                type="checkbox"
+                                                checked={formData.hiddenGem || false}
+                                                onChange={e => setFormData(prev => ({ ...prev, hiddenGem: e.target.checked }))}
+                                                className="w-10 h-5 rounded-full appearance-none bg-slate-200 dark:bg-slate-700 checked:bg-violet-500 relative transition-all cursor-pointer before:content-[''] before:absolute before:left-1 before:top-1 before:w-3 before:h-3 before:bg-white before:rounded-full before:transition-all checked:before:translate-x-5"
+                                            />
+                                        </div>
+
+                                        {/* AI Summary */}
+                                        <div>
+                                            <div className="flex items-center justify-between mb-2">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                                                    AI Summary (для поиска и рекомендаций)
+                                                </label>
+                                                <button
+                                                    type="button"
+                                                    onClick={handleGenerateAISummary}
+                                                    disabled={isAiEnhancing}
+                                                    className="flex items-center gap-1.5 text-violet-500 text-[9px] font-black uppercase tracking-widest hover:bg-violet-50 dark:hover:bg-violet-500/10 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
+                                                    {isAiEnhancing ? (
+                                                        <svg className="animate-spin w-3 h-3 text-violet-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+                                                    ) : (
+                                                        <Sparkles size={12} />
+                                                    )}
+                                                    Сгенерировать
+                                                </button>
+                                            </div>
+                                            <textarea
+                                                value={formData.aiSummary || ''}
+                                                onChange={e => setFormData(prev => ({ ...prev, aiSummary: e.target.value }))}
+                                                placeholder="Богатое описание для AI-поиска: что это за место, для кого идеально, что делает его особенным, лучшее время для посещения..."
+                                                rows={4}
+                                                className="w-full px-6 py-4 bg-white dark:bg-slate-800/60 rounded-2xl border border-violet-100 dark:border-violet-500/20 font-medium text-[12px] leading-relaxed outline-none focus:ring-2 ring-violet-500/20 transition-all resize-y min-h-[100px]"
+                                            />
+                                        </div>
+
+                                        {/* Dish Menu */}
+                                        <div>
+                                            <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-3">
+                                                Меню (для AI-поиска по блюдам)
+                                            </label>
+                                            {(formData.dishMenu || []).map((dish, i) => (
+                                                <div key={i} className="flex gap-2 items-center mb-2">
+                                                    <input
+                                                        value={dish.name}
+                                                        onChange={e => {
+                                                            const updated = [...(formData.dishMenu || [])]
+                                                            updated[i] = { ...updated[i], name: e.target.value }
+                                                            setFormData(prev => ({ ...prev, dishMenu: updated }))
+                                                        }}
+                                                        placeholder="Название блюда"
+                                                        className="flex-1 px-4 py-2.5 bg-white dark:bg-slate-800/60 rounded-xl border border-violet-100 dark:border-violet-500/20 font-bold text-xs outline-none focus:ring-2 ring-violet-500/20 transition-all"
+                                                    />
+                                                    <input
+                                                        value={dish.price || ''}
+                                                        onChange={e => {
+                                                            const updated = [...(formData.dishMenu || [])]
+                                                            updated[i] = { ...updated[i], price: e.target.value }
+                                                            setFormData(prev => ({ ...prev, dishMenu: updated }))
+                                                        }}
+                                                        placeholder="Цена"
+                                                        className="w-24 px-4 py-2.5 bg-white dark:bg-slate-800/60 rounded-xl border border-violet-100 dark:border-violet-500/20 font-bold text-xs outline-none focus:ring-2 ring-violet-500/20 transition-all"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const updated = (formData.dishMenu || []).filter((_, idx) => idx !== i)
+                                                            setFormData(prev => ({ ...prev, dishMenu: updated }))
+                                                        }}
+                                                        className="text-red-400 hover:text-red-600 transition-colors p-1"
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                            <button
+                                                type="button"
+                                                onClick={() => setFormData(prev => ({
+                                                    ...prev,
+                                                    dishMenu: [...(prev.dishMenu || []), { name: '', category: '', price: '', description: '', dietary: [] }]
+                                                }))}
+                                                className="text-[10px] font-bold text-indigo-500 hover:text-indigo-700 flex items-center gap-1 transition-colors mt-1"
+                                            >
+                                                <Plus size={12} /> Добавить блюдо
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
