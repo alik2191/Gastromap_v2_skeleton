@@ -516,7 +516,6 @@ export async function analyzeQueryStream(message, context = {}, onChunk) {
 
     if (getActiveAIConfig().apiKey) {
         try {
-            const model = config.ai.model || 'deepseek/deepseek-chat-v3-0324:free'
             const historyMessages = (context.history ?? [])
                 .slice(-8)
                 .filter(m => m.role === 'user' || m.role === 'assistant')

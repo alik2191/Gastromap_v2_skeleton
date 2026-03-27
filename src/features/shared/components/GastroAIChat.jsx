@@ -23,25 +23,7 @@ const buildWelcomeMessages = (userName) => [
         id: 'welcome-3',
         role: 'assistant',
         content:
-            'Italian and cozy? Great choice! For a date in Krakow, I highly recommend these spots.',
-        matches: [
-            {
-                id: 'loc1',
-                title: 'Ti Amo Bella',
-                category: 'Italian',
-                rating: 4.8,
-                image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=300&q=80',
-                tags: ['Date', 'Pasta'],
-            },
-            {
-                id: 'loc2',
-                title: 'Mamma Mia',
-                category: 'Italian',
-                rating: 4.6,
-                image: 'https://images.unsplash.com/photo-1595854341625-f33ee10dbf94?auto=format&fit=crop&w=300&q=80',
-                tags: ['Family', 'Authentic'],
-            },
-        ],
+            'Italian and cozy? Great choice! Just type your request and I\'ll search our database for the perfect match — from hidden gems to top-rated spots.',
     },
 ]
 
