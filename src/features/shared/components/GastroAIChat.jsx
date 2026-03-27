@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import { ChefHat, MoveUp } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -124,8 +125,8 @@ export function ChatInterface({
                             {attachments.length > 0 && (
                                 <div className="mt-2 space-y-3 w-full max-w-[85%]">
                                     {attachments.map((loc) => (
+                                        <Link key={loc.id} to={`/location/${loc.id}`}>
                                         <motion.div
-                                            key={loc.id}
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             className={`rounded-2xl p-3 flex gap-3 items-center shadow-lg backdrop-blur-sm cursor-pointer group transition-all hover:scale-[1.02] ${
@@ -166,6 +167,7 @@ export function ChatInterface({
                                                 <MoveUp className="h-4 w-4 rotate-45" />
                                             </div>
                                         </motion.div>
+                                        </Link>
                                     ))}
                                 </div>
                             )}

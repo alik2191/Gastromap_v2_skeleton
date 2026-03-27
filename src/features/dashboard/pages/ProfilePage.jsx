@@ -91,10 +91,17 @@ const ProfilePage = () => {
         { label: t('profile.reward'), val: favoritesCount, icon: Coffee, color: 'text-purple-500 bg-purple-500/10' },
     ]
 
-    const contributions = [
-        { id: 1, name: 'The Artisan Bakery', status: 'Approved', points: '+50 XP', date: '2 days ago' },
-        { id: 2, name: 'Mucha Macha', status: 'Pending', points: 'In Review', date: 'Just now' },
-    ]
+    const { locations } = useLocationsStore()
+    const contributions = locations
+        .filter(loc => loc.status === 'Approved' || loc.status === 'Pending')
+        .slice(0, 5)
+        .map(loc => ({
+            id: loc.id,
+            name: loc.title,
+            status: loc.status,
+            points: loc.status === 'Approved' ? '+50 XP' : 'In Review',
+            date: loc.status === 'Pending' ? 'Pending review' : 'Approved',
+        }))
 
     const menuItems = [
         {
