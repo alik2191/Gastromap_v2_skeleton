@@ -199,6 +199,11 @@ export const MOCK_LOCATIONS = [
             'candlelit bar', 'authentic local bar', 'late night krakow', 'cult bar'
         ],
         ai_context: 'The most iconic bar in Kazimierz. Bohemian, dark, full of candles and mismatched furniture. A Krakow institution loved by locals and artists. Live music (jazz, blues, folk) most nights. Secret back room adds mystery. Cash only — very budget friendly.',
+        website: 'https://alchemia.com.pl',
+        bookingUrl: null,
+        socialLinks: { instagram: 'https://instagram.com/alchemia_krakow', facebook: 'https://facebook.com/alchemia.kazimierz', twitter: null },
+        menuUrl: null,
+        menuFormat: 'text',
     },
     {
         id: '6',
@@ -233,6 +238,11 @@ export const MOCK_LOCATIONS = [
             'courtyard cafe', 'instagrammable', 'lazy afternoon', 'local favourite'
         ],
         ai_context: 'Beloved by Krakow locals for its authentic Kazimierz character. Pre-war Jewish district atmosphere with vintage decor. The courtyard garden is magical in summer. Perfect for long lazy afternoons with beer or coffee. Very budget-friendly.',
+        website: 'https://mleczarnia.krakow.pl',
+        bookingUrl: null,
+        socialLinks: { instagram: 'https://instagram.com/cafe_mleczarnia', facebook: 'https://facebook.com/mleczarnia.kazimierz', twitter: null },
+        menuUrl: null,
+        menuFormat: 'text',
     },
     {
         id: '7',
@@ -267,6 +277,11 @@ export const MOCK_LOCATIONS = [
             'rainy day krakow', 'cozy interior', 'remote work', 'intellectual crowd'
         ],
         ai_context: 'The best bookshop-café in Krakow. Thousands of English-language books for sale, comfortable sofas, excellent coffee and cakes. Very quiet and relaxed. Loved by expats, students, and travellers. Perfect for long stays — no one rushes you.',
+        website: 'https://massolit.com',
+        bookingUrl: null,
+        socialLinks: { instagram: 'https://instagram.com/massolitbooks', facebook: 'https://facebook.com/massolitbooks', twitter: null },
+        menuUrl: null,
+        menuFormat: 'text',
     },
     {
         id: '8',
@@ -302,6 +317,11 @@ export const MOCK_LOCATIONS = [
             'budget friendly', 'van gogh theme', 'creative pierogi'
         ],
         ai_context: 'One of the best pierogi spots in Krakow. 30+ varieties from classic to creative. Great for first-timers wanting to try traditional Polish food. Van Gogh themed decor adds charm. Very affordable and filling. Vegetarians and vegans well catered for.',
+        website: 'https://pierogivincentkrakow.pl',
+        bookingUrl: null,
+        socialLinks: { instagram: 'https://instagram.com/pierogi_mrvin', facebook: 'https://facebook.com/pierogiMrVincent', twitter: null },
+        menuUrl: 'https://pierogivincentkrakow.pl/menu',
+        menuFormat: 'text',
     },
     {
         id: '9',
@@ -337,6 +357,11 @@ export const MOCK_LOCATIONS = [
             'must try krakow', 'local street food', 'plac nowy'
         ],
         ai_context: 'Plac Nowy is the heart of Kazimierz nightlife. The zapiekanka (open-faced baguette with mushrooms, cheese, ketchup) is a Krakow institution — must try for any visitor. Flea market on Sunday mornings. Best atmosphere late at night. Very cheap and lively.',
+        website: null,
+        bookingUrl: null,
+        socialLinks: { instagram: 'https://instagram.com/placnowy_krakow', facebook: null, twitter: null },
+        menuUrl: null,
+        menuFormat: 'text',
     },
     {
         id: '10',
@@ -371,6 +396,11 @@ export const MOCK_LOCATIONS = [
             'dog friendly', 'after work drinks', 'architecture lover', 'gallery cafe'
         ],
         ai_context: 'Part of the Bunkier Sztuki (Art Bunker) gallery. Unique modernist glass building right on Planty park. The best spot in Krakow for drinks with a park view. Casual and artsy crowd. Great for summer evenings. Often has vernissages and cultural events.',
+        website: 'https://bunkier.art.pl',
+        bookingUrl: null,
+        socialLinks: { instagram: 'https://instagram.com/bunkiersztuki', facebook: 'https://facebook.com/bunkiersztuki', twitter: null },
+        menuUrl: null,
+        menuFormat: 'text',
     },
 
     // ── WARSAW ──────────────────────────────────────────────────────────────
@@ -409,6 +439,11 @@ export const MOCK_LOCATIONS = [
             'instagrammable interior', 'date ideas warsaw'
         ],
         ai_context: 'The most beautiful food destination in Warsaw. A stunning 1908 Art Nouveau market hall, lovingly restored. 18 food concepts from sushi to craft beer. Great for groups where everyone wants something different. Lively and photogenic. Best experience Thu–Sun evening.',
+        website: 'https://halakoszyki.com',
+        bookingUrl: null,
+        socialLinks: { instagram: 'https://instagram.com/halakoszyki', facebook: 'https://facebook.com/halakoszyki', twitter: null },
+        menuUrl: null,
+        menuFormat: 'text',
     },
     {
         id: '12',
@@ -444,6 +479,11 @@ export const MOCK_LOCATIONS = [
             'time travel poland', 'soviet era canteen'
         ],
         ai_context: 'A surviving communist-era milk bar (bar mleczny) — a uniquely Polish institution. Open since 1957, unchanged. Incredibly cheap, filling, and authentic. Mostly patronised by Warsaw office workers and older locals. A true time-capsule experience. Closed on weekends.',
+        website: null,
+        bookingUrl: null,
+        socialLinks: { instagram: null, facebook: null, twitter: null },
+        menuUrl: null,
+        menuFormat: 'text',
     },
     {
         id: '13',
@@ -479,6 +519,11 @@ export const MOCK_LOCATIONS = [
             'classic warsaw', 'gift shop chocolate'
         ],
         ai_context: 'One of Warsaw\'s most beloved institutions. E. Wedel is Poland\'s most famous chocolate brand since 1851. The cafe is elegant but accessible. The pianka (hot drinking chocolate) is legendary. Great for dates, family treats, and anyone with a sweet tooth. Very photogenic interior.',
+        website: 'https://wedel.pl',
+        bookingUrl: null,
+        socialLinks: { instagram: 'https://instagram.com/ewedelpl', facebook: 'https://facebook.com/ewedel', twitter: null },
+        menuUrl: 'https://wedel.pl/menu',
+        menuFormat: 'text',
     },
     {
         id: '14',
@@ -514,6 +559,11 @@ export const MOCK_LOCATIONS = [
             'beer flight', 'craft ale'
         ],
         ai_context: 'The go-to spot for Polish craft beer in Warsaw. 20+ taps exclusively from Polish microbreweries. Beautiful vaulted brick interior. Near the Old Town and New Town area. Very popular Thu–Sat evenings. Great for beer lovers wanting to explore the booming Polish craft scene.',
+        website: 'https://samekrafty.pl',
+        bookingUrl: null,
+        socialLinks: { instagram: 'https://instagram.com/samekrafty', facebook: 'https://facebook.com/samekrafty', twitter: null },
+        menuUrl: null,
+        menuFormat: 'text',
     },
     {
         id: '15',
@@ -549,6 +599,11 @@ export const MOCK_LOCATIONS = [
             'best local food warsaw', 'comfort food poland', 'popular warsaw restaurant'
         ],
         ai_context: 'A beloved Warsaw institution known for its unique pyzy (Warsaw-style potato dumplings) served in glass jars. Different from Krakow\'s pierogi — thicker, softer. Very high ratings, always busy at lunch. One of the most authentic local food experiences in Warsaw. Affordable and filling.',
+        website: 'https://pyzyflakigorace.pl',
+        bookingUrl: null,
+        socialLinks: { instagram: 'https://instagram.com/pyzyflakigorace', facebook: 'https://facebook.com/pyzyflakigorace', twitter: null },
+        menuUrl: null,
+        menuFormat: 'text',
     },
     {
         id: '16',
@@ -584,6 +639,11 @@ export const MOCK_LOCATIONS = [
             'upscale warsaw', 'contemporary european', 'wine pairing warsaw', 'luxury dining'
         ],
         ai_context: '1 Michelin star. One of the best restaurants in Warsaw. 8-course tasting menu using seasonal Polish ingredients with French technique. Intimate, elegant setting. The chef\'s table experience is exceptional. Reservations essential — book 2-3 weeks ahead. Perfect for the most special occasions.',
+        website: 'https://nolita.pl',
+        bookingUrl: 'https://resy.com/cities/warsaw/nolita-restaurant',
+        socialLinks: { instagram: 'https://instagram.com/nolita_warsaw', facebook: 'https://facebook.com/nolitawarsaw', twitter: null },
+        menuUrl: 'https://nolita.pl/tasting-menu',
+        menuFormat: 'text',
     },
 ]
 
