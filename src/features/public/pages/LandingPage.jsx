@@ -4,6 +4,7 @@ import { Sparkles, Map, List, Globe, ArrowUpRight, Search, Check, ChevronDown, C
 import { Button } from '@/components/ui/button'
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion'
+import { useLocationsStore } from '@/features/public/hooks/useLocationsStore'
 
 
 // --- Animations (Apple-like Springs) ---
@@ -35,6 +36,12 @@ const BentoHero = () => {
     const [reviewIndex, setReviewIndex] = React.useState(0)
     // Smart List Toggle Logic
     const [listMode, setListMode] = React.useState('wishlist')
+
+    // Real location count from store
+    const locationCount = useLocationsStore(s => s.locations.length)
+    const locationStat = locationCount > 0
+        ? (locationCount >= 1000 ? `${(locationCount / 1000).toFixed(0)}k+` : `${locationCount}+`)
+        : '12k+'
 
     const reviews = [
         { name: "Anna K.", loc: "Warsaw", text: "Incredible atmosphere ☕", img: "https://i.pravatar.cc/100?img=5" },
@@ -123,7 +130,7 @@ const BentoHero = () => {
                         >
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <h3 className="text-4xl md:text-5xl font-semibold text-black/90 dark:text-white mb-1 tracking-tight">12k+</h3>
+                                    <h3 className="text-4xl md:text-5xl font-semibold text-black/90 dark:text-white mb-1 tracking-tight">{locationStat}</h3>
                                     <p className="text-sm md:text-base text-black/40 dark:text-white/40 font-medium">Curated Locations</p>
                                 </div>
                                 <div className="w-10 h-10 rounded-full bg-black/5 dark:bg-white/10 flex items-center justify-center">

@@ -7,7 +7,7 @@ import {
     Calendar, Users, Lock, Sparkles, Lightbulb,
     UtensilsCrossed, Camera, User, ChevronRight, CheckCircle2,
     FileText, Image as ImageIcon, Plus, Edit3, Send, Trash2,
-    Instagram, Facebook, Twitter, ExternalLink, Globe
+    Instagram, Facebook, Twitter, ExternalLink, Globe, X
 } from 'lucide-react'
 import { useTheme } from '@/hooks/useTheme'
 import { useLocationsStore } from '@/features/public/hooks/useLocationsStore'
