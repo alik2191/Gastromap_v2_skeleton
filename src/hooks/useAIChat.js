@@ -41,7 +41,7 @@ export function useAIChat() {
     } = useAIChatStore()
 
     const { prefs } = useUserPrefsStore()
-    const { aiApiKey: adminApiKey } = useAppConfigStore()
+    const { aiApiKey: adminApiKey, aiGuideActive } = useAppConfigStore()
 
     // Use admin runtime key (set via AdminAIPage) or fall back to env var.
     // Mirrors the logic in ai.api.js getActiveAIConfig() so streaming path
@@ -50,6 +50,12 @@ export function useAIChat() {
 
     const sendMessage = useCallback(async (text) => {
         if (!text?.trim() || isTyping) return
+
+        if (aiGuideActive === false) {
+            addMessage('user', text.trim())
+            addMessage('assistant', 'GastroGuide is currently offline. The admin has paused the AI assistant.')
+            return
+        }
 
         clearError()
         addMessage('user', text.trim())
@@ -100,7 +106,7 @@ export function useAIChat() {
         } finally {
             setTyping(false)
         }
-    }, [isTyping, prefs, messages, activeApiKey, addMessage, updateLastMessage, setTyping, setError, clearError, trimHistory])
+    }, [isTyping, prefs, messages, activeApiKey, aiGuideActive, addMessage, updateLastMessage, setTyping, setError, clearError, trimHistory])
 
     return {
         messages,

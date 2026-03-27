@@ -72,7 +72,10 @@ const LogoUpload = ({ label, value, onUpload }) => {
                     className="hidden"
                     onChange={(e) => {
                         const file = e.target.files?.[0]
-                        if (file) onUpload(URL.createObjectURL(file))
+                        if (!file) return
+                        const reader = new FileReader()
+                        reader.onload = (ev) => onUpload(ev.target.result)
+                        reader.readAsDataURL(file)
                     }}
                 />
             </div>

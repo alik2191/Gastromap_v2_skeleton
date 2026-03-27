@@ -38,6 +38,7 @@ function getActiveAIConfig() {
         apiKey:        appCfg.aiApiKey        || config.ai.openRouterKey,
         model:         appCfg.aiPrimaryModel  || config.ai.model,
         fallbackModel: appCfg.aiFallbackModel || config.ai.modelFallback,
+        temperature:   appCfg.aiGuideTemp     ?? 0.7,
     }
 }
 
@@ -318,13 +319,14 @@ When recommending places, format your response naturally — mention the name, w
  * @returns {Promise<Response>}
  */
 async function fetchOpenRouter(messages, { stream = false, withTools = true, modelOverride } = {}) {
-    const { apiKey, model: activeModel, fallbackModel } = getActiveAIConfig()
+    const { apiKey, model: activeModel, fallbackModel, temperature } = getActiveAIConfig()
     const model = modelOverride ?? activeModel
 
     const body = {
         model,
         messages,
         max_tokens: config.ai.maxResponseTokens,
+        temperature,
         stream,
     }
     if (withTools) {

@@ -4,11 +4,13 @@ import { motion } from 'framer-motion'
 import { ArrowLeft } from 'lucide-react'
 import { useGastroAI, ChatInterface } from '@/features/shared/components/GastroAIChat'
 import { AnimatedInputBar } from '@/components/layout/AnimatedInputBar'
+import { useAppConfigStore } from '@/store/useAppConfigStore'
 
 const AIGuidePage = () => {
     const { messages, isTyping, sendMessage } = useGastroAI()
     const [input, setInput] = useState('')
     const navigate = useNavigate()
+    const { aiGuideActive } = useAppConfigStore()
 
     const handleSend = (e) => {
         e.preventDefault()
@@ -54,6 +56,13 @@ const AIGuidePage = () => {
                 <ArrowLeft size={16} />
                 Back
             </button>
+
+            {/* Offline banner when admin has paused GastroGuide */}
+            {!aiGuideActive && (
+                <div className="absolute inset-x-0 top-16 z-30 mx-4 p-4 bg-amber-500/20 border border-amber-500/40 rounded-2xl text-amber-700 dark:text-amber-400 text-sm font-bold text-center">
+                    GastroGuide is temporarily offline
+                </div>
+            )}
 
             {/* Chat Interface - Positioned to fill screen under the new Global Header */}
             <div className="absolute inset-0 z-0">

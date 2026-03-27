@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 import { useAuthStore } from '../../auth/hooks/useAuthStore'
 import { useTheme } from '@/hooks/useTheme'
 import { useLocationsStore } from '@/features/public/hooks/useLocationsStore'
+import { useAppConfigStore } from '@/store/useAppConfigStore'
 
 export default function AdminLayout() {
     const location = useLocation()
@@ -20,6 +21,7 @@ export default function AdminLayout() {
     const { theme, toggleTheme } = useTheme()
     const locations = useLocationsStore(s => s.locations)
     const pendingCount = locations.filter(l => l.status === 'Pending' || l.status === 'Draft').length
+    const aiAssistantActive = useAppConfigStore(s => s.aiAssistantActive)
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
     const [isCollapsed, setIsCollapsed] = useState(false)
@@ -105,6 +107,14 @@ export default function AdminLayout() {
                     )
                 })}
             </nav>
+
+            {/* AI Assistant paused badge */}
+            {aiAssistantActive === false && !collapsed && (
+                <div className="mx-4 mb-2 px-4 py-2.5 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 flex items-center gap-2 relative z-10">
+                    <div className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
+                    <span className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">AI Assistant paused</span>
+                </div>
+            )}
 
             {/* Footer Actions */}
             <div className="p-6 bg-slate-50/30 dark:bg-slate-900/30 border-t border-slate-100 dark:border-slate-800/50 space-y-3 relative z-10">
