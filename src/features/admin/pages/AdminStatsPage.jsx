@@ -263,7 +263,10 @@ const AdminStatsPage = () => {
                 <div className="bg-slate-950 dark:bg-black p-6 lg:p-10 rounded-[32px] lg:rounded-[48px] text-white relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-48 lg:w-64 h-48 lg:h-64 bg-indigo-500/10 blur-[60px] lg:blur-[100px] -mr-16 -mt-16" />
 
-                    <h2 className="text-lg lg:text-xl font-bold mb-8 relative z-10 leading-tight pl-1">AI Impact</h2>
+                    <div className="flex items-center gap-3 mb-8 pl-1 relative z-10">
+                        <h2 className="text-lg lg:text-xl font-bold leading-tight">AI Impact</h2>
+                        <span className="text-[8px] font-bold uppercase tracking-widest text-slate-500 border border-slate-700 px-2 py-0.5 rounded-full">Demo</span>
+                    </div>
                     <div className="space-y-4 lg:space-y-6 relative z-10">
                         <div className="p-5 lg:p-6 rounded-[24px] lg:rounded-[32px] bg-white/5 border border-white/5 backdrop-blur-xl group hover:border-white/10 transition-all">
                             <div className="flex items-center gap-4 mb-4">
