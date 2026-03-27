@@ -246,38 +246,59 @@ const LocationDetailsPage = () => {
                 </div>
 
                 {/* Bento Style Gallery Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-12 gap-2 h-[300px] md:h-[600px]">
-                    <div className="col-span-2 md:col-span-6 rounded-[24px] md:rounded-[48px] overflow-hidden group cursor-pointer relative shadow-lg">
-                        <LazyImage
-                            src={location.image}
-                            alt={location.title}
-                            crossOrigin="anonymous"
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
+                {(() => {
+                    const galleryImages = location.images?.length > 0
+                        ? location.images
+                        : location.image
+                            ? [location.image]
+                            : []
 
-                    <div className="col-span-1 md:col-span-3 rounded-[24px] md:rounded-[40px] overflow-hidden group cursor-pointer relative shadow-lg">
-                        <LazyImage src="https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1000&auto=format&fit=crop" crossOrigin="anonymous" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="detail 1" />
-                    </div>
+                    if (galleryImages.length === 0) {
+                        return (
+                            <div className={`flex flex-col items-center justify-center h-[200px] rounded-[32px] border gap-3 ${isDark ? 'border-white/10 text-slate-400' : 'border-gray-200 text-slate-400'}`}>
+                                <Camera size={40} className="opacity-30" />
+                                <p className="text-sm font-bold">No photos yet</p>
+                            </div>
+                        )
+                    }
 
-                    <div className="col-span-1 md:col-span-3 rounded-[24px] md:rounded-[40px] overflow-hidden group cursor-pointer relative shadow-lg">
-                        <LazyImage src="https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=1000&auto=format&fit=crop" crossOrigin="anonymous" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="detail 2" />
-                    </div>
+                    return (
+                        <div className="grid grid-cols-2 md:grid-cols-12 gap-2 h-[300px] md:h-[600px]">
+                            <div className="col-span-2 md:col-span-6 rounded-[24px] md:rounded-[48px] overflow-hidden group cursor-pointer relative shadow-lg">
+                                <LazyImage
+                                    src={galleryImages[0]}
+                                    alt={`${location.title} 1`}
+                                    crossOrigin="anonymous"
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </div>
 
-                    <div className="col-span-1 md:col-span-4 rounded-[24px] md:rounded-[40px] overflow-hidden group cursor-pointer relative shadow-lg">
-                        <LazyImage src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=1000&auto=format&fit=crop" crossOrigin="anonymous" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="detail 3" />
-                    </div>
+                            <div className="col-span-1 md:col-span-3 rounded-[24px] md:rounded-[40px] overflow-hidden group cursor-pointer relative shadow-lg bg-gray-100 dark:bg-white/5">
+                                {galleryImages[1] && <LazyImage src={galleryImages[1]} crossOrigin="anonymous" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={`${location.title} 2`} />}
+                            </div>
 
-                    <div className="col-span-1 md:col-span-8 rounded-[24px] md:rounded-[40px] overflow-hidden relative group cursor-pointer shadow-lg">
-                        <LazyImage src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000&auto=format&fit=crop" crossOrigin="anonymous" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="detail 4" />
-                        <div className="absolute inset-0 bg-blue-600/80 backdrop-blur-md flex flex-col items-center justify-center text-white p-4 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                            <Camera size={24} className="mb-1" />
-                            <span className="text-xl font-black">+24</span>
-                            <span className="text-[9px] font-black uppercase tracking-widest">Explore</span>
+                            <div className="col-span-1 md:col-span-3 rounded-[24px] md:rounded-[40px] overflow-hidden group cursor-pointer relative shadow-lg bg-gray-100 dark:bg-white/5">
+                                {galleryImages[2] && <LazyImage src={galleryImages[2]} crossOrigin="anonymous" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={`${location.title} 3`} />}
+                            </div>
+
+                            <div className="col-span-1 md:col-span-4 rounded-[24px] md:rounded-[40px] overflow-hidden group cursor-pointer relative shadow-lg bg-gray-100 dark:bg-white/5">
+                                {galleryImages[3] && <LazyImage src={galleryImages[3]} crossOrigin="anonymous" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={`${location.title} 4`} />}
+                            </div>
+
+                            <div className="col-span-1 md:col-span-8 rounded-[24px] md:rounded-[40px] overflow-hidden relative group cursor-pointer shadow-lg bg-gray-100 dark:bg-white/5">
+                                {galleryImages[4] && <LazyImage src={galleryImages[4]} crossOrigin="anonymous" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={`${location.title} 5`} />}
+                                {galleryImages.length > 5 && (
+                                    <div className="absolute inset-0 bg-blue-600/80 backdrop-blur-md flex flex-col items-center justify-center text-white p-4 opacity-0 group-hover:opacity-100 transition-all duration-500">
+                                        <Camera size={24} className="mb-1" />
+                                        <span className="text-xl font-black">+{galleryImages.length - 5}</span>
+                                        <span className="text-[9px] font-black uppercase tracking-widest">Explore</span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    )
+                })()}
             </section>
 
             {/* 5. Connect & External Links */}
