@@ -22,6 +22,7 @@ export default function AdminLayout() {
     const locations = useLocationsStore(s => s.locations)
     const pendingCount = locations.filter(l => l.status === 'Pending' || l.status === 'Draft').length
     const aiAssistantActive = useAppConfigStore(s => s.aiAssistantActive)
+    const logoDark = useAppConfigStore(s => s.logoDark)
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
     const [isCollapsed, setIsCollapsed] = useState(false)

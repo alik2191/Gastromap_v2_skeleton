@@ -17,6 +17,7 @@ import LocationHierarchyExplorer from '../components/LocationHierarchyExplorer'
 import ImportWizard from '../components/ImportWizard'
 import MapTab from '@/features/dashboard/components/MapTab'
 import { useLocationsStore } from '@/features/public/hooks/useLocationsStore'
+import { useAppConfigStore } from '@/store/useAppConfigStore'
 
 // Fix for default marker icon issue with Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -54,6 +55,9 @@ const AdminLocationsPage = () => {
     const [formData, setFormData] = useState(null)
     const [openMenuId, setOpenMenuId] = useState(null) // MoreHorizontal dropdown
     const [toast, setToast] = useState(null) // { message, type }
+    const [aiPrompt, setAiPrompt] = useState('')
+    const [isAiFilling, setIsAiFilling] = useState(false)
+    const [isAiEnhancing, setIsAiEnhancing] = useState(false)
     const location = useLocation()
     const navigate = useNavigate()
     const menuRef = useRef(null)
@@ -340,6 +344,122 @@ const AdminLocationsPage = () => {
                 image_url: prev.image_url === prev.images[index] ? (newImages[0] || '') : prev.image_url
             }
         })
+    }
+
+    const handleAIFill = async (prompt) => {
+        if (!prompt.trim()) {
+            setToast({ message: '⚠ Введите название и город', type: 'error' })
+            return
+        }
+        setIsAiFilling(true)
+        try {
+            const appCfg = useAppConfigStore.getState()
+            const apiKey = appCfg.aiApiKey || import.meta.env.VITE_OPENROUTER_API_KEY || ''
+            if (!apiKey) {
+                setToast({ message: '⚠ Укажите API ключ в разделе AI', type: 'error' })
+                setIsAiFilling(false)
+                return
+            }
+            const model = appCfg.aiPrimaryModel || 'meta-llama/llama-3.3-70b-instruct:free'
+            const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'HTTP-Referer': window.location.origin,
+                    'X-Title': 'GastroMap',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    model,
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'You are a gastro data assistant. When given a restaurant name and city, return a JSON object with these exact fields: name (string), category (one of: Cafe, Restaurant, Street Food, Bar, Market, Bakery, Winery, Store, Coffee Shop, Pastry Shop), city (string), country (string), description (string, 2-3 vivid appetizing sentences), price_range (one of: $, $$, $$$, $$$$), must_try (comma-separated string of 2-4 signature dishes), insider_tip (string, one sentence local secret), ai_keywords (comma-separated string of 5-8 mood/vibe tags), website (string URL or empty string). Return ONLY valid JSON, no markdown fences, no explanation.'
+                        },
+                        { role: 'user', content: `Restaurant: ${prompt}` }
+                    ],
+                    max_tokens: 700,
+                    temperature: 0.4,
+                })
+            })
+            if (!res.ok) throw new Error(`OpenRouter error ${res.status}`)
+            const data = await res.json()
+            const raw = data.choices?.[0]?.message?.content ?? ''
+            const jsonStr = raw.replace(/```json?\n?/gi, '').replace(/```/g, '').trim()
+            const parsed = JSON.parse(jsonStr)
+            setFormData(prev => ({
+                ...prev,
+                name: parsed.name || prev.name,
+                category: parsed.category || prev.category,
+                city: parsed.city || prev.city,
+                country: parsed.country || prev.country,
+                description: parsed.description || prev.description,
+                price_range: parsed.price_range || prev.price_range,
+                must_try: parsed.must_try || prev.must_try,
+                insider_tip: parsed.insider_tip || prev.insider_tip,
+                ai_keywords: parsed.ai_keywords || prev.ai_keywords,
+                website: parsed.website || prev.website,
+            }))
+            setAiPrompt('')
+            setToast({ message: '✓ AI заполнил форму', type: 'success' })
+        } catch (err) {
+            console.error('[AI Fill]', err)
+            setToast({ message: '⚠ Ошибка AI. Проверьте API ключ', type: 'error' })
+        } finally {
+            setIsAiFilling(false)
+        }
+    }
+
+    const handleAIEnhanceDescription = async () => {
+        const currentDesc = formData?.description?.trim()
+        if (!currentDesc) {
+            setToast({ message: '⚠ Введите описание для улучшения', type: 'error' })
+            return
+        }
+        setIsAiEnhancing(true)
+        try {
+            const appCfg = useAppConfigStore.getState()
+            const apiKey = appCfg.aiApiKey || import.meta.env.VITE_OPENROUTER_API_KEY || ''
+            if (!apiKey) {
+                setToast({ message: '⚠ Укажите API ключ в разделе AI', type: 'error' })
+                setIsAiEnhancing(false)
+                return
+            }
+            const model = appCfg.aiPrimaryModel || 'meta-llama/llama-3.3-70b-instruct:free'
+            const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'HTTP-Referer': window.location.origin,
+                    'X-Title': 'GastroMap',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    model,
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'You are a gastro copywriter. Enhance the given restaurant description to be vivid, appetizing, and evocative. Keep it exactly 2-3 sentences. Return only the enhanced text with no quotes, no explanation, no prefix.'
+                        },
+                        { role: 'user', content: `Enhance this restaurant description: ${currentDesc}` }
+                    ],
+                    max_tokens: 250,
+                    temperature: 0.7,
+                })
+            })
+            if (!res.ok) throw new Error(`OpenRouter error ${res.status}`)
+            const data = await res.json()
+            const enhanced = data.choices?.[0]?.message?.content?.trim() ?? ''
+            if (enhanced) {
+                setFormData(prev => ({ ...prev, description: enhanced }))
+                setToast({ message: '✓ Описание улучшено', type: 'success' })
+            }
+        } catch (err) {
+            console.error('[AI Enhance]', err)
+            setToast({ message: '⚠ Ошибка AI при улучшении', type: 'error' })
+        } finally {
+            setIsAiEnhancing(false)
+        }
     }
 
     const renderListView = (filtered) => (
@@ -651,10 +771,21 @@ const AdminLocationsPage = () => {
                                                     type="text"
                                                     className="w-full pl-5 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl text-xs font-bold placeholder:text-white/30 outline-none focus:bg-white/10 focus:border-white/20 transition-all"
                                                     placeholder="Название и город..."
+                                                    value={aiPrompt}
+                                                    onChange={e => setAiPrompt(e.target.value)}
+                                                    onKeyDown={e => e.key === 'Enter' && !isAiFilling && handleAIFill(aiPrompt)}
+                                                    disabled={isAiFilling}
                                                 />
                                                 <Wand2 size={12} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within/input:text-white/60 group-focus-within/input:scale-110 transition-all" />
                                             </div>
-                                            <button className="px-6 py-3 bg-white text-indigo-600 rounded-xl font-black text-[9px] uppercase tracking-widest shadow-lg active:scale-[0.96] hover:bg-indigo-50 transition-all shrink-0">
+                                            <button
+                                                className="px-6 py-3 bg-white text-indigo-600 rounded-xl font-black text-[9px] uppercase tracking-widest shadow-lg active:scale-[0.96] hover:bg-indigo-50 transition-all shrink-0 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                                onClick={() => handleAIFill(aiPrompt)}
+                                                disabled={isAiFilling || !aiPrompt.trim()}
+                                            >
+                                                {isAiFilling ? (
+                                                    <svg className="animate-spin w-3 h-3 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+                                                ) : null}
                                                 Заполнить
                                             </button>
                                         </div>
@@ -970,8 +1101,17 @@ const AdminLocationsPage = () => {
                                         <div className="space-y-2.5">
                                             <div className="flex justify-between items-center mb-1">
                                                 <label className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.2em] ml-1">Описание</label>
-                                                <button className="flex items-center gap-1.5 text-indigo-500 text-[9px] font-black uppercase tracking-widest hover:bg-indigo-50 dark:hover:bg-slate-800 px-3 py-1.5 rounded-lg transition-all">
-                                                    <Sparkles size={12} /> AI Улучшить
+                                                <button
+                                                    className="flex items-center gap-1.5 text-indigo-500 text-[9px] font-black uppercase tracking-widest hover:bg-indigo-50 dark:hover:bg-slate-800 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    onClick={handleAIEnhanceDescription}
+                                                    disabled={isAiEnhancing || !formData?.description?.trim()}
+                                                >
+                                                    {isAiEnhancing ? (
+                                                        <svg className="animate-spin w-3 h-3 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+                                                    ) : (
+                                                        <Sparkles size={12} />
+                                                    )}
+                                                    AI Улучшить
                                                 </button>
                                             </div>
                                             <textarea
@@ -1066,6 +1206,20 @@ const AdminLocationsPage = () => {
                                                     onChange={e => setFormData({ ...formData, is_featured: e.target.checked })}
                                                     className="w-10 h-5 rounded-full appearance-none bg-slate-800 dark:bg-slate-200 checked:bg-indigo-500 relative transition-all cursor-pointer before:content-[''] before:absolute before:left-1 before:top-1 before:w-3 before:h-3 before:bg-white dark:before:bg-slate-900 before:rounded-full before:transition-all checked:before:translate-x-5"
                                                 />
+                                            </div>
+                                            {/* Status */}
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[11px] font-bold uppercase tracking-widest text-white/70">Статус</span>
+                                                <select
+                                                    value={formData.status || 'Active'}
+                                                    onChange={e => setFormData(prev => ({ ...prev, status: e.target.value }))}
+                                                    className="bg-white/10 text-white text-[10px] font-bold uppercase rounded-xl px-3 py-1.5 border border-white/10 outline-none focus:ring-2 ring-indigo-500/30 cursor-pointer"
+                                                >
+                                                    <option value="Active">Active</option>
+                                                    <option value="Pending">Pending</option>
+                                                    <option value="Draft">Draft</option>
+                                                    <option value="Revision">Revision</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
