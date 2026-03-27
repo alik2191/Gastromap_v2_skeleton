@@ -5,7 +5,7 @@ import {
     Download, Upload, ChevronRight, Globe, Building2, MapPin,
     CheckCircle, Clock, AlertCircle, Star, ChevronDown, ArrowRight,
     X, LayoutGrid, List as ListIcon, Activity, Zap, Phone, Link as LinkIcon, Tag, Sparkles,
-    Instagram, Facebook, Wand2, Image as ImageIcon, Map, CalendarCheck
+    Instagram, Facebook, Wand2, Image as ImageIcon, Map, CalendarCheck, Brain
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -113,7 +113,18 @@ const AdminLocationsPage = () => {
             ai_keywords: '',
             is_hidden_gem: false,
             is_featured: false,
-            status: 'Active'
+            status: 'Active',
+            occasions: [],
+            mealTimes: [],
+            noiseLevel: 'moderate',
+            ambiance: [],
+            pricePerPerson: '',
+            reservationPolicy: 'not_required',
+            avgVisitDuration: '1-2h',
+            instagramScore: 3,
+            hiddenGem: false,
+            aiSummary: '',
+            dishMenu: [],
         }
         setSelectedLocation(emptyLocation)
         setFormData(emptyLocation)
@@ -178,6 +189,17 @@ const AdminLocationsPage = () => {
             is_hidden_gem: loc.is_hidden_gem || false,
             is_featured: loc.is_featured || false,
             status: loc.status || 'Active',
+            occasions: loc.occasions || [],
+            mealTimes: loc.mealTimes || [],
+            noiseLevel: loc.noiseLevel || 'moderate',
+            ambiance: loc.ambiance || [],
+            pricePerPerson: loc.pricePerPerson || '',
+            reservationPolicy: loc.reservationPolicy || 'not_required',
+            avgVisitDuration: loc.avgVisitDuration || '1-2h',
+            instagramScore: loc.instagramScore || 3,
+            hiddenGem: loc.hiddenGem || false,
+            aiSummary: loc.aiSummary || '',
+            dishMenu: loc.dishMenu || [],
         })
         setIsSlideOverOpen(true)
     }
@@ -246,6 +268,17 @@ const AdminLocationsPage = () => {
             is_featured: formData.is_featured || false,
             status: formData.status || 'Active',
             rating: selectedLocation?.rating || 0,
+            occasions: formData.occasions || [],
+            mealTimes: formData.mealTimes || [],
+            noiseLevel: formData.noiseLevel || 'moderate',
+            ambiance: formData.ambiance || [],
+            pricePerPerson: formData.pricePerPerson || '',
+            reservationPolicy: formData.reservationPolicy || 'not_required',
+            avgVisitDuration: formData.avgVisitDuration || '1-2h',
+            instagramScore: formData.instagramScore || 3,
+            hiddenGem: formData.hiddenGem || false,
+            aiSummary: formData.aiSummary || '',
+            dishMenu: formData.dishMenu || [],
         }
         const isNew = selectedLocation?.id === 'NEW'
         if (isNew) {
