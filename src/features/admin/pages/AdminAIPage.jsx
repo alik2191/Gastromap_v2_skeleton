@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAppConfigStore } from '@/store/useAppConfigStore'
+import { config } from '@/shared/config/env'
 
 // ─── Available OpenRouter free models ────────────────────────────────────────
 
@@ -179,8 +180,8 @@ const AdminAIPage = () => {
         appConfig.aiFallbackModel || 'qwen/qwen3-coder:free'
     )
 
-    // ── API key
-    const [apiKey, setApiKey] = useState(appConfig.aiApiKey || '')
+    // ── API key (pre-load from store, then fall back to env var)
+    const [apiKey, setApiKey] = useState(appConfig.aiApiKey || config.ai.openRouterKey || '')
     const [showKey, setShowKey] = useState(false)
 
     // ── UI state
@@ -215,7 +216,7 @@ const AdminAIPage = () => {
 
     // ── Test model call (simple direct fetch, no tool use, just verify connectivity)
     const handleTest = async () => {
-        const activeKey = apiKey || appConfig.aiApiKey
+        const activeKey = apiKey || appConfig.aiApiKey || config.ai.openRouterKey
         if (!activeKey) {
             setTestResult({ ok: false, text: 'No API key set. Enter your OpenRouter key first.', latency: 0, model: '' })
             return
@@ -230,8 +231,8 @@ const AdminAIPage = () => {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${activeKey}`,
-                    'HTTP-Referer': 'https://gastromap.app',
-                    'X-Title': 'GastroMap Admin Test',
+                    'HTTP-Referer': window.location.origin,
+                    'X-Title': 'GastroMap',
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
@@ -251,22 +252,37 @@ const AdminAIPage = () => {
             })
 
             const latency = Date.now() - t0
+            const body = await res.json().catch(() => null)
 
-            if (!res.ok) {
-                const err = await res.json().catch(() => ({}))
-                setTestResult({
-                    ok: false,
-                    text: err?.error?.message ?? `Error ${res.status}`,
-                    latency,
-                    model,
-                })
+            if (!res.ok || body?.error) {
+                const errMsg = body?.error?.message
+                const errCode = body?.error?.code ?? res.status
+
+                let humanMsg
+                if (errCode === 401 || res.status === 401) {
+                    humanMsg = 'Invalid API key. Check your key at openrouter.ai/keys.'
+                } else if (errCode === 402 || res.status === 402) {
+                    humanMsg = 'No credits. Add credits at openrouter.ai/credits.'
+                } else if (errCode === 429 || res.status === 429) {
+                    humanMsg = 'Rate limit exceeded. Wait a moment and try again.'
+                } else if (errMsg && errMsg.toLowerCase().includes('provider returned error')) {
+                    humanMsg = `The model provider is temporarily unavailable. Try the fallback model instead.`
+                } else {
+                    humanMsg = errMsg ?? `HTTP ${res.status} — unknown error`
+                }
+
+                setTestResult({ ok: false, text: humanMsg, latency, model })
             } else {
-                const data = await res.json()
-                const text = data.choices?.[0]?.message?.content ?? '(empty response)'
+                const text = body?.choices?.[0]?.message?.content ?? '(empty response)'
                 setTestResult({ ok: true, text, latency, model })
             }
         } catch (err) {
-            setTestResult({ ok: false, text: err.message ?? 'Network error', latency: Date.now() - t0, model })
+            const latency = Date.now() - t0
+            const msg = err?.message ?? ''
+            const humanMsg = msg.includes('fetch') || msg.includes('network') || msg.includes('Failed')
+                ? 'Network error — check your internet connection or CORS settings.'
+                : msg || 'Unknown network error'
+            setTestResult({ ok: false, text: humanMsg, latency, model })
         } finally {
             setTesting(false)
         }
@@ -310,9 +326,13 @@ const AdminAIPage = () => {
                     </div>
                     <div>
                         <h2 className="font-bold text-slate-900 dark:text-white text-sm">OpenRouter API Key</h2>
-                        <p className="text-[11px] text-slate-400">Overrides the environment variable at runtime.</p>
+                        <p className="text-[11px] text-slate-400">
+                            {config.ai.openRouterKey && !appConfig.aiApiKey
+                                ? 'Using key from environment variable (.env).'
+                                : 'Overrides the environment variable at runtime.'}
+                        </p>
                     </div>
-                    {apiKey && (
+                    {(apiKey || config.ai.openRouterKey) && (
                         <span className="ml-auto text-[10px] font-bold text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded-full">
                             ● Connected
                         </span>
