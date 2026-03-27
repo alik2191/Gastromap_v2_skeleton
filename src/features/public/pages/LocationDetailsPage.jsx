@@ -273,7 +273,7 @@ const LocationDetailsPage = () => {
 
             {/* 5. Connect & External Links */}
             <section className="pt-8 space-y-6">
-                <div className="flex flex-col md:flex-row gap-6 items-center justify-between p-10 rounded-[48px] border overflow-hidden relative group transition-all duration-700 hover:border-blue-500/30 ${isDark ? 'bg-white/[0.02] border-white/5 shadow-2xl shadow-blue-500/5' : 'bg-gray-50 border-gray-100 shadow-xl shadow-gray-200/50'}">
+                <div className={`flex flex-col md:flex-row gap-6 items-center justify-between p-10 rounded-[48px] border overflow-hidden relative group transition-all duration-700 hover:border-blue-500/30 ${isDark ? 'bg-white/[0.02] border-white/5 shadow-2xl shadow-blue-500/5' : 'bg-gray-50 border-gray-100 shadow-xl shadow-gray-200/50'}`}>
                     <div className="absolute top-0 left-0 w-40 h-40 bg-blue-600/5 rounded-full -ml-20 -mt-20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
 
                     <div className="space-y-4 text-center md:text-left relative z-10">

@@ -71,11 +71,16 @@ export function useAIChat() {
 
         const context = { preferences: prefs, history }
 
+        // Track whether we've already added the streaming placeholder so the
+        // catch block knows whether to update-in-place or add a fresh message.
+        let streamingPlaceholderAdded = false
+
         try {
             // ── Streaming path (OpenRouter API) ──────────────────────────────
             if (activeApiKey) {
                 // Add an empty assistant message that will fill with streamed chunks
                 addMessage('assistant', '…')
+                streamingPlaceholderAdded = true
                 let accumulated = ''
 
                 const result = await analyzeQueryStream(text.trim(), context, (chunk) => {
@@ -102,7 +107,14 @@ export function useAIChat() {
             trimHistory()
         } catch (err) {
             setError(err.message ?? 'GastroGuide не отвечает. Попробуйте ещё раз.')
-            addMessage('assistant', 'Произошла ошибка. Попробуйте ещё раз.', { isError: true })
+            const errorText = 'Произошла ошибка. Попробуйте ещё раз.'
+            // If streaming placeholder ('…') was already added, replace it in-place
+            // instead of appending a second assistant message.
+            if (streamingPlaceholderAdded) {
+                updateLastMessage('assistant', errorText, { isError: true })
+            } else {
+                addMessage('assistant', errorText, { isError: true })
+            }
         } finally {
             setTyping(false)
         }
