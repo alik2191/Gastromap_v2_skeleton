@@ -13,7 +13,7 @@
  *
  * Models used via OpenRouter (both free):
  *   Primary : meta-llama/llama-3.3-70b-instruct:free  (131K ctx, tool use)
- *   Fallback: qwen/qwen3-coder:free                    (262K ctx, 100+ languages)
+ *   Fallback: meta-llama/llama-3.1-8b-instruct:free    (131K ctx, fast & reliable)
  *
  * ⚠️  SECURITY NOTE:
  *   VITE_OPENROUTER_API_KEY is embedded in the client bundle.
@@ -142,6 +142,9 @@ const TOOLS = [
  */
 function executeTool(name, args) {
     const { locations } = useLocationsStore.getState()
+    const dataSources = useAppConfigStore.getState().aiGuideDataSources ?? {
+        locations: true, reviews: true, insiderTips: true, userPreferences: true,
+    }
 
     if (name === 'search_locations') {
         const {
@@ -241,9 +244,14 @@ function executeTool(name, args) {
             michelin_stars: l.michelin_stars ?? 0,
             michelin_bib: l.michelin_bib ?? false,
             description: l.description,
-            // Expert data — included for AI context, NOT shown in raw UI
-            insider_tip: l.insider_tip ?? null,
-            what_to_try: l.what_to_try ?? [],
+            // Expert data — only included when admin enables these data sources
+            ...(dataSources.insiderTips ? {
+                insider_tip: l.insider_tip ?? null,
+                what_to_try: l.what_to_try ?? [],
+            } : {}),
+            ...(dataSources.reviews ? {
+                review_count: l.review_count ?? 0,
+            } : {}),
             ai_context: l.ai_context ?? null,
         }))
     }
@@ -260,7 +268,6 @@ function executeTool(name, args) {
             vibe: loc.vibe,
             price_level: loc.priceLevel,
             rating: loc.rating,
-            review_count: loc.review_count ?? 0,
             address: loc.address,
             opening_hours: loc.openingHours,
             phone: loc.phone ?? null,
@@ -270,8 +277,14 @@ function executeTool(name, args) {
             michelin_stars: loc.michelin_stars ?? 0,
             michelin_bib: loc.michelin_bib ?? false,
             description: loc.description,
-            insider_tip: loc.insider_tip ?? null,
-            what_to_try: loc.what_to_try ?? [],
+            // Respect admin data source toggles
+            ...(dataSources.insiderTips ? {
+                insider_tip: loc.insider_tip ?? null,
+                what_to_try: loc.what_to_try ?? [],
+            } : {}),
+            ...(dataSources.reviews ? {
+                review_count: loc.review_count ?? 0,
+            } : {}),
             ai_context: loc.ai_context ?? null,
         }
     }
@@ -286,19 +299,22 @@ function buildSystemPrompt(userPrefs = {}) {
 
     const appCfg = useAppConfigStore.getState()
 
+    const dataSources = appCfg.aiGuideDataSources ?? { locations: true, reviews: true, insiderTips: true, userPreferences: true }
+
+    // Build user preferences block (only if data source enabled)
+    const prefLines = dataSources.userPreferences ? [
+        favoriteCuisines.length ? `Favourite cuisines: ${favoriteCuisines.join(', ')}` : '',
+        vibePreference.length ? `Preferred vibes: ${vibePreference.join(', ')}` : '',
+        priceRange.length ? `Budget: ${priceRange.join(', ')}` : '',
+        dietaryRestrictions.length ? `Dietary restrictions: ${dietaryRestrictions.join(', ')}` : '',
+    ].filter(Boolean).join('\n') : ''
+
     // If admin set a custom system prompt, use it (with user prefs appended)
     if (appCfg.aiGuideSystemPrompt?.trim()) {
-        const prefLines = [
-            favoriteCuisines.length ? `Favourite cuisines: ${favoriteCuisines.join(', ')}` : '',
-            vibePreference.length ? `Preferred vibes: ${vibePreference.join(', ')}` : '',
-            priceRange.length ? `Budget: ${priceRange.join(', ')}` : '',
-            dietaryRestrictions.length ? `Dietary restrictions: ${dietaryRestrictions.join(', ')}` : '',
-        ].filter(Boolean).join('\n')
-
         return `${appCfg.aiGuideSystemPrompt.trim()}${prefLines ? `\n\nUSER PREFERENCES:\n${prefLines}` : ''}`
     }
 
-    // Default prompt (keep existing logic, but incorporate language/style settings)
+    // Default prompt — incorporate language, style, focus, and data source settings
     const langInstruction = appCfg.aiGuideLanguage === 'auto'
         ? 'Respond in the same language the user writes in (Russian, English, Polish — match their language).'
         : appCfg.aiGuideLanguage === 'ru' ? 'Always respond in Russian.'
@@ -312,12 +328,16 @@ function buildSystemPrompt(userPrefs = {}) {
         ? 'Be extremely concise — max 2 sentences per response.'
         : 'Be warm, friendly, and conversational.'
 
-    const prefLines = [
-        favoriteCuisines.length ? `Favourite cuisines: ${favoriteCuisines.join(', ')}` : '',
-        vibePreference.length ? `Preferred vibes: ${vibePreference.join(', ')}` : '',
-        priceRange.length ? `Budget: ${priceRange.join(', ')}` : '',
-        dietaryRestrictions.length ? `Dietary restrictions: ${dietaryRestrictions.join(', ')}` : '',
-    ].filter(Boolean).join('\n')
+    const focusInstruction = appCfg.aiGuideFocusTopics === 'strict-dining'
+        ? 'STRICT FOCUS: Only discuss restaurants, cafes, food, drinks, and dining. Politely decline all other topics.'
+        : appCfg.aiGuideFocusTopics === 'broad'
+        ? 'You may help with any topic, but prioritize food and dining when relevant.'
+        : 'Focus primarily on food, restaurants, and dining. You may briefly touch on related topics like city neighborhoods and events.'
+
+    const dataSourceNotes = []
+    if (!dataSources.locations) dataSourceNotes.push('Do NOT use the search_locations or get_location_details tools — the location database is currently disabled by the admin.')
+    if (!dataSources.insiderTips) dataSourceNotes.push('Do NOT mention insider tips or must-try dishes — this data source is currently disabled.')
+    if (!dataSources.reviews) dataSourceNotes.push('Do NOT reference review counts or ratings data.')
 
     return `You are GastroGuide — a warm, knowledgeable dining assistant for GastroMap, a gastronomy app focused on discovering the best places to eat and drink.
 
@@ -325,13 +345,14 @@ CORE RULES:
 - NEVER invent or guess restaurant names. ALWAYS use the search_locations tool before recommending any places.
 - When the user asks for recommendations, call search_locations with appropriate filters first.
 - When the user asks about a specific place by name or ID, use get_location_details.
-- Use the insider_tip and what_to_try fields from tool results to make your response feel personal and expert.
+${dataSources.insiderTips ? '- Use the insider_tip and what_to_try fields from tool results to make your response feel personal and expert.' : ''}
 - ${langInstruction}
 - ${styleInstruction}
+- ${focusInstruction}
+${dataSourceNotes.length ? '\nDISABLED DATA SOURCES:\n' + dataSourceNotes.map(n => `- ${n}`).join('\n') : ''}
+${prefLines ? `\nUSER PREFERENCES:\n${prefLines}` : ''}
 
-${prefLines ? `USER PREFERENCES:\n${prefLines}` : ''}
-
-When recommending places, format your response naturally — mention the name, why it fits, and include one insider tip or dish recommendation from the data.`
+When recommending places, format your response naturally — mention the name, why it fits${dataSources.insiderTips ? ', and include one insider tip or dish recommendation from the data' : ''}.`
 }
 
 // ─── OpenRouter fetch helper ──────────────────────────────────────────────
@@ -358,8 +379,14 @@ async function fetchOpenRouter(messages, { stream = false, withTools = true, mod
         stream,
     }
     if (withTools) {
-        body.tools = TOOLS
-        body.tool_choice = 'auto'
+        // Respect admin data source toggle — don't send location tools if DB disabled
+        const dataSources = useAppConfigStore.getState().aiGuideDataSources
+        if (dataSources?.locations === false) {
+            // No tools — AI responds from general knowledge only
+        } else {
+            body.tools = TOOLS
+            body.tool_choice = 'auto'
+        }
     }
 
     const res = await fetch(OPENROUTER_URL, {
