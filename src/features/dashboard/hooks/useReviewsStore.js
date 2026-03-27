@@ -59,11 +59,12 @@ export const useReviewsStore = create(
                 computeAggregate(get().reviewsByLocation[locationId] ?? []),
 
             /** Submit a new review */
-            addReview: (locationId, { authorName, rating, text }) => {
+            addReview: (locationId, { authorName, rating, text, userId }) => {
                 const review = {
                     id: `${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
                     locationId,
                     authorName: authorName || 'Anonymous',
+                    userId: userId || null,
                     rating: Math.min(5, Math.max(1, Math.round(rating))),
                     text: text.trim(),
                     date: new Date().toISOString(),

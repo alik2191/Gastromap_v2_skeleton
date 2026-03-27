@@ -52,6 +52,7 @@ const AIGuidePage = lazy(() => import('@/features/dashboard/pages/AIGuidePage'))
 const SavedPage = lazy(() => import('@/features/dashboard/pages/SavedPage'))
 const VisitedPage = lazy(() => import('@/features/dashboard/pages/VisitedPage'))
 const ExploreWrapper = lazy(() => import('@/features/dashboard/pages/ExploreWrapper'))
+const NotificationsPage = lazy(() => import('@/features/dashboard/pages/NotificationsPage'))
 
 // ─── LAZY: Admin pages ─────────────────────────────────────────────────────
 const AdminLayout = lazy(() => import('@/features/admin/layout/AdminLayout'))
@@ -128,6 +129,7 @@ export const AppRouter = () => {
                         />
                         <Route path="/saved" element={<SavedPage />} />
                         <Route path="/visited" element={<VisitedPage />} />
+                        <Route path="/notifications" element={<NotificationsPage />} />
                         <Route path="/map" element={<Navigate to="/explore" replace />} />
                     </Route>
                 </Route>

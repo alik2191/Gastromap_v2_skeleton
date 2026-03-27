@@ -78,7 +78,11 @@ const ProfilePage = () => {
     const itemHover = isDark ? "hover:bg-white/5" : "hover:bg-gray-50"
 
     const visitedCount = prefs.lastVisited?.length ?? 0
-    const reviewsCount = Object.values(reviewsByLocation).flat().filter(r => r.authorName === user.name).length
+    const reviewsCount = Object.values(reviewsByLocation).flat().filter(r =>
+        r.authorName === user.name ||
+        (user?.id && r.userId === user.id) ||
+        (user?.email && r.userId === user.email)
+    ).length
     const favoritesCount = favoriteIds.length
 
     const points = visitedCount * 50 + favoritesCount * 10 + reviewsCount * 30

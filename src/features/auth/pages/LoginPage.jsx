@@ -182,6 +182,10 @@ const LoginPage = () => {
                         </motion.button>
                     </form>
 
+                    <p className="text-center text-xs text-slate-400 mt-3">
+                        Demo: <span className="font-mono">demo@gastromap.com</span> / <span className="font-mono">demo123</span>
+                    </p>
+
                     <motion.div variants={itemVariants} className="mt-8 text-center space-y-6">
                         <div className="relative">
                             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-100"></div></div>

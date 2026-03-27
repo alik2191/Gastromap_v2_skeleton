@@ -17,6 +17,7 @@ const ADMIN_EMAILS = ['admin@gastromap.com', 'alik2191@gmail.com']
 const MOCK_USERS = [
     { id: 'admin1', name: 'Admin User', email: 'admin@gastromap.com', role: 'admin', avatar: null, createdAt: '2024-01-01T00:00:00Z' },
     { id: 'admin2', name: 'Alik', email: 'alik2191@gmail.com', role: 'admin', avatar: null, createdAt: '2024-01-01T00:00:00Z' },
+    { id: 'demo-user-1', name: 'Demo User', email: 'demo@gastromap.com', password: 'demo123', role: 'user', avatar: null },
 ]
 
 // ─── Supabase helpers ──────────────────────────────────────────────────────

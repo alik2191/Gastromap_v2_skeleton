@@ -407,6 +407,7 @@ const LocationDetailsPage = () => {
         if (!newReview.text.trim()) return
         addReview(location.id, {
             authorName: user?.name || 'Anonymous',
+            userId: user?.id || user?.email || null,
             rating: newReview.rating,
             text: newReview.text,
         })
