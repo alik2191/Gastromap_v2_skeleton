@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { MOCK_LOCATIONS } from '@/mocks/locations'
-import { getLocations } from '@/shared/api/locations.api'
+import { getLocations, createLocation, updateLocation as apiUpdateLocation, deleteLocation as apiDeleteLocation } from '@/shared/api/locations.api'
 
 /**
  * useLocationsStore — client-side filter state for the locations list.
@@ -169,28 +169,53 @@ export const useLocationsStore = create(
             filteredLocations: applyAllFilters(locations, state),
         })),
 
-    addLocation: (location) =>
-        set((state) => {
-            const locations = [
-                ...state.locations,
-                { ...location, id: Math.random().toString(36).slice(2, 11) },
-            ]
-            return { locations, filteredLocations: applyAllFilters(locations, state) }
-        }),
+    addLocation: async (location) => {
+        try {
+            const created = await createLocation(location)
+            set((state) => {
+                const locations = [...state.locations, created]
+                return { locations, filteredLocations: applyAllFilters(locations, state) }
+            })
+            return created
+        } catch (err) {
+            // Fallback: add locally if API fails (offline mode)
+            const loc = { ...location, id: Math.random().toString(36).slice(2, 11) }
+            set((state) => {
+                const locations = [...state.locations, loc]
+                return { locations, filteredLocations: applyAllFilters(locations, state) }
+            })
+            console.warn('[useLocationsStore] addLocation API failed, added locally:', err.message)
+            return loc
+        }
+    },
 
-    updateLocation: (id, updates) =>
+    updateLocation: async (id, updates) => {
+        // Optimistic update first
         set((state) => {
             const locations = state.locations.map(loc =>
                 loc.id === id ? { ...loc, ...updates } : loc
             )
             return { locations, filteredLocations: applyAllFilters(locations, state) }
-        }),
+        })
+        try {
+            await apiUpdateLocation(id, updates)
+        } catch (err) {
+            console.warn('[useLocationsStore] updateLocation API failed, kept local update:', err.message)
+        }
+    },
 
-    deleteLocation: (id) =>
+    deleteLocation: async (id) => {
+        // Optimistic delete
         set((state) => {
             const locations = state.locations.filter(loc => loc.id !== id)
             return { locations, filteredLocations: applyAllFilters(locations, state) }
-        }),
+        })
+        try {
+            await apiDeleteLocation(id)
+        } catch (err) {
+            console.warn('[useLocationsStore] deleteLocation API failed, kept local delete:', err.message)
+        }
+    },
 
     /** Load all locations from Supabase (or mocks) and populate the store. */
     initialize: async () => {

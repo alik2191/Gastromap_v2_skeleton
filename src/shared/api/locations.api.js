@@ -47,6 +47,32 @@ function normalise(row) {
         status: row.status ?? 'active',
         createdAt: row.created_at,
         updatedAt: row.updated_at,
+        // AI Data Layer fields
+        website: row.website ?? null,
+        bookingUrl: row.booking_url ?? null,
+        socialLinks: row.social_links ?? {},
+        menuUrl: row.menu_url ?? null,
+        menuFormat: row.menu_format ?? 'file',
+        phone: row.phone ?? null,
+        // Extended AI fields
+        occasions: row.occasions ?? [],
+        mealTimes: row.meal_times ?? [],
+        neighbourhood: row.neighbourhood ?? null,
+        ambiance: row.ambiance ?? [],
+        noiseLevel: row.noise_level ?? 'moderate',
+        avgVisitDuration: row.avg_visit_duration ?? '1-2h',
+        dressCode: row.dress_code ?? 'casual',
+        reservationPolicy: row.reservation_policy ?? 'not_required',
+        pricePerPerson: row.price_per_person ?? null,
+        parkingOptions: row.parking_options ?? [],
+        accessibility: row.accessibility ?? [],
+        languages: row.languages ?? [],
+        instagramScore: row.instagram_score ?? null,
+        hiddenGem: row.hidden_gem ?? false,
+        authenticityScore: row.authenticity_score ?? null,
+        popularityScore: row.popularity_score ?? null,
+        dishMenu: row.dish_menu ?? [],
+        aiSummary: row.ai_summary ?? null,
     }
 }
 
@@ -242,6 +268,35 @@ function _toRow(d) {
     if (d.ai_keywords !== undefined) row.ai_keywords = d.ai_keywords
     if (d.ai_context !== undefined)  row.ai_context = d.ai_context
     if (d.status !== undefined)      row.status = d.status
+    if (d.website !== undefined)           row.website = d.website
+    if (d.bookingUrl !== undefined)        row.booking_url = d.bookingUrl
+    if (d.socialLinks !== undefined)       row.social_links = d.socialLinks
+    if (d.menuUrl !== undefined)           row.menu_url = d.menuUrl
+    if (d.menuFormat !== undefined)        row.menu_format = d.menuFormat
+    if (d.phone !== undefined)             row.phone = d.phone
+    if (d.occasions !== undefined)         row.occasions = d.occasions
+    if (d.mealTimes !== undefined)         row.meal_times = d.mealTimes
+    if (d.neighbourhood !== undefined)     row.neighbourhood = d.neighbourhood
+    if (d.ambiance !== undefined)          row.ambiance = d.ambiance
+    if (d.noiseLevel !== undefined)        row.noise_level = d.noiseLevel
+    if (d.avgVisitDuration !== undefined)  row.avg_visit_duration = d.avgVisitDuration
+    if (d.dressCode !== undefined)         row.dress_code = d.dressCode
+    if (d.reservationPolicy !== undefined) row.reservation_policy = d.reservationPolicy
+    if (d.pricePerPerson !== undefined)    row.price_per_person = d.pricePerPerson
+    if (d.parkingOptions !== undefined)    row.parking_options = d.parkingOptions
+    if (d.accessibility !== undefined)     row.accessibility = d.accessibility
+    if (d.languages !== undefined)         row.languages = d.languages
+    if (d.instagramScore !== undefined)    row.instagram_score = d.instagramScore
+    if (d.hiddenGem !== undefined)         row.hidden_gem = d.hiddenGem
+    if (d.authenticityScore !== undefined) row.authenticity_score = d.authenticityScore
+    if (d.popularityScore !== undefined)   row.popularity_score = d.popularityScore
+    if (d.dishMenu !== undefined)          row.dish_menu = d.dishMenu
+    if (d.aiSummary !== undefined)         row.ai_summary = d.aiSummary
+    // Also handle admin form field names
+    if (d.price_range !== undefined)       row.price_level = d.price_range
+    if (d.must_try !== undefined)          row.what_to_try = Array.isArray(d.must_try) ? d.must_try : d.must_try?.split(',').map(s => s.trim()).filter(Boolean) ?? []
+    if (d.ai_keywords !== undefined && typeof d.ai_keywords === 'string') row.ai_keywords = d.ai_keywords.split(',').map(s => s.trim()).filter(Boolean)
+    if (d.ai_keywords !== undefined && Array.isArray(d.ai_keywords)) row.ai_keywords = d.ai_keywords
     return row
 }
 
