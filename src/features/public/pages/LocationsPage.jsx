@@ -168,7 +168,16 @@ const DesktopCard = memo(function DesktopCard({ item, isDark, textStyle, subText
                         )}
                     </div>
                     <div className="flex gap-2">
-                        <button onClick={(e) => e.stopPropagation()}
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                const url = `${window.location.origin}/location/${item.id}`
+                                if (navigator.share) {
+                                    navigator.share({ title: item.title, url })
+                                } else {
+                                    navigator.clipboard?.writeText(url)
+                                }
+                            }}
                             className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${isDark ? 'bg-white/5 hover:bg-white/10 text-white/50' : 'bg-gray-50 hover:bg-gray-100 text-gray-400'}`}>
                             <Share2 size={16} />
                         </button>

@@ -192,7 +192,7 @@ const LocationDetailsPage = () => {
                         <h4 className="text-xs font-black uppercase tracking-[0.2em] text-orange-600">Curator's Tip</h4>
                     </div>
                     <p className={`text-sm font-bold italic leading-relaxed ${isDark ? 'text-orange-200/80' : 'text-orange-900/80'}`}>
-                        "To experience the full magic, visit right before sunset. The lighting makes every photo look like a cinematic masterpiece."
+                        "{location.insider_tip || location.insiderTip || 'The perfect experience awaits — ask the staff for their personal recommendations.'}"
                     </p>
                 </div>
                 <div className={`p-5 rounded-[32px] border relative overflow-hidden ${isDark ? 'bg-blue-500/5 border-blue-500/10' : 'bg-blue-50 border-blue-100'}`}>
@@ -201,9 +201,32 @@ const LocationDetailsPage = () => {
                         <Star size={16} className="text-blue-500" />
                         <h4 className="text-xs font-black uppercase tracking-[0.2em] text-blue-600">Must Try</h4>
                     </div>
-                    <p className={`text-sm font-bold leading-relaxed ${isDark ? 'text-blue-200/80' : 'text-blue-900/80'}`}>
-                        Our signature truffle-infused specialty is a non-negotiable choice for first-timers.
-                    </p>
+                    {(() => {
+                        const mustTry = location.what_to_try || location.mustTry
+                        if (!mustTry) {
+                            return (
+                                <p className={`text-sm font-bold leading-relaxed ${isDark ? 'text-blue-200/80' : 'text-blue-900/80'}`}>
+                                    Ask the staff for their current seasonal recommendations.
+                                </p>
+                            )
+                        }
+                        if (Array.isArray(mustTry)) {
+                            return (
+                                <div className="flex flex-wrap gap-2">
+                                    {mustTry.map((dish, i) => (
+                                        <span key={i} className={`px-3 py-1 rounded-xl text-xs font-black border ${isDark ? 'bg-blue-500/10 border-blue-500/20 text-blue-300' : 'bg-blue-100 border-blue-200 text-blue-700'}`}>
+                                            {dish}
+                                        </span>
+                                    ))}
+                                </div>
+                            )
+                        }
+                        return (
+                            <p className={`text-sm font-bold leading-relaxed ${isDark ? 'text-blue-200/80' : 'text-blue-900/80'}`}>
+                                {mustTry}
+                            </p>
+                        )
+                    })()}
                 </div>
             </div>
 
@@ -257,11 +280,18 @@ const LocationDetailsPage = () => {
                         <h3 className={`text-2xl font-black ${textStyle}`}>Find them online</h3>
                         <div className="flex gap-3 justify-center md:justify-start">
                             {[
-                                { icon: Instagram, color: "hover:bg-pink-500 hover:text-white", label: "Instagram" },
-                                { icon: Facebook, color: "hover:bg-blue-600 hover:text-white", label: "Facebook" },
-                                { icon: Twitter, color: "hover:bg-black hover:text-white", label: "Twitter / X" }
+                                { icon: Instagram, color: "hover:bg-pink-500 hover:text-white", label: "Instagram", key: "instagram" },
+                                { icon: Facebook, color: "hover:bg-blue-600 hover:text-white", label: "Facebook", key: "facebook" },
+                                { icon: Twitter, color: "hover:bg-black hover:text-white", label: "Twitter / X", key: "twitter" }
                             ].map((social, i) => (
-                                <button key={i} aria-label={social.label} className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 border ${isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-500'} ${social.color}`}>
+                                <button
+                                    key={i}
+                                    aria-label={social.label}
+                                    onClick={() => {
+                                        const url = location.socialLinks?.[social.key]
+                                        if (url) window.open(url, '_blank', 'noopener,noreferrer')
+                                    }}
+                                    className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 border ${isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-500'} ${social.color}`}>
                                     <social.icon size={22} />
                                 </button>
                             ))}
@@ -269,11 +299,26 @@ const LocationDetailsPage = () => {
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto relative z-10">
-                        <button className={`flex-1 sm:flex-none px-10 py-5 rounded-2xl flex items-center justify-center gap-3 font-black text-sm border transition-all ${isDark ? 'bg-white/5 border-white/10 text-white hover:bg-white/10' : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-50'}`}>
+                        <button
+                            onClick={() => {
+                                if (location.website) {
+                                    window.open(location.website, '_blank', 'noopener,noreferrer')
+                                }
+                            }}
+                            disabled={!location.website}
+                            className={`flex-1 sm:flex-none px-10 py-5 rounded-2xl flex items-center justify-center gap-3 font-black text-sm border transition-all disabled:opacity-40 disabled:cursor-not-allowed ${isDark ? 'bg-white/5 border-white/10 text-white hover:bg-white/10' : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-50'}`}>
                             <Globe size={18} className="text-blue-500" />
                             Visit Website
                         </button>
-                        <button className="flex-1 sm:flex-none px-10 py-5 bg-blue-600 text-white rounded-2xl flex items-center justify-center gap-3 font-black text-sm shadow-xl shadow-blue-600/20 hover:scale-[1.02] active:scale-95 transition-all">
+                        <button
+                            onClick={() => {
+                                const url = location.bookingUrl || location.booking_url
+                                if (url) {
+                                    window.open(url, '_blank', 'noopener,noreferrer')
+                                }
+                            }}
+                            disabled={!(location.bookingUrl || location.booking_url)}
+                            className="flex-1 sm:flex-none px-10 py-5 bg-blue-600 text-white rounded-2xl flex items-center justify-center gap-3 font-black text-sm shadow-xl shadow-blue-600/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             <ExternalLink size={18} />
                             External Booking
                         </button>
@@ -285,7 +330,7 @@ const LocationDetailsPage = () => {
 
     const renderMenu = () => {
         // Mocking an admin choice: "text" vs "file"
-        const menuType = location.id === '1' ? 'text' : 'file';
+        const menuType = location.menuFormat || (location.id === '1' ? 'text' : 'file');
 
         if (menuType === 'file') {
             return (
@@ -298,7 +343,14 @@ const LocationDetailsPage = () => {
                             <h4 className={`text-xl font-black ${textStyle}`}>Digital Menu Available</h4>
                             <p className={`text-sm max-w-xs mx-auto ${subTextStyle}`}>This location has provided their menu in a physical or digital document format.</p>
                         </div>
-                        <button className="px-8 py-4 bg-blue-600 text-white font-black rounded-2xl shadow-xl shadow-blue-600/20 hover:scale-[1.02] active:scale-95 transition-all">
+                        <button
+                            onClick={() => {
+                                if (location.menuUrl || location.menu_url) {
+                                    window.open(location.menuUrl || location.menu_url, '_blank', 'noopener,noreferrer')
+                                }
+                            }}
+                            disabled={!(location.menuUrl || location.menu_url)}
+                            className="px-8 py-4 bg-blue-600 text-white font-black rounded-2xl shadow-xl shadow-blue-600/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             View Full Menu (PDF)
                         </button>
                     </div>
