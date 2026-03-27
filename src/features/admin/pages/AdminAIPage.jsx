@@ -689,6 +689,231 @@ const AdminAIPage = () => {
                 />
             </div>
 
+            {/* ── AI Guide Settings Modal ─────────────────────────────────── */}
+            <AnimatePresence>
+                {showGuideSettings && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                        onClick={(e) => e.target === e.currentTarget && setShowGuideSettings(false)}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                            className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 rounded-[32px] shadow-2xl border border-slate-100 dark:border-slate-800"
+                        >
+                            {/* Modal Header */}
+                            <div className="sticky top-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-t-[32px] flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 z-10">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                                        <MessageSquare size={18} className="text-white" />
+                                    </div>
+                                    <div>
+                                        <h2 className="font-bold text-slate-900 dark:text-white">AI Guide — Настройки</h2>
+                                        <p className="text-xs text-slate-400">Поведение, источники данных, инструкции</p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => setShowGuideSettings(false)}
+                                    className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            <div className="p-6 space-y-6">
+                                {/* System Prompt */}
+                                <div>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <BookOpen size={15} className="text-indigo-500" />
+                                        <h3 className="font-bold text-sm text-slate-900 dark:text-white">Системный промпт</h3>
+                                    </div>
+                                    <p className="text-xs text-slate-400 mb-3">
+                                        Основные инструкции для AI Guide. Оставьте пустым для использования стандартного промпта. Поддерживает Markdown-форматирование.
+                                    </p>
+                                    <textarea
+                                        value={guideSystemPrompt}
+                                        onChange={e => setGuideSystemPrompt(e.target.value)}
+                                        placeholder={`Оставьте пустым для стандартного поведения.\n\nПример:\nВы — GastroGuide, персональный гастрономический ассистент приложения GastroMap. Ваша задача — помогать пользователям находить лучшие рестораны и кафе.\n\nПравила:\n- Всегда используйте инструменты search_locations для поиска мест\n- Отвечайте на языке пользователя\n- Будьте краткими и дружелюбными`}
+                                        rows={8}
+                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm text-slate-700 dark:text-slate-300 placeholder:text-slate-300 dark:placeholder:text-slate-600 outline-none focus:ring-2 ring-indigo-500/30 resize-none font-mono leading-relaxed"
+                                    />
+                                    {guideSystemPrompt && (
+                                        <button
+                                            onClick={() => setGuideSystemPrompt('')}
+                                            className="mt-2 text-[10px] font-bold text-slate-400 hover:text-red-500 transition-colors uppercase tracking-widest"
+                                        >
+                                            Сбросить до стандартного
+                                        </button>
+                                    )}
+                                </div>
+
+                                {/* Language */}
+                                <div>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <Globe2 size={15} className="text-indigo-500" />
+                                        <h3 className="font-bold text-sm text-slate-900 dark:text-white">Язык ответов</h3>
+                                    </div>
+                                    <div className="grid grid-cols-4 gap-2">
+                                        {[
+                                            { value: 'auto', label: 'Авто', desc: 'Как у пользователя' },
+                                            { value: 'ru', label: 'Русский', desc: 'Всегда RU' },
+                                            { value: 'en', label: 'English', desc: 'Всегда EN' },
+                                            { value: 'pl', label: 'Polski', desc: 'Всегда PL' },
+                                        ].map(opt => (
+                                            <button
+                                                key={opt.value}
+                                                onClick={() => setGuideLanguage(opt.value)}
+                                                className={cn(
+                                                    'p-3 rounded-2xl border text-center transition-all',
+                                                    guideLanguage === opt.value
+                                                        ? 'bg-indigo-50 dark:bg-indigo-500/20 border-indigo-300 dark:border-indigo-500/40 text-indigo-700 dark:text-indigo-300'
+                                                        : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600'
+                                                )}
+                                            >
+                                                <p className="font-bold text-xs">{opt.label}</p>
+                                                <p className="text-[9px] mt-0.5 opacity-60">{opt.desc}</p>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Response Style */}
+                                <div>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <MessageCircle size={15} className="text-indigo-500" />
+                                        <h3 className="font-bold text-sm text-slate-900 dark:text-white">Стиль общения</h3>
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {[
+                                            { value: 'friendly', label: 'Дружелюбный', desc: 'Тёплый и разговорный' },
+                                            { value: 'formal', label: 'Формальный', desc: 'Профессиональный тон' },
+                                            { value: 'concise', label: 'Краткий', desc: 'Только суть, 2 предл.' },
+                                        ].map(opt => (
+                                            <button
+                                                key={opt.value}
+                                                onClick={() => setGuideResponseStyle(opt.value)}
+                                                className={cn(
+                                                    'p-3 rounded-2xl border text-center transition-all',
+                                                    guideResponseStyle === opt.value
+                                                        ? 'bg-indigo-50 dark:bg-indigo-500/20 border-indigo-300 dark:border-indigo-500/40 text-indigo-700 dark:text-indigo-300'
+                                                        : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600'
+                                                )}
+                                            >
+                                                <p className="font-bold text-xs">{opt.label}</p>
+                                                <p className="text-[9px] mt-0.5 opacity-60">{opt.desc}</p>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Data Sources */}
+                                <div>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <Database size={15} className="text-indigo-500" />
+                                        <h3 className="font-bold text-sm text-slate-900 dark:text-white">Источники данных</h3>
+                                    </div>
+                                    <p className="text-xs text-slate-400 mb-3">Какие данные AI Guide анализирует при ответах</p>
+                                    <div className="space-y-2">
+                                        {[
+                                            { key: 'locations', label: 'База локаций', desc: 'Все рестораны, кафе и места из базы GastroMap', icon: '📍' },
+                                            { key: 'reviews', label: 'Отзывы пользователей', desc: 'Реальные оценки и комментарии пользователей', icon: '⭐' },
+                                            { key: 'insiderTips', label: 'Insider Tips', desc: 'Экспертные советы и фирменные блюда', icon: '💡' },
+                                            { key: 'userPreferences', label: 'Предпочтения пользователя', desc: 'Персонализация на основе истории и сохранённых мест', icon: '👤' },
+                                        ].map(source => (
+                                            <div
+                                                key={source.key}
+                                                className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-lg">{source.icon}</span>
+                                                    <div>
+                                                        <p className="font-bold text-xs text-slate-900 dark:text-white">{source.label}</p>
+                                                        <p className="text-[10px] text-slate-400 mt-0.5">{source.desc}</p>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => setGuideDataSources(prev => ({ ...prev, [source.key]: !prev[source.key] }))}
+                                                    className={cn(
+                                                        'w-12 h-6 rounded-full transition-all relative flex-shrink-0',
+                                                        guideDataSources[source.key] ? 'bg-indigo-600' : 'bg-slate-200 dark:bg-slate-700'
+                                                    )}
+                                                >
+                                                    <span className={cn(
+                                                        'absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all',
+                                                        guideDataSources[source.key] ? 'left-[26px]' : 'left-0.5'
+                                                    )} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Focus Topics */}
+                                <div>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <Zap size={15} className="text-indigo-500" />
+                                        <h3 className="font-bold text-sm text-slate-900 dark:text-white">Тематический фокус</h3>
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {[
+                                            { value: 'strict-dining', label: 'Только еда', desc: 'Только рестораны и блюда' },
+                                            { value: 'dining', label: 'Гастро-фокус', desc: 'Еда + городские места' },
+                                            { value: 'broad', label: 'Широкий', desc: 'Любые вопросы' },
+                                        ].map(opt => (
+                                            <button
+                                                key={opt.value}
+                                                onClick={() => setGuideFocusTopics(opt.value)}
+                                                className={cn(
+                                                    'p-3 rounded-2xl border text-center transition-all',
+                                                    guideFocusTopics === opt.value
+                                                        ? 'bg-indigo-50 dark:bg-indigo-500/20 border-indigo-300 dark:border-indigo-500/40 text-indigo-700 dark:text-indigo-300'
+                                                        : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600'
+                                                )}
+                                            >
+                                                <p className="font-bold text-xs">{opt.label}</p>
+                                                <p className="text-[9px] mt-0.5 opacity-60">{opt.desc}</p>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Modal Footer */}
+                            <div className="sticky bottom-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-b-[32px] p-6 border-t border-slate-100 dark:border-slate-800 flex gap-3">
+                                <button
+                                    onClick={() => setShowGuideSettings(false)}
+                                    className="flex-1 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                                >
+                                    Отмена
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        appConfig.updateSettings({
+                                            aiGuideSystemPrompt: guideSystemPrompt,
+                                            aiGuideLanguage: guideLanguage,
+                                            aiGuideResponseStyle: guideResponseStyle,
+                                            aiGuideDataSources: guideDataSources,
+                                            aiGuideFocusTopics: guideFocusTopics,
+                                        })
+                                        setShowGuideSettings(false)
+                                        setSaved(true)
+                                        setTimeout(() => setSaved(false), 2500)
+                                    }}
+                                    className="flex-1 py-3.5 rounded-2xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-lg shadow-indigo-500/20"
+                                >
+                                    Сохранить настройки
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* ── SECTION: Model Parameters + Status ───────────────────────── */}
             <div id="model-config" className="grid grid-cols-1 xl:grid-cols-3 gap-5">
                 <div className="xl:col-span-2 bg-white dark:bg-slate-900 rounded-[28px] border border-slate-100 dark:border-slate-800 shadow-sm p-6">
