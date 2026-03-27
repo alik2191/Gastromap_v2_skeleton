@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next'
 
 const ProfileEditPage = () => {
     const { t } = useTranslation()
-    const { user: authUser, updateProfile } = useAuthStore()
+    const { user: authUser, updateUserProfile } = useAuthStore()
     const user = authUser || {
         name: 'Alex Johnson',
         email: 'alex@gastromap.com',
@@ -44,7 +44,7 @@ const ProfileEditPage = () => {
     const inputBg = isDark ? "bg-white/5 border-white/10" : "bg-gray-50 border-gray-200"
 
     const handleSave = () => {
-        updateProfile(formData)
+        updateUserProfile({ name: formData.name, email: formData.email, bio: formData.bio, preferences: formData.preferences })
         navigate('/profile')
     }
 

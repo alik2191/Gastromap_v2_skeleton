@@ -7,6 +7,9 @@ import {
     HelpCircle, Mail, Shield, Globe, UserX, PlusCircle, CheckCircle2, Clock, Sparkles, Users, ShieldCheck
 } from 'lucide-react'
 import { useAuthStore } from '../../auth/hooks/useAuthStore'
+import { useUserPrefsStore } from '@/features/auth/hooks/useUserPrefsStore'
+import { useReviewsStore } from '@/features/dashboard/hooks/useReviewsStore'
+import { useFavoritesStore } from '@/features/dashboard/hooks/useFavoritesStore'
 import { useTheme } from '@/hooks/useTheme'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
@@ -51,6 +54,9 @@ const ProfilePage = () => {
     const { t } = useTranslation()
     const { user: authUser } = useAuthStore()
     const user = authUser || { name: 'Alex Johnson', email: 'alex@gastromap.com' }
+    const { prefs } = useUserPrefsStore()
+    const { reviewsByLocation } = useReviewsStore()
+    const { favoriteIds } = useFavoritesStore()
     const { theme } = useTheme()
     const isDark = theme === 'dark'
     const navigate = useNavigate()
@@ -70,11 +76,15 @@ const ProfilePage = () => {
     const cardBg = isDark ? "bg-[#1f2128]/80 border-white/5" : "bg-white border-gray-100"
     const itemHover = isDark ? "hover:bg-white/5" : "hover:bg-gray-50"
 
+    const visitedCount = prefs.lastVisited?.length ?? 0
+    const reviewsCount = Object.values(reviewsByLocation).flat().filter(r => r.authorName === user.name).length
+    const favoritesCount = favoriteIds.length
+
     const stats = [
         { label: t('profile.level'), val: 'Expert', icon: Star, color: 'text-yellow-500 bg-yellow-500/10' },
-        { label: t('profile.visited'), val: '12', icon: MapPin, color: 'text-blue-500 bg-blue-500/10' },
-        { label: t('profile.reviews'), val: '8', icon: Utensils, color: 'text-green-500 bg-green-500/10' },
-        { label: t('profile.reward'), val: 'Coffee', icon: Coffee, color: 'text-purple-500 bg-purple-500/10' },
+        { label: t('profile.visited'), val: visitedCount, icon: MapPin, color: 'text-blue-500 bg-blue-500/10' },
+        { label: t('profile.reviews'), val: reviewsCount, icon: Utensils, color: 'text-green-500 bg-green-500/10' },
+        { label: t('profile.reward'), val: favoritesCount, icon: Coffee, color: 'text-purple-500 bg-purple-500/10' },
     ]
 
     const contributions = [

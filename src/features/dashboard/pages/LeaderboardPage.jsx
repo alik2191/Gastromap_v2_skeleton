@@ -3,20 +3,43 @@ import { motion } from 'framer-motion'
 import { Trophy, Star, TrendingUp, Medal, Crown } from 'lucide-react'
 import { useTheme } from '@/hooks/useTheme'
 import { PageTransition } from '@/components/ui/PageTransition'
+import { useAuthStore } from '@/features/auth/hooks/useAuthStore'
+import { useUserPrefsStore } from '@/features/auth/hooks/useUserPrefsStore'
+import { useFavoritesStore } from '@/features/dashboard/hooks/useFavoritesStore'
+import { useReviewsStore } from '@/features/dashboard/hooks/useReviewsStore'
 
-const mockLeaderboard = [
+const mockTopUsers = [
     { rank: 1, name: 'Elena R.', points: 1450, level: 'Local Legend', avatar: 'E' },
     { rank: 2, name: 'Alex J.', points: 1200, level: 'Foodie Guide', avatar: 'A' },
     { rank: 3, name: 'Sara K.', points: 950, level: 'Explorer', avatar: 'S' },
     { rank: 4, name: 'Mike T.', points: 820, level: 'Taster', avatar: 'M' },
     { rank: 5, name: 'Jane D.', points: 650, level: 'Novice', avatar: 'J' },
-    // Simulate user somewhere in middle
-    { rank: 24, name: 'You', points: 300, level: 'Beginner', avatar: 'Me', isUser: true }
 ]
+
+function getLevelFromPoints(points) {
+    if (points <= 100) return 'Beginner'
+    if (points <= 300) return 'Taster'
+    if (points <= 600) return 'Explorer'
+    if (points <= 1000) return 'Foodie Guide'
+    return 'Local Legend'
+}
 
 export default function LeaderboardPage() {
     const { theme } = useTheme()
     const isDark = theme === 'dark'
+
+    const { user } = useAuthStore()
+    const { prefs } = useUserPrefsStore()
+    const { favoriteIds } = useFavoritesStore()
+
+    const visitedCount = prefs.lastVisited?.length ?? 0
+    const userPoints = visitedCount * 50 + favoriteIds.length * 10
+    const userLevel = getLevelFromPoints(userPoints)
+    const userName = user?.name || 'You'
+    const userAvatar = userName.charAt(0).toUpperCase()
+
+    const currentUserEntry = { rank: 24, name: userName, points: userPoints, level: userLevel, avatar: userAvatar, isUser: true }
+    const mockLeaderboard = [...mockTopUsers, currentUserEntry]
 
     const textStyle = isDark ? "text-white" : "text-gray-900"
     const subTextStyle = isDark ? "text-gray-400" : "text-gray-500"
