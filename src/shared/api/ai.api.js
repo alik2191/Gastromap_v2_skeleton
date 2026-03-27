@@ -49,7 +49,7 @@ const TOOLS = [
         type: 'function',
         function: {
             name: 'search_locations',
-            description: 'Search gastro locations (restaurants, cafes, bars) by filters. ALWAYS call this tool before making any specific recommendations. Do not recommend places you have not retrieved via this tool.',
+            description: 'Search gastro locations by filters. ALWAYS call this tool before making any specific recommendations. Supports filtering by cuisine, vibe, occasion, meal time, noise level, ambiance, dietary needs, price, dish menu items, and more.',
             parameters: {
                 type: 'object',
                 properties: {
@@ -107,6 +107,42 @@ const TOOLS = [
                         type: 'integer',
                         description: 'Max results to return (default 5)',
                     },
+                    occasions: {
+                        type: 'array',
+                        items: { type: 'string' },
+                        description: 'Occasion types, e.g. ["date", "business", "family", "solo", "celebration", "anniversary", "proposal", "friends", "group"]',
+                    },
+                    meal_times: {
+                        type: 'array',
+                        items: { type: 'string' },
+                        description: 'Meal time, e.g. ["breakfast", "brunch", "lunch", "dinner", "late_night"]',
+                    },
+                    noise_level: {
+                        type: 'string',
+                        enum: ['quiet', 'moderate', 'loud'],
+                        description: 'Noise level: quiet (for business/intimate), moderate, loud (for groups/parties)',
+                    },
+                    ambiance: {
+                        type: 'array',
+                        items: { type: 'string' },
+                        description: 'Ambiance tags, e.g. ["cozy", "romantic", "industrial", "rustic", "modern", "historic", "lively"]',
+                    },
+                    hidden_gems_only: {
+                        type: 'boolean',
+                        description: 'True to return only hidden gem / locals-only places',
+                    },
+                    max_price_per_person: {
+                        type: 'number',
+                        description: 'Maximum price per person budget in local currency',
+                    },
+                    reservation_required: {
+                        type: 'boolean',
+                        description: 'True to filter for walk-in places only (no reservation needed)',
+                    },
+                    dish_keyword: {
+                        type: 'string',
+                        description: 'Search by specific dish or menu item, e.g. "pasta", "sushi", "cheesecake", "craft beer"',
+                    },
                 },
             },
         },
@@ -150,6 +186,10 @@ function executeTool(name, args) {
         const {
             city, cuisine, vibe, price_level, category,
             features, best_for, dietary, min_rating, keyword, michelin, limit = 5
+        } = args
+        const {
+            occasions, meal_times, noise_level, ambiance, hidden_gems_only,
+            max_price_per_person, reservation_required, dish_keyword
         } = args
 
         let results = [...locations]
@@ -215,11 +255,63 @@ function executeTool(name, args) {
             results = results.filter(l =>
                 l.title?.toLowerCase().includes(kw) ||
                 l.description?.toLowerCase().includes(kw) ||
+                l.aiSummary?.toLowerCase().includes(kw) ||
                 l.tags?.some(t => t.toLowerCase().includes(kw)) ||
                 l.ai_keywords?.some(k => k.toLowerCase().includes(kw)) ||
                 l.ai_context?.toLowerCase().includes(kw) ||
                 l.insider_tip?.toLowerCase().includes(kw) ||
-                l.what_to_try?.some(w => w.toLowerCase().includes(kw))
+                l.what_to_try?.some(w => w.toLowerCase().includes(kw)) ||
+                l.occasions?.some(o => o.toLowerCase().includes(kw)) ||
+                l.ambiance?.some(a => a.toLowerCase().includes(kw)) ||
+                l.neighbourhood?.toLowerCase().includes(kw) ||
+                l.dishMenu?.some(d => d.name?.toLowerCase().includes(kw) || d.description?.toLowerCase().includes(kw))
+            )
+        }
+        if (occasions?.length) {
+            results = results.filter(l =>
+                l.occasions?.some(o => occasions.some(req => o.toLowerCase().includes(req.toLowerCase())))
+                || l.best_for?.some(b => occasions.some(req => b.toLowerCase().includes(req.toLowerCase())))
+            )
+        }
+        if (meal_times?.length) {
+            results = results.filter(l =>
+                l.mealTimes?.some(t => meal_times.some(req => t.toLowerCase().includes(req.toLowerCase())))
+            )
+        }
+        if (noise_level) {
+            results = results.filter(l => !l.noiseLevel || l.noiseLevel === noise_level)
+        }
+        if (ambiance?.length) {
+            results = results.filter(l =>
+                l.ambiance?.some(a => ambiance.some(req => a.toLowerCase().includes(req.toLowerCase())))
+            )
+        }
+        if (hidden_gems_only) {
+            results = results.filter(l => l.hiddenGem === true)
+        }
+        if (max_price_per_person) {
+            results = results.filter(l => {
+                if (!l.pricePerPerson) return true
+                const [, max] = (l.pricePerPerson || '').split('-').map(Number)
+                return !max || max <= max_price_per_person
+            })
+        }
+        if (reservation_required === false) {
+            // User wants walk-in places only
+            results = results.filter(l =>
+                !l.reservationPolicy || l.reservationPolicy === 'not_required' || l.reservationPolicy === 'walk_in_only'
+            )
+        }
+        if (dish_keyword) {
+            const dk = dish_keyword.toLowerCase()
+            results = results.filter(l =>
+                l.dishMenu?.some(d =>
+                    d.name?.toLowerCase().includes(dk) ||
+                    d.description?.toLowerCase().includes(dk) ||
+                    d.category?.toLowerCase().includes(dk)
+                ) ||
+                l.what_to_try?.some(w => w.toLowerCase().includes(dk)) ||
+                l.ai_keywords?.some(k => k.toLowerCase().includes(dk))
             )
         }
 
@@ -253,6 +345,20 @@ function executeTool(name, args) {
                 review_count: l.review_count ?? 0,
             } : {}),
             ai_context: l.ai_context ?? null,
+            // New rich fields
+            occasions: l.occasions ?? l.best_for ?? [],
+            meal_times: l.mealTimes ?? [],
+            noise_level: l.noiseLevel ?? null,
+            ambiance: l.ambiance ?? [],
+            neighbourhood: l.neighbourhood ?? null,
+            price_per_person: l.pricePerPerson ?? null,
+            reservation_policy: l.reservationPolicy ?? null,
+            avg_visit_duration: l.avgVisitDuration ?? null,
+            hidden_gem: l.hiddenGem ?? false,
+            instagram_score: l.instagramScore ?? null,
+            authenticity_score: l.authenticityScore ?? null,
+            dish_highlights: l.dishMenu?.slice(0, 3).map(d => d.name) ?? [],  // top 3 dish names
+            ai_summary: dataSources.insiderTips ? (l.aiSummary ?? null) : null,
         }))
     }
 
@@ -286,6 +392,22 @@ function executeTool(name, args) {
                 review_count: loc.review_count ?? 0,
             } : {}),
             ai_context: loc.ai_context ?? null,
+            occasions: loc.occasions ?? loc.best_for ?? [],
+            meal_times: loc.mealTimes ?? [],
+            noise_level: loc.noiseLevel ?? null,
+            ambiance: loc.ambiance ?? [],
+            neighbourhood: loc.neighbourhood ?? null,
+            price_per_person: loc.pricePerPerson ?? null,
+            reservation_policy: loc.reservationPolicy ?? null,
+            dress_code: loc.dressCode ?? null,
+            avg_visit_duration: loc.avgVisitDuration ?? null,
+            hidden_gem: loc.hiddenGem ?? false,
+            instagram_score: loc.instagramScore ?? null,
+            languages: loc.languages ?? [],
+            accessibility: loc.accessibility ?? [],
+            parking: loc.parkingOptions ?? [],
+            dish_menu: dataSources.insiderTips ? (loc.dishMenu ?? []) : [],
+            ai_summary: dataSources.insiderTips ? (loc.aiSummary ?? null) : null,
         }
     }
 
@@ -346,6 +468,14 @@ CORE RULES:
 - When the user asks for recommendations, call search_locations with appropriate filters first.
 - When the user asks about a specific place by name or ID, use get_location_details.
 ${dataSources.insiderTips ? '- Use the insider_tip and what_to_try fields from tool results to make your response feel personal and expert.' : ''}
+- You can filter by occasions (date, business, family, solo, celebration, proposal, anniversary, friends, group)
+- You can filter by meal_times (breakfast, brunch, lunch, dinner, late_night)
+- You can filter by noise_level (quiet, moderate, loud) — use this for business meetings (quiet) or group parties (loud)
+- You can filter by ambiance (cozy, romantic, industrial, rustic, modern, historic)
+- You can use dish_keyword to find places with specific dishes on their menu
+- When user asks about budget, use max_price_per_person parameter
+- hidden_gems_only=true for locals-only recommendations
+- reservation_required=false when user wants walk-in places
 - ${langInstruction}
 - ${styleInstruction}
 - ${focusInstruction}
