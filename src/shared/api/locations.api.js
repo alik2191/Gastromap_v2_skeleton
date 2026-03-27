@@ -86,14 +86,21 @@ function normalise(row) {
 export async function getLocations(filters = {}) {
     if (!USE_SUPABASE) return _mockGetLocations(filters)
 
-    const { category, query, priceLevel, minRating, vibe, city, country, limit = 100, offset = 0 } = filters
+    const {
+        category, query, priceLevel, minRating, vibe, city, country,
+        limit = 100, offset = 0, adminMode = false  // adminMode skips status filter
+    } = filters
 
     let q = supabase
         .from('locations')
         .select('*', { count: 'exact' })
-        .eq('status', 'active')
         .order('rating', { ascending: false })
         .range(offset, offset + (limit - 1))
+
+    // Only filter by status for public-facing queries
+    if (!adminMode) {
+        q = q.eq('status', 'active')
+    }
 
     if (category && category !== 'All') q = q.eq('category', category)
     if (city)    q = q.ilike('city', city)
@@ -119,6 +126,11 @@ export async function getLocations(filters = {}) {
         total: count ?? 0,
         hasMore: offset + limit < (count ?? 0),
     }
+}
+
+/** Fetch ALL locations for admin (all statuses, no RLS status filter) */
+export async function getLocationsAdmin(filters = {}) {
+    return getLocations({ ...filters, adminMode: true, limit: 1000 })
 }
 
 /**

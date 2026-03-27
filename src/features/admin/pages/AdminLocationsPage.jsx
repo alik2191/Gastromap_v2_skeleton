@@ -221,7 +221,7 @@ const AdminLocationsPage = () => {
 
 
     // Save form → store
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!formData?.name?.trim()) return
         const locationData = {
             title: formData.name,
@@ -281,18 +281,22 @@ const AdminLocationsPage = () => {
             dishMenu: formData.dishMenu || [],
         }
         const isNew = selectedLocation?.id === 'NEW'
-        if (isNew) {
-            addLocation(locationData)
-        } else {
-            updateLocation(selectedLocation.id, locationData)
+        try {
+            if (isNew) {
+                await addLocation(locationData)
+            } else {
+                await updateLocation(selectedLocation.id, locationData)
+            }
+            setIsSlideOverOpen(false)
+            setToast({ message: isNew ? '✓ Объект создан' : '✓ Изменения сохранены', type: 'success' })
+        } catch (err) {
+            setToast({ message: '⚠ Ошибка сохранения', type: 'error' })
         }
-        setIsSlideOverOpen(false)
-        setToast({ message: isNew ? '✓ Объект создан' : '✓ Изменения сохранены', type: 'success' })
     }
 
     // Approve from moderation queue → update status in store
-    const handleApprove = (id) => {
-        updateLocation(id, { status: 'Active' })
+    const handleApprove = async (id) => {
+        await updateLocation(id, { status: 'Active' })
         setToast({ message: '✓ Объект одобрен', type: 'success' })
     }
 

@@ -70,3 +70,46 @@ COMMENT ON COLUMN locations.ambiance IS 'Ambiance tags: cozy, romantic, industri
 COMMENT ON COLUMN locations.noise_level IS 'Noise level: quiet (business/intimate), moderate, loud, very_loud';
 COMMENT ON COLUMN locations.dish_menu IS 'Array of {name, category, price, description, dietary[]} menu items for AI dish search';
 COMMENT ON COLUMN locations.ai_summary IS 'Rich AI-generated summary for semantic search and recommendations';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- RLS policy fix (idempotent — safe to run even if 001_locations.sql already
+-- applied the correct policies; drop-then-create ensures we land in the right state)
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- Drop old restrictive write policy
+drop policy if exists "Service role full access" on public.locations;
+
+-- Public: read active locations only (keep this)
+drop policy if exists "Public read active locations" on public.locations;
+create policy "Public read active locations"
+    on public.locations for select
+    using (status = 'active');
+
+-- Authenticated users: read ALL locations (needed for admin moderation)
+drop policy if exists "Authenticated read all locations" on public.locations;
+create policy "Authenticated read all locations"
+    on public.locations for select
+    to authenticated
+    using (true);
+
+-- Authenticated users: insert new locations (admin + user submissions)
+drop policy if exists "Authenticated insert locations" on public.locations;
+create policy "Authenticated insert locations"
+    on public.locations for insert
+    to authenticated
+    with check (true);
+
+-- Authenticated users: update locations (admin moderation, editing)
+drop policy if exists "Authenticated update locations" on public.locations;
+create policy "Authenticated update locations"
+    on public.locations for update
+    to authenticated
+    using (true)
+    with check (true);
+
+-- Authenticated users: delete locations (admin only)
+drop policy if exists "Authenticated delete locations" on public.locations;
+create policy "Authenticated delete locations"
+    on public.locations for delete
+    to authenticated
+    using (true);

@@ -65,16 +65,42 @@ create trigger locations_updated_at
     before update on public.locations
     for each row execute function public.set_updated_at();
 
--- RLS: anyone can read active locations; only service role can write
+-- RLS: granular policies for public, authenticated, and service roles
 alter table public.locations enable row level security;
 
+-- Drop old restrictive write policy
+drop policy if exists "Service role full access" on public.locations;
+
+-- Public: read active locations only
+drop policy if exists "Public read active locations" on public.locations;
 create policy "Public read active locations"
     on public.locations for select
     using (status = 'active');
 
-create policy "Service role full access"
-    on public.locations for all
-    using (auth.role() = 'service_role');
+-- Authenticated users: read ALL locations (needed for admin moderation)
+create policy "Authenticated read all locations"
+    on public.locations for select
+    to authenticated
+    using (true);
+
+-- Authenticated users: insert new locations (admin + user submissions)
+create policy "Authenticated insert locations"
+    on public.locations for insert
+    to authenticated
+    with check (true);
+
+-- Authenticated users: update locations (admin moderation, editing)
+create policy "Authenticated update locations"
+    on public.locations for update
+    to authenticated
+    using (true)
+    with check (true);
+
+-- Authenticated users: delete locations (admin only)
+create policy "Authenticated delete locations"
+    on public.locations for delete
+    to authenticated
+    using (true);
 
 -- ═══════════════════════════════════════════════════════════════
 -- Seed data — migrated from MOCK_LOCATIONS

@@ -11,13 +11,17 @@ import { useAuthStore } from '@/features/auth/hooks/useAuthStore'
 const App = ({ includeRouter = true }) => {
     const initialize = useLocationsStore(s => s.initialize)
     const initAuth = useAuthStore(s => s.initAuth)
+    const { user } = useAuthStore()
 
     useEffect(() => {
         // Restore Supabase session + subscribe to auth changes
         initAuth()
-        // Load locations from Supabase (or mocks)
-        initialize()
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        // Load locations from Supabase (or mocks); use admin mode when user is admin
+        initialize(user?.role === 'admin')
+    }, [user?.role]) // Re-initialize when user logs in as admin
 
     return (
         <AppProviders includeRouter={includeRouter}>
