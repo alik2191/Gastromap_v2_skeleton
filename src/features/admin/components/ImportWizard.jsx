@@ -17,6 +17,7 @@ const ImportWizard = ({ isOpen, onClose, onImportComplete }) => {
     const [isImporting, setIsImporting] = useState(false)
     const [enrichmentEnabled, setEnrichmentEnabled] = useState(true)
     const [importProgress, setImportProgress] = useState(0)
+    const [skippedCount, setSkippedCount] = useState(0)
     const fileInputRef = useRef(null)
     const addLocation = useLocationsStore(state => state.addLocation)
 
@@ -66,9 +67,14 @@ const ImportWizard = ({ isOpen, onClose, onImportComplete }) => {
         setIsImporting(true)
         setImportProgress(0)
 
-        // Process items
-        for (let i = 0; i < previewData.length; i++) {
-            const item = previewData[i]
+        // Validate and filter rows — require name/title and city
+        const validRows = previewData.filter(row => (row.title || row.name) && row.city)
+        const skipped = previewData.length - validRows.length
+        setSkippedCount(skipped)
+
+        // Process valid items
+        for (let i = 0; i < validRows.length; i++) {
+            const item = validRows[i]
             let enrichedItem = { ...item }
 
             if (enrichmentEnabled) {
@@ -86,7 +92,7 @@ const ImportWizard = ({ isOpen, onClose, onImportComplete }) => {
             }
 
             addLocation(enrichedItem)
-            setImportProgress(Math.round(((i + 1) / previewData.length) * 100))
+            setImportProgress(Math.round(((i + 1) / validRows.length) * 100))
         }
 
         setIsImporting(false)
@@ -262,7 +268,13 @@ const ImportWizard = ({ isOpen, onClose, onImportComplete }) => {
                                 </div>
                                 <div className="text-center">
                                     <h3 className="text-2xl font-bold text-slate-900 dark:text-white leading-none">Import Success!</h3>
-                                    <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium">{previewData.length} locations added and verified with GastroAI.</p>
+                                    <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium">{previewData.length - skippedCount} locations added and verified with GastroAI.</p>
+                                    {skippedCount > 0 && (
+                                        <p className="text-xs text-orange-500 dark:text-orange-400 mt-1 font-bold uppercase tracking-wide flex items-center justify-center gap-1">
+                                            <AlertCircle className="w-3.5 h-3.5" />
+                                            {skippedCount} row{skippedCount === 1 ? '' : 's'} skipped — missing name or city
+                                        </p>
+                                    )}
                                 </div>
                                 <Button
                                     onClick={onClose}

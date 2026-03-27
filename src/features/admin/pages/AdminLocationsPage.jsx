@@ -48,6 +48,9 @@ function LocationPicker({ position, onLocationSelect }) {
 const AdminLocationsPage = () => {
     const [view, setView] = useState('list')
     const [searchQuery, setSearchQuery] = useState('')
+    const [filterCategory, setFilterCategory] = useState('All')
+    const [filterStatus, setFilterStatus] = useState('All')
+    const [filterCity, setFilterCity] = useState('All')
     const [selectedLocation, setSelectedLocation] = useState(null)
     const [isSlideOverOpen, setIsSlideOverOpen] = useState(false)
     const [isImportWizardOpen, setIsImportWizardOpen] = useState(false)
@@ -275,17 +278,23 @@ const AdminLocationsPage = () => {
         { label: 'Категории', val: categoryCount > 0 ? categoryCount.toString() : '—', icon: Zap, color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-500/10' },
     ], [locations, pendingCount, categoryCount])
 
-    // Filtered list by search query
+    // Filtered list by search query and dropdowns
     const filteredLocations = useMemo(() => {
-        if (!searchQuery.trim()) return locations
-        const q = searchQuery.toLowerCase()
-        return locations.filter(l =>
-            (l.title || l.name || '').toLowerCase().includes(q) ||
-            l.category?.toLowerCase().includes(q) ||
-            l.city?.toLowerCase().includes(q) ||
-            l.cuisine?.toLowerCase().includes(q)
-        )
-    }, [locations, searchQuery])
+        let result = locations
+        if (searchQuery.trim()) {
+            const q = searchQuery.toLowerCase()
+            result = result.filter(l =>
+                (l.title || l.name || '').toLowerCase().includes(q) ||
+                l.category?.toLowerCase().includes(q) ||
+                l.city?.toLowerCase().includes(q) ||
+                l.cuisine?.toLowerCase().includes(q)
+            )
+        }
+        return result
+            .filter(loc => filterCategory === 'All' || loc.category === filterCategory)
+            .filter(loc => filterStatus === 'All' || loc.status === filterStatus)
+            .filter(loc => filterCity === 'All' || loc.city === filterCity)
+    }, [locations, searchQuery, filterCategory, filterStatus, filterCity])
 
     const categories = [
         'Cafe', 'Restaurant', 'Street Food', 'Bar', 'Market',
@@ -665,6 +674,48 @@ const AdminLocationsPage = () => {
                                 className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950/30 border-none rounded-2xl text-[13px] font-medium outline-none focus:ring-2 ring-indigo-500/10 transition-all font-black leading-none"
                             />
                         </div>
+                    </div>
+
+                    {/* Filter dropdowns */}
+                    <div className="flex gap-2 flex-wrap px-4 lg:px-10 pb-4">
+                        <select
+                            value={filterCategory}
+                            onChange={e => setFilterCategory(e.target.value)}
+                            className="text-[10px] font-bold uppercase tracking-wide bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-3 py-2 outline-none focus:ring-2 ring-indigo-500/20 text-slate-600 dark:text-slate-300"
+                        >
+                            <option value="All">Все категории</option>
+                            {[...new Set(locations.map(l => l.category).filter(Boolean))].map(cat => (
+                                <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                        </select>
+                        <select
+                            value={filterStatus}
+                            onChange={e => setFilterStatus(e.target.value)}
+                            className="text-[10px] font-bold uppercase tracking-wide bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-3 py-2 outline-none focus:ring-2 ring-indigo-500/20 text-slate-600 dark:text-slate-300"
+                        >
+                            <option value="All">Все статусы</option>
+                            <option value="Active">Active</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Draft">Draft</option>
+                        </select>
+                        <select
+                            value={filterCity}
+                            onChange={e => setFilterCity(e.target.value)}
+                            className="text-[10px] font-bold uppercase tracking-wide bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-3 py-2 outline-none focus:ring-2 ring-indigo-500/20 text-slate-600 dark:text-slate-300"
+                        >
+                            <option value="All">Все города</option>
+                            {[...new Set(locations.map(l => l.city).filter(Boolean))].sort().map(city => (
+                                <option key={city} value={city}>{city}</option>
+                            ))}
+                        </select>
+                        {(filterCategory !== 'All' || filterStatus !== 'All' || filterCity !== 'All') && (
+                            <button
+                                onClick={() => { setFilterCategory('All'); setFilterStatus('All'); setFilterCity('All') }}
+                                className="text-[9px] font-bold uppercase tracking-widest text-indigo-500 hover:text-indigo-700 transition-colors px-2 py-1"
+                            >
+                                Сбросить
+                            </button>
+                        )}
                     </div>
                 </div>
 

@@ -194,6 +194,27 @@ const AdminDashboardPage = () => {
                             </button>
                         </div>
                     </div>
+
+                    {/* Moderation quick link — only shown when pending items exist */}
+                    {locations.filter(l => l.status === 'Pending').length > 0 && (
+                        <button
+                            onClick={() => navigate('/admin/moderation')}
+                            className="w-full flex items-center justify-between p-4 bg-orange-50 dark:bg-orange-500/10 border border-orange-100 dark:border-orange-500/20 rounded-[24px] hover:bg-orange-100 dark:hover:bg-orange-500/20 transition-all group"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 bg-orange-500 rounded-xl flex items-center justify-center">
+                                    <Clock size={16} className="text-white" />
+                                </div>
+                                <div className="text-left">
+                                    <p className="text-[11px] font-bold text-orange-700 dark:text-orange-400 uppercase tracking-widest">Ожидают модерации</p>
+                                    <p className="text-lg font-bold text-orange-900 dark:text-orange-300 leading-none">
+                                        {locations.filter(l => l.status === 'Pending').length} объект{locations.filter(l => l.status === 'Pending').length === 1 ? '' : 'ов'}
+                                    </p>
+                                </div>
+                            </div>
+                            <ArrowRight size={18} className="text-orange-400 group-hover:translate-x-1 transition-transform" />
+                        </button>
+                    )}
                 </div>
 
                 {/* Right area */}
