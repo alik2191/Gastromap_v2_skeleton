@@ -4,7 +4,8 @@ import {
     Bot, MessageSquare, Zap, Shield, Settings,
     Save, Play, Pause, RefreshCw, Sliders, Brain,
     CheckCircle2, ChevronDown, ChevronUp, Send,
-    Loader2, AlertCircle, Eye, EyeOff, Star, Globe, Cpu
+    Loader2, AlertCircle, Eye, EyeOff, Star, Globe, Cpu,
+    X, Database, MessageCircle, Globe2, BookOpen
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAppConfigStore } from '@/store/useAppConfigStore'
@@ -246,6 +247,19 @@ const AdminAIPage = () => {
     const [showPrimaryPicker, setShowPrimaryPicker] = useState(false)
     const [showFallbackPicker, setShowFallbackPicker] = useState(false)
 
+    // ── AI Guide settings modal
+    const [showGuideSettings, setShowGuideSettings] = useState(false)
+    const [guideSystemPrompt, setGuideSystemPrompt] = useState(appConfig.aiGuideSystemPrompt || '')
+    const [guideLanguage, setGuideLanguage] = useState(appConfig.aiGuideLanguage || 'auto')
+    const [guideResponseStyle, setGuideResponseStyle] = useState(appConfig.aiGuideResponseStyle || 'friendly')
+    const [guideDataSources, setGuideDataSources] = useState(appConfig.aiGuideDataSources || {
+        locations: true,
+        reviews: true,
+        insiderTips: true,
+        userPreferences: true,
+    })
+    const [guideFocusTopics, setGuideFocusTopics] = useState(appConfig.aiGuideFocusTopics || 'dining')
+
     // ── Test panel
     const [testMessage, setTestMessage] = useState('')
     const [testModel, setTestModel] = useState('primary')
@@ -299,6 +313,11 @@ const AdminAIPage = () => {
             aiPrimaryModel: primaryModel,
             aiFallbackModel: fallbackModel,
             aiApiKey: apiKey,
+            aiGuideSystemPrompt: guideSystemPrompt,
+            aiGuideLanguage: guideLanguage,
+            aiGuideResponseStyle: guideResponseStyle,
+            aiGuideDataSources: guideDataSources,
+            aiGuideFocusTopics: guideFocusTopics,
         })
         setSaved(true)
         setTimeout(() => setSaved(false), 2500)
@@ -653,7 +672,7 @@ const AdminAIPage = () => {
                     role="User Support"
                     isActive={agentActive.guide}
                     onToggle={() => toggleAgent('guide')}
-                    onSettings={() => document.getElementById('model-config')?.scrollIntoView({ behavior: 'smooth' })}
+                    onSettings={() => setShowGuideSettings(true)}
                     icon={MessageSquare}
                     color="text-indigo-500"
                     description="Answers user questions, matches locations based on preferences, and helps plan dining routes."

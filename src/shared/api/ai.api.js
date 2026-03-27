@@ -284,6 +284,34 @@ function executeTool(name, args) {
 function buildSystemPrompt(userPrefs = {}) {
     const { favoriteCuisines = [], vibePreference = [], priceRange = [], dietaryRestrictions = [] } = userPrefs
 
+    const appCfg = useAppConfigStore.getState()
+
+    // If admin set a custom system prompt, use it (with user prefs appended)
+    if (appCfg.aiGuideSystemPrompt?.trim()) {
+        const prefLines = [
+            favoriteCuisines.length ? `Favourite cuisines: ${favoriteCuisines.join(', ')}` : '',
+            vibePreference.length ? `Preferred vibes: ${vibePreference.join(', ')}` : '',
+            priceRange.length ? `Budget: ${priceRange.join(', ')}` : '',
+            dietaryRestrictions.length ? `Dietary restrictions: ${dietaryRestrictions.join(', ')}` : '',
+        ].filter(Boolean).join('\n')
+
+        return `${appCfg.aiGuideSystemPrompt.trim()}${prefLines ? `\n\nUSER PREFERENCES:\n${prefLines}` : ''}`
+    }
+
+    // Default prompt (keep existing logic, but incorporate language/style settings)
+    const langInstruction = appCfg.aiGuideLanguage === 'auto'
+        ? 'Respond in the same language the user writes in (Russian, English, Polish — match their language).'
+        : appCfg.aiGuideLanguage === 'ru' ? 'Always respond in Russian.'
+        : appCfg.aiGuideLanguage === 'en' ? 'Always respond in English.'
+        : appCfg.aiGuideLanguage === 'pl' ? 'Always respond in Polish.'
+        : 'Respond in the same language the user writes in.'
+
+    const styleInstruction = appCfg.aiGuideResponseStyle === 'formal'
+        ? 'Be professional and formal in tone.'
+        : appCfg.aiGuideResponseStyle === 'concise'
+        ? 'Be extremely concise — max 2 sentences per response.'
+        : 'Be warm, friendly, and conversational.'
+
     const prefLines = [
         favoriteCuisines.length ? `Favourite cuisines: ${favoriteCuisines.join(', ')}` : '',
         vibePreference.length ? `Preferred vibes: ${vibePreference.join(', ')}` : '',
@@ -298,8 +326,8 @@ CORE RULES:
 - When the user asks for recommendations, call search_locations with appropriate filters first.
 - When the user asks about a specific place by name or ID, use get_location_details.
 - Use the insider_tip and what_to_try fields from tool results to make your response feel personal and expert.
-- Respond in the same language the user writes in (Russian, English, Polish — match their language).
-- Be concise and friendly. Max 3–4 sentences for general responses, slightly longer when detailing recommendations.
+- ${langInstruction}
+- ${styleInstruction}
 
 ${prefLines ? `USER PREFERENCES:\n${prefLines}` : ''}
 

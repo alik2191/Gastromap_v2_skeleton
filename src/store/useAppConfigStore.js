@@ -20,6 +20,18 @@ export const useAppConfigStore = create(
             aiGuideTemp: 0.7,
             aiAssistantTemp: 0.4,
 
+            // AI Guide behavior config
+            aiGuideSystemPrompt: '',        // custom instructions (empty = use default)
+            aiGuideLanguage: 'auto',        // 'auto' | 'ru' | 'en' | 'pl'
+            aiGuideResponseStyle: 'friendly', // 'friendly' | 'formal' | 'concise'
+            aiGuideDataSources: {           // which data sources the guide can use
+                locations: true,
+                reviews: true,
+                insiderTips: true,
+                userPreferences: true,
+            },
+            aiGuideFocusTopics: 'dining',   // 'dining' | 'broad' | 'strict-dining'
+
             updateSettings: (settings) => set((state) => ({ ...state, ...settings })),
             setAppStatus: (status) => set({ appStatus: status }),
         }),
