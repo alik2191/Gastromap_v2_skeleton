@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { MOCK_LOCATIONS } from '@/mocks/locations'
 import { getLocations } from '@/shared/api/locations.api'
 
@@ -96,7 +97,9 @@ function applyAllFilters(locations, filters) {
     return result
 }
 
-export const useLocationsStore = create((set, get) => ({
+export const useLocationsStore = create(
+    persist(
+        (set, get) => ({
     locations: MOCK_LOCATIONS,
     filteredLocations: MOCK_LOCATIONS,
     isLoading: false,
@@ -208,4 +211,7 @@ export const useLocationsStore = create((set, get) => ({
             set({ isLoading: false })
         }
     },
-}))
+        }),
+        { name: 'locations-storage' }
+    )
+)

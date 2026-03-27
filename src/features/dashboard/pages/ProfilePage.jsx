@@ -80,8 +80,11 @@ const ProfilePage = () => {
     const reviewsCount = Object.values(reviewsByLocation).flat().filter(r => r.authorName === user.name).length
     const favoritesCount = favoriteIds.length
 
+    const points = visitedCount * 50 + favoritesCount * 10 + reviewsCount * 30
+    const level = points > 1000 ? 'Local Legend' : points > 600 ? 'Foodie Guide' : points > 300 ? 'Explorer' : points > 100 ? 'Taster' : 'Beginner'
+
     const stats = [
-        { label: t('profile.level'), val: 'Expert', icon: Star, color: 'text-yellow-500 bg-yellow-500/10' },
+        { label: t('profile.level'), val: level, icon: Star, color: 'text-yellow-500 bg-yellow-500/10' },
         { label: t('profile.visited'), val: visitedCount, icon: MapPin, color: 'text-blue-500 bg-blue-500/10' },
         { label: t('profile.reviews'), val: reviewsCount, icon: Utensils, color: 'text-green-500 bg-green-500/10' },
         { label: t('profile.reward'), val: favoritesCount, icon: Coffee, color: 'text-purple-500 bg-purple-500/10' },

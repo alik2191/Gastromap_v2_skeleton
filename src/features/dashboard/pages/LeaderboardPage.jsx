@@ -31,11 +31,13 @@ export default function LeaderboardPage() {
     const { user } = useAuthStore()
     const { prefs } = useUserPrefsStore()
     const { favoriteIds } = useFavoritesStore()
+    const { reviewsByLocation } = useReviewsStore()
 
     const visitedCount = prefs.lastVisited?.length ?? 0
-    const userPoints = visitedCount * 50 + favoriteIds.length * 10
-    const userLevel = getLevelFromPoints(userPoints)
     const userName = user?.name || 'You'
+    const reviewsCount = Object.values(reviewsByLocation).flat().filter(r => r.authorName === userName).length
+    const userPoints = visitedCount * 50 + favoriteIds.length * 10 + reviewsCount * 30
+    const userLevel = getLevelFromPoints(userPoints)
     const userAvatar = userName.charAt(0).toUpperCase()
 
     const currentUserEntry = { rank: 24, name: userName, points: userPoints, level: userLevel, avatar: userAvatar, isUser: true }
