@@ -654,7 +654,7 @@ const AdminLocationsPage = () => {
                                                 <Edit size={13} /> Редактировать
                                             </button>
                                             <button
-                                                onClick={() => { setOpenMenuId(null); deleteLocation(loc.id); setToast({ message: '✓ Объект удалён', type: 'success' }) }}
+                                                onClick={async () => { setOpenMenuId(null); await deleteLocation(loc.id); setToast({ message: '✓ Объект удалён', type: 'success' }) }}
                                                 className="flex items-center gap-2.5 w-full px-4 py-3 text-[11px] font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors uppercase tracking-widest border-t border-slate-50 dark:border-slate-700"
                                             >
                                                 <Trash2 size={13} /> Удалить
@@ -851,7 +851,7 @@ const AdminLocationsPage = () => {
                                                         Одобрить
                                                     </button>
                                                     <button
-                                                        onClick={() => { deleteLocation(loc.id); setToast({ message: '✓ Объект отклонён', type: 'success' }) }}
+                                                        onClick={async () => { await deleteLocation(loc.id); setToast({ message: '✓ Объект отклонён', type: 'success' }) }}
                                                         className="flex-1 sm:px-8 py-3.5 bg-white dark:bg-slate-800 text-red-500 rounded-[20px] font-bold text-[10px] uppercase tracking-widest border border-slate-100 dark:border-slate-700 transition-all active:scale-95"
                                                     >
                                                         Отклонить
