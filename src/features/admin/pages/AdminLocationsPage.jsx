@@ -112,6 +112,28 @@ const AdminLocationsPage = () => {
         setIsSlideOverOpen(true)
     }
 
+    const handleExport = () => {
+        const rows = [
+            ['Название', 'Город', 'Страна', 'Категория', 'Рейтинг', 'Цена'],
+            ...locations.map(l => [
+                l.title || l.name || '',
+                l.city || '',
+                l.country || '',
+                l.category || '',
+                l.rating ?? '',
+                l.priceLevel || l.price_range || '',
+            ])
+        ]
+        const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `gastromap-locations-${new Date().toISOString().slice(0,10)}.csv`
+        a.click()
+        URL.revokeObjectURL(url)
+    }
+
     // Map store location fields → form fields
     const handleEdit = (loc) => {
         setSelectedLocation(loc)
@@ -157,6 +179,9 @@ const AdminLocationsPage = () => {
             navigate(location.pathname, { replace: true })
         } else if (params.get('import') === 'true') {
             setIsImportWizardOpen(true)
+            navigate(location.pathname, { replace: true })
+        } else if (params.get('export') === 'true') {
+            handleExport()
             navigate(location.pathname, { replace: true })
         }
     }, [location.search])
@@ -420,6 +445,13 @@ const AdminLocationsPage = () => {
                     <p className="text-slate-500 dark:text-slate-400 font-medium mt-1.5 text-xs lg:text-base">База объектов и инструменты модерации.</p>
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto p-1 bg-slate-100/50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/20 dark:border-slate-800/50">
+                    <button
+                        onClick={handleExport}
+                        className="flex-1 sm:px-6 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-sm active:scale-95 transition-all flex items-center gap-1.5 justify-center"
+                    >
+                        <Download size={12} />
+                        Экспорт
+                    </button>
                     <button
                         onClick={() => setIsImportWizardOpen(true)}
                         className="flex-1 sm:px-6 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-sm active:scale-95 transition-all"
